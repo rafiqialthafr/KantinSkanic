@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\MenuController as AdminMenuController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\StandController as AdminStandController;
+use App\Http\Controllers\Admin\SystemController as AdminSystemController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KatalogController;
@@ -52,6 +56,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/stands/create', [AdminStandController::class, 'create'])->name('stands.create');
     Route::post('/stands', [AdminStandController::class, 'store'])->name('stands.store');
     Route::post('/stands/{stand}/toggle', [AdminStandController::class, 'toggleActive'])->name('stands.toggle');
+
+    // Riwayat Transaksi (All Orders)
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+
+    // Menu Management Overview
+    Route::get('/menus', [AdminMenuController::class, 'index'])->name('menus.index');
+
+    // Laporan & Omset
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+
+    // Informasi Sistem & Operasional
+    Route::get('/system', [AdminSystemController::class, 'index'])->name('system.index');
 
     // Reset vendor password
     Route::get('/vendors/{user}/reset-password', [AdminStandController::class, 'showResetPassword'])->name('vendors.resetPassword');

@@ -255,7 +255,8 @@ class KantinOrderTest extends TestCase
 
         $response = $this->get(route('admin.dashboard'));
         $response->assertStatus(200);
-        $response->assertSee('Panel Kontrol Utama');
+        $response->assertSee('Dashboard');
+        $response->assertSee('Selamat Datang!');
         $response->assertSee('Total Stand Kantin');
 
         // Admin stores a new stand + vendor atomically

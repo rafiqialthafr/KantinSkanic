@@ -46,8 +46,7 @@ class AuthController extends Controller
 
             // Role-based redirect — respect intended() for siswa guest cart flow
             if ($user->isAdmin()) {
-                return redirect()->route('admin.dashboard')
-                    ->with('success', 'Selamat datang, Admin!');
+                return redirect()->route('admin.dashboard');
             }
 
             if ($user->isPenjual()) {

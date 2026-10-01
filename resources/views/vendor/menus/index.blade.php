@@ -47,16 +47,6 @@
 @section('content')
 <div class="p-4 sm:p-6 space-y-6">
 
-    @if(session('success'))
-    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-            </svg>
-            <span>{{ session('success') }}</span>
-        </div>
-    </div>
-    @endif
 
     <!-- Header with Add Button -->
     <div class="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

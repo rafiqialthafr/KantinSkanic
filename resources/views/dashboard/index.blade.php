@@ -1,9 +1,9 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Dashboard - ' . $stand->nama_stand)
 @section('sidebar-role', 'Stand Penjual')
 @section('page-title', $stand->nama_stand)
-@section('page-subtitle', 'Pantau pesanan & kelola stand kamu hari ini')
+@section('page-subtitle', \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('dddd') . ', ' . \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('d F Y'))
 
 @section('sidebar-nav')
 <a href="{{ route('dashboard') }}" class="sidebar-link {{ request()->routeIs('dashboard') && !request()->routeIs('menus.*') ? 'active' : '' }}">
@@ -29,10 +29,6 @@
     @endif
 </a>
 
-<a href="{{ route('dashboard', ['status' => 'diproses']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'diproses' ? 'active' : '' }}">
-    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" /></svg>
-    Diproses
-</a>
 
 <a href="{{ route('dashboard', ['status' => 'siap_diambil']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'siap_diambil' ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
@@ -107,7 +103,7 @@
             </div>
             {{-- Filter Tabs --}}
             <div class="flex items-center gap-1.5 flex-wrap">
-                @foreach(['all' => 'Semua', 'pending' => 'Menunggu', 'diproses' => 'Diproses', 'siap_diambil' => 'Siap Ambil', 'selesai' => 'Selesai'] as $val => $label)
+                @foreach(['all' => 'Semua', 'pending' => 'Menunggu', 'siap_diambil' => 'Siap Ambil', 'selesai' => 'Selesai'] as $val => $label)
                 <a href="{{ route('dashboard', ['status' => $val]) }}"
                     class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors whitespace-nowrap
                     {{ ($activeStatus ?? 'all') === $val
@@ -142,7 +138,6 @@
                             <span class="text-sm font-black text-slate-900">#{{ $order->kode_tr }}</span>
                             <span class="px-2.5 py-0.5 text-[10px] font-extrabold rounded-full uppercase tracking-wide
                                 @if($order->status === 'pending') bg-orange-100 text-orange-700 border border-orange-200
-                                @elseif($order->status === 'diproses') bg-amber-100 text-amber-800 border border-amber-200
                                 @elseif($order->status === 'siap_diambil') bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse
                                 @elseif($order->status === 'selesai') bg-slate-100 text-slate-600
                                 @else bg-rose-100 text-rose-700 @endif">
@@ -181,12 +176,6 @@
                         </div>
                         <div class="flex items-center gap-1.5">
                             @if($order->status === 'pending')
-                            <form action="{{ route('orders.updateStatus', $order->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="status" value="diproses">
-                                <button type="submit" class="px-3.5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-xs shadow-orange-300 transition-all">Proses</button>
-                            </form>
-                            @elseif($order->status === 'diproses')
                             <form action="{{ route('orders.updateStatus', $order->id) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="status" value="siap_diambil">

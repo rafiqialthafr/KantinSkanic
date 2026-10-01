@@ -3,7 +3,7 @@
 @section('title', 'Dashboard - ' . $stand->nama_stand)
 @section('sidebar-role', 'Stand Penjual')
 @section('page-title', $stand->nama_stand)
-@section('page-subtitle', 'Pantau pesanan masuk & kelola operasional stand kamu hari ini')
+@section('page-subtitle', \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('dddd') . ', ' . \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('d F Y'))
 
 @section('sidebar-nav')
 <a href="{{ route('vendor.dashboard') }}" class="sidebar-link {{ request()->routeIs('vendor.dashboard') && !request()->has('status') ? 'active' : '' }}">
@@ -29,10 +29,6 @@
     @endif
 </a>
 
-<a href="{{ route('vendor.dashboard', ['status' => 'diproses']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'diproses' ? 'active' : '' }}">
-    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
-    Diproses
-</a>
 
 <a href="{{ route('vendor.dashboard', ['status' => 'siap_diambil']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'siap_diambil' ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
@@ -57,27 +53,6 @@
 @section('content')
 <div class="p-4 sm:p-6 space-y-6">
 
-    @if(session('success'))
-    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-            </svg>
-            <span>{{ session('success') }}</span>
-        </div>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-semibold flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-            </svg>
-            <span>{{ session('error') }}</span>
-        </div>
-    </div>
-    @endif
 
     {{-- STAT CARDS --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -169,10 +144,6 @@
                class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ ($activeStatus ?? '') === 'pending' ? 'bg-orange-500 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                 Menunggu
             </a>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'diproses'])) }}"
-               class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ ($activeStatus ?? '') === 'diproses' ? 'bg-amber-500 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
-                Diproses
-            </a>
             <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'siap_diambil'])) }}"
                class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ ($activeStatus ?? '') === 'siap_diambil' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                 Siap Diambil
@@ -206,7 +177,6 @@
                     </span>
                     <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
                         @if($order->status === 'pending') bg-orange-100 text-orange-700
-                        @elseif($order->status === 'diproses') bg-amber-100 text-amber-800
                         @elseif($order->status === 'siap_diambil') bg-emerald-100 text-emerald-800
                         @elseif($order->status === 'selesai') bg-slate-100 text-slate-600
                         @else bg-rose-100 text-rose-700 @endif">
@@ -246,14 +216,6 @@
                 <!-- Sequential Status Progression -->
                 <div class="flex items-center gap-2">
                     @if($order->status === 'pending')
-                    <form action="{{ route('vendor.orders.updateStatus', $order) }}" method="POST" class="inline">
-                        @csrf
-                        <input type="hidden" name="status" value="diproses">
-                        <button type="submit" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs transition-all shadow-xs cursor-pointer">
-                            Mulai Proses Pesanan &rarr;
-                        </button>
-                    </form>
-                    @elseif($order->status === 'diproses')
                     <form action="{{ route('vendor.orders.updateStatus', $order) }}" method="POST" class="inline">
                         @csrf
                         <input type="hidden" name="status" value="siap_diambil">

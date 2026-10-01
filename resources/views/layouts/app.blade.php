@@ -204,42 +204,15 @@
         </div>
     </header>
 
-    <!-- Global Flash Messages (Only rendered if there are alerts) -->
-    @if(session('success') || session('error') || $errors->any())
+    <!-- Global Flash Messages (session error only; validation errors are shown inside each form) -->
+    @if(session('error'))
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full">
-        @if(session('success'))
-        <div class="mb-4 rounded-2xl bg-emerald-50 p-4 border border-emerald-200 flex items-start gap-3 shadow-xs">
-            <svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-            <div class="text-sm font-semibold text-emerald-800">{{ session('success') }}</div>
-        </div>
-        @endif
-
-        @if(session('error'))
         <div class="mb-4 rounded-2xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3 shadow-xs">
             <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
             </svg>
             <div class="text-sm font-semibold text-rose-800">{{ session('error') }}</div>
         </div>
-        @endif
-
-        @if ($errors->any())
-        <div class="mb-4 rounded-2xl bg-rose-50 p-4 border border-rose-200 shadow-xs">
-            <div class="flex items-center gap-2 text-sm font-bold text-rose-800 mb-1">
-                <svg class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                </svg>
-                <span>Terjadi kesalahan input:</span>
-            </div>
-            <ul class="list-disc list-inside text-xs text-rose-700 space-y-1 font-medium">
-                @foreach ($errors->all() as $err)
-                <li>{{ $err }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
     </div>
     @endif
 

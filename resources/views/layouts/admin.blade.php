@@ -41,8 +41,12 @@
         </div>
 
         <!-- Nav Links -->
-        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            @yield('sidebar-nav')
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-hidden">
+            @hasSection('sidebar-nav')
+                @yield('sidebar-nav')
+            @elseif(Auth::check() && Auth::user()->isAdmin())
+                @include('admin.partials.sidebar_nav')
+            @endif
         </nav>
 
         <!-- User Info at Bottom -->
@@ -85,28 +89,21 @@
                 <div>
                     <h1 class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-snug">@yield('page-title', 'Dashboard')</h1>
                     @hasSection('page-subtitle')
-                    <p class="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">@yield('page-subtitle')</p>
+                    <p class="text-xs sm:text-sm text-slate-400 font-medium mt-0.5">@yield('page-subtitle')</p>
                     @endif
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 sm:gap-3">
-                <!-- Quick link to katalog -->
-                <a href="{{ route('katalog.index') }}" target="_blank"
-                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-orange-600 hover:bg-orange-50 border border-slate-200 hover:border-orange-200 transition-all">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                    </svg>
-                    Katalog Siswa
-                </a>
+            <div class="flex items-center gap-3">
                 @auth
-                <div class="flex items-center gap-3 pl-2 sm:pl-3 border-l border-slate-200">
-                    <!-- Text (Nama User & Role) to the left of the logo -->
-                    <div class="hidden sm:flex flex-col text-right">
-                        <span class="text-xs sm:text-sm font-extrabold text-slate-800 leading-tight">{{ Auth::user()->name }}</span>
-                        <span class="text-[10px] font-bold text-orange-600 leading-tight mt-0.5">
+                <div class="flex items-center gap-3">
+                    <div class="flex flex-col text-right">
+                        <span class="text-xs sm:text-sm font-extrabold text-slate-800 leading-tight">
+                            {{ Auth::user()->isAdmin() ? 'Administrator' : Auth::user()->name }}
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-medium text-slate-400 leading-tight mt-0.5">
                             @if(Auth::user()->isAdmin())
-                                Super Administrator
+                                Super Admin
                             @elseif(Auth::user()->isPenjual())
                                 Vendor Stand
                             @else
@@ -114,9 +111,8 @@
                             @endif
                         </span>
                     </div>
-                    <!-- Logo at the very far right -->
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 p-0.5 shadow-md shadow-orange-500/20 shrink-0 flex items-center justify-center overflow-hidden">
-                        <img src="{{ asset('img/kanic-logo.png') }}?v=2" alt="Logo KantinSkanic" class="w-full h-full object-cover rounded-[10px]">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-black text-sm sm:text-base shrink-0 shadow-xs">
+                        {{ strtoupper(substr(Auth::user()->isAdmin() ? 'Administrator' : Auth::user()->name, 0, 1)) }}
                     </div>
                 </div>
                 @endauth
@@ -124,9 +120,12 @@
         </header>
 
         <!-- Flash Messages -->
-        @if(session('success') || session('error') || $errors->any())
-        <div class="px-4 sm:px-6 pt-4">
-            @if(session('success'))
+        @php
+            $hasValidSuccess = session('success') && !str_contains(strtolower(session('success')), 'selamat datang');
+        @endphp
+        @if($hasValidSuccess || session('error') || $errors->any())
+        <div id="flash-alerts" class="px-4 sm:px-6 pt-4 transition-all duration-500">
+            @if($hasValidSuccess)
             <div class="mb-3 rounded-xl bg-emerald-50 p-3.5 border border-emerald-200 flex items-center gap-3 shadow-xs">
                 <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -150,6 +149,16 @@
             </div>
             @endif
         </div>
+        <script>
+            setTimeout(function () {
+                var el = document.getElementById('flash-alerts');
+                if (el) {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(-6px)';
+                    setTimeout(function () { el.style.display = 'none'; }, 500);
+                }
+            }, 3000);
+        </script>
         @endif
 
         <!-- Main Content -->

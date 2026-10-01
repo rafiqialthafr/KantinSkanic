@@ -2,43 +2,25 @@
 
 @section('title', 'Admin Dashboard - Kantin Skanic')
 @section('sidebar-role', 'Super Administrator')
-@section('page-title', 'Panel Kontrol Utama')
-@section('page-subtitle', 'Monitoring seluruh stand, transaksi, dan kredensial vendor kantin')
+@section('page-title', 'Dashboard')
+@section('page-subtitle', \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('dddd') . ', ' . \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('d F Y'))
 
 @section('sidebar-nav')
-<a href="{{ route('admin.dashboard') }}" class="sidebar-link active">
-    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>
-    Dashboard
-</a>
-
-<div class="pt-3 pb-1 px-2">
-    <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Manajemen</span>
-</div>
-
-<a href="{{ route('admin.stands.create') }}" class="sidebar-link">
-    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-    Tambah Stand Baru
-</a>
-
-<a href="{{ route('katalog.index') }}" target="_blank" class="sidebar-link">
-    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-    Katalog Siswa
-</a>
+    @include('admin.partials.sidebar_nav')
 @endsection
 
 @section('content')
 <div class="p-4 sm:p-6 space-y-6">
 
-    @if(session('success'))
-    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-            </svg>
-            <span>{{ session('success') }}</span>
-        </div>
+    {{-- WELCOME HEADER (SESUAI GAMBAR) --}}
+    <div class="space-y-1">
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            Selamat Datang! <span class="inline-block">👋</span>
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 font-medium">Kondisi Terkini Kantin SMKN 1 Ciomas
+            
+        </p>
     </div>
-    @endif
 
     {{-- 1. STAT CARDS --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -92,7 +74,7 @@
     </div>
 
     {{-- 2. STANDS MANAGEMENT TABLE --}}
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+    <div id="daftar-stand" class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden scroll-mt-6">
         <div class="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h2 class="text-base font-extrabold text-slate-900">Manajemen Stand & Kredensial Vendor</h2>
@@ -115,7 +97,6 @@
                         <th class="py-3 px-4">Pemilik & Kontak</th>
                         <th class="py-3 px-4">Akun Login Vendor</th>
                         <th class="py-3 px-4">Statistik</th>
-                        <th class="py-3 px-4">Status</th>
                         <th class="py-3 px-5 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -129,7 +110,10 @@
                                     {{ strtoupper(substr($st->nama_stand, 0, 1)) }}
                                 </div>
                                 <div>
-                                    <span class="font-extrabold text-slate-900 text-sm block">{{ $st->nama_stand }}</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-extrabold text-slate-900 text-sm block">{{ $st->nama_stand }}</span>
+                                        <span class="w-2 h-2 rounded-full {{ $st->is_active ? 'bg-emerald-500' : 'bg-slate-300' }}" title="{{ $st->is_active ? 'Stand Aktif' : 'Stand Nonaktif' }}"></span>
+                                    </div>
                                     <span class="text-[10px] font-bold bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-md inline-block mt-0.5">{{ $st->nomor_stand }}</span>
                                 </div>
                             </div>
@@ -158,16 +142,6 @@
                                 <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-bold text-[10px]">{{ $st->orders_count }} Pesanan</span>
                             </div>
                         </td>
-                        <td class="py-4 px-4">
-                            <form action="{{ route('admin.stands.toggle', $st) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase transition-all cursor-pointer {{ $st->is_active ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-slate-200 text-slate-600 hover:bg-slate-300' }}"
-                                        title="Klik untuk toggle status aktif">
-                                    <span class="w-1.5 h-1.5 rounded-full {{ $st->is_active ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
-                                    <span>{{ $st->is_active ? 'Aktif' : 'Nonaktif' }}</span>
-                                </button>
-                            </form>
-                        </td>
                         <td class="py-4 px-5 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 @if($vendorUser)
@@ -177,6 +151,13 @@
                                     Reset Password
                                 </a>
                                 @endif
+                                <form action="{{ route('admin.stands.toggle', $st) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer {{ $st->is_active ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200' : 'border-slate-200 bg-slate-100 text-slate-500 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200' }}"
+                                            title="Klik untuk ubah status aktif/nonaktif">
+                                        {{ $st->is_active ? 'Aktif' : 'Nonaktif' }}
+                                    </button>
+                                </form>
                                 <a href="{{ route('katalog.index', ['stand' => $st->id]) }}" target="_blank"
                                    class="p-1.5 rounded-lg text-slate-400 hover:text-orange-600 hover:bg-slate-100 transition-colors"
                                    title="Lihat katalog stand">
@@ -189,7 +170,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-10 text-slate-400">Belum ada stand yang terdaftar.</td>
+                        <td colspan="5" class="text-center py-10 text-slate-400">Belum ada stand yang terdaftar.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -204,6 +185,12 @@
                 <h2 class="text-base font-extrabold text-slate-900">20 Transaksi Terbaru (Seluruh Stand)</h2>
                 <p class="text-xs text-slate-500 mt-0.5">Aktivitas pesanan pre-order masuk di seluruh kantin sekolah</p>
             </div>
+            <a href="{{ route('admin.orders.index') }}" class="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1 transition-colors">
+                <span>Lihat Semua Riwayat</span>
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+            </a>
         </div>
 
         <div class="overflow-x-auto">
