@@ -14,7 +14,30 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
+        $periode = $request->query('periode', 'hari_ini');
+        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
+            $periode = 'hari_ini';
+        }
+
+        $periodeLabel = match ($periode) {
+            'hari_ini' => 'Hari Ini',
+            'minggu_ini' => 'Minggu Ini',
+            'bulan_ini' => 'Bulan Ini',
+            'semua' => 'Keseluruhan',
+        };
+
+        $periodFilter = function ($q) use ($periode) {
+            match ($periode) {
+                'hari_ini' => $q->whereDate('created_at', today()),
+                'minggu_ini' => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'bulan_ini' => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+                'semua' => null,
+                default => $q->whereDate('created_at', today()),
+            };
+        };
+
         $query = Order::with(['stand', 'items.menu'])->latest();
+        $periodFilter($query);
 
         if ($request->filled('stand_id')) {
             $query->where('stand_id', $request->integer('stand_id'));
@@ -40,10 +63,14 @@ class OrderController extends Controller
         $orders = $query->paginate(15)->withQueryString();
 
         $stands = Stand::orderBy('nomor_stand')->get();
-        $totalOrdersCount = Order::count();
-        $pendingOrdersCount = Order::where('status', 'pending')->count();
-        $selesaiOrdersCount = Order::where('status', 'selesai')->count();
-        $totalRevenue = Order::where('status', 'selesai')->sum('total_harga');
+
+        $baseOrderQuery = Order::query();
+        $periodFilter($baseOrderQuery);
+
+        $totalOrdersCount = (clone $baseOrderQuery)->count();
+        $pendingOrdersCount = (clone $baseOrderQuery)->where('status', 'pending')->count();
+        $selesaiOrdersCount = (clone $baseOrderQuery)->where('status', 'selesai')->count();
+        $totalRevenue = (clone $baseOrderQuery)->where('status', 'selesai')->sum('total_harga');
 
         return view('admin.orders.index', compact(
             'orders',
@@ -51,7 +78,9 @@ class OrderController extends Controller
             'totalOrdersCount',
             'pendingOrdersCount',
             'selesaiOrdersCount',
-            'totalRevenue'
+            'totalRevenue',
+            'periode',
+            'periodeLabel'
         ));
     }
 }

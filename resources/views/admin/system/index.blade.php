@@ -3,7 +3,7 @@
 @section('title', 'Status & Info Sistem - Super Admin')
 @section('sidebar-role', 'Super Administrator')
 @section('page-title', 'Status & Info Sistem')
-@section('page-subtitle', 'Informasi lingkungan server, konfigurasi jam pre-order, dan statistik aplikasi')
+@section('page-subtitle', \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('dddd') . ', ' . \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('d F Y'))
 
 @section('sidebar-nav')
     @include('admin.partials.sidebar_nav')

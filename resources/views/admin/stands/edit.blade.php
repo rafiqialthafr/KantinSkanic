@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Stand Baru - Admin Kantin')
+@section('title', 'Edit Stand - Admin Kantin')
 @section('sidebar-role', 'Super Administrator')
-@section('page-title', 'Tambah Stand Baru')
-@section('page-subtitle', 'Buat stand kantin baru beserta akun login untuk penjual vendor')
+@section('page-title', 'Edit Stand')
+@section('page-subtitle', 'Perbarui data stand kantin')
 
 @section('sidebar-nav')
     @include('admin.partials.sidebar_nav')
@@ -23,8 +23,8 @@
 
     <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 sm:p-8">
         <div class="border-b border-slate-100 pb-4 mb-6">
-            <h1 class="text-xl font-black text-slate-900">Form Pendaftaran Stand & Akun Vendor</h1>
-            <p class="text-xs text-slate-500 mt-1">Sistem akan secara atomik (DB Transaction) membuat profil stand sekaligus akun user dengan role penjual.</p>
+            <h1 class="text-xl font-black text-slate-900">Edit Data Stand</h1>
+            <p class="text-xs text-slate-500 mt-1">Perbarui informasi stand. Untuk mengubah email/password vendor, gunakan fitur Reset Password.</p>
         </div>
 
         @if($errors->any())
@@ -38,62 +38,68 @@
         </div>
         @endif
 
-        <form action="{{ route('admin.stands.store') }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.stands.update', $stand) }}" method="POST" class="space-y-6">
             @csrf
+            @method('PUT')
 
-            <!-- Section 1: Data Stand -->
             <div>
                 <h3 class="text-xs font-extrabold uppercase tracking-wider text-orange-600 mb-3">1. Data Fisik Stand</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="nama_stand" class="block text-xs font-bold text-slate-700 mb-1">Nama Stand *</label>
-                        <input type="text" id="nama_stand" name="nama_stand" value="{{ old('nama_stand') }}" required placeholder="Contoh: Kantin Bu Siti"
+                        <input type="text" id="nama_stand" name="nama_stand" value="{{ old('nama_stand', $stand->nama_stand) }}" required
                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
                     </div>
                     <div>
                         <label for="nomor_stand" class="block text-xs font-bold text-slate-700 mb-1">Nomor / Kode Stand *</label>
-                        <input type="text" id="nomor_stand" name="nomor_stand" value="{{ old('nomor_stand') }}" required placeholder="Contoh: Stand 06"
+                        <input type="text" id="nomor_stand" name="nomor_stand" value="{{ old('nomor_stand', $stand->nomor_stand) }}" required
                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
                     </div>
                     <div>
                         <label for="pemilik" class="block text-xs font-bold text-slate-700 mb-1">Nama Pemilik Stand *</label>
-                        <input type="text" id="pemilik" name="pemilik" value="{{ old('pemilik') }}" required placeholder="Contoh: Ibu Siti Rahayu"
+                        <input type="text" id="pemilik" name="pemilik" value="{{ old('pemilik', $stand->pemilik) }}" required
                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
                     </div>
                     <div>
                         <label for="no_wa" class="block text-xs font-bold text-slate-700 mb-1">No. WhatsApp Pemilik *</label>
-                        <input type="text" id="no_wa" name="no_wa" value="{{ old('no_wa') }}" required placeholder="Contoh: 081234567890"
+                        <input type="text" id="no_wa" name="no_wa" value="{{ old('no_wa', $stand->no_wa) }}" required
                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
                     </div>
+                    <div class="sm:col-span-2">
+                        <label for="is_active" class="block text-xs font-bold text-slate-700 mb-1">Status Operasional Stand *</label>
+                        <select id="is_active" name="is_active" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
+                            <option value="1" {{ old('is_active', $stand->is_active ? '1' : '0') === '1' ? 'selected' : '' }}>Aktif (Buka & Menerima Pesanan)</option>
+                            <option value="0" {{ old('is_active', $stand->is_active ? '1' : '0') === '0' ? 'selected' : '' }}>Nonaktif (Tutup Sementara)</option>
+                        </select>
+                    </div>
                 </div>
-
                 <div class="mt-4">
                     <label for="deskripsi" class="block text-xs font-bold text-slate-700 mb-1">Deskripsi Singkat / Menu Andalan</label>
-                    <textarea id="deskripsi" name="deskripsi" rows="2" placeholder="Contoh: Spesialis Bakso Sapi Asli & Aneka Minuman Dingin"
-                              class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">{{ old('deskripsi') }}</textarea>
+                    <textarea id="deskripsi" name="deskripsi" rows="2"
+                              class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">{{ old('deskripsi', $stand->deskripsi) }}</textarea>
                 </div>
             </div>
 
-            <!-- Section 2: Kredensial Login Vendor -->
+            @if($vendorUser)
             <div class="pt-4 border-t border-slate-100">
-                <h3 class="text-xs font-extrabold uppercase tracking-wider text-orange-600 mb-3">2. Akun Login Penjual (Vendor Credential)</h3>
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-orange-600 mb-3">2. Akun Login Penjual (Read-only)</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="email" class="block text-xs font-bold text-slate-700 mb-1">Email Login Vendor *</label>
-                        <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="busiti@kantin.com"
-                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
-                        <span class="text-[10px] text-slate-400 mt-1 block">Digunakan vendor untuk login di /login</span>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Email Login Vendor</label>
+                        <div class="w-full px-3.5 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl font-medium text-slate-600">
+                            {{ $vendorUser->email }}
+                        </div>
                     </div>
-                    <div>
-                        <label for="password" class="block text-xs font-bold text-slate-700 mb-1">Password Sementara *</label>
-                        <input type="password" id="password" name="password" required placeholder="Minimal 6 karakter"
-                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
-                        <span class="text-[10px] text-slate-400 mt-1 block">Berikan kata sandi ini kepada pemilik stand</span>
+                    <div class="flex items-end">
+                        <a href="{{ route('admin.vendors.resetPassword', $vendorUser) }}"
+                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-orange-50 hover:text-orange-600 text-slate-700 font-bold text-xs border border-slate-200 transition-colors">
+                            Reset Password Vendor
+                        </a>
                     </div>
                 </div>
             </div>
+            @endif
 
-            <!-- Action buttons -->
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                 <a href="{{ route('admin.stands.index') }}"
                    class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition-colors">
@@ -104,7 +110,7 @@
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
-                    <span>Simpan Stand & Akun Vendor</span>
+                    <span>Simpan Perubahan</span>
                 </button>
             </div>
         </form>

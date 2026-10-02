@@ -81,7 +81,7 @@
             <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
                 <a href="{{ route('katalog.index', array_merge(request()->query(), ['stand' => 'all'])) }}#katalog-section"
                     class="shrink-0 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-1.5 {{ $activeStand === 'all' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25 scale-[1.02]' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/90 shadow-xs' }}">
-                    <span>🏪 Semua Stand</span>
+                    <span>Semua Stand</span>
                     <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] {{ $activeStand === 'all' ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-600' }}">
                         {{ $stands->sum('menus_count') }}
                     </span>

@@ -53,8 +53,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // ==========================================================
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminStandController::class, 'index'])->name('dashboard');
+    Route::get('/stands', [AdminStandController::class, 'manageIndex'])->name('stands.index');
     Route::get('/stands/create', [AdminStandController::class, 'create'])->name('stands.create');
     Route::post('/stands', [AdminStandController::class, 'store'])->name('stands.store');
+    Route::get('/stands/{stand}/edit', [AdminStandController::class, 'edit'])->name('stands.edit');
+    Route::put('/stands/{stand}', [AdminStandController::class, 'update'])->name('stands.update');
+    Route::delete('/stands/{stand}', [AdminStandController::class, 'destroy'])->name('stands.destroy');
     Route::post('/stands/{stand}/toggle', [AdminStandController::class, 'toggleActive'])->name('stands.toggle');
 
     // Riwayat Transaksi (All Orders)

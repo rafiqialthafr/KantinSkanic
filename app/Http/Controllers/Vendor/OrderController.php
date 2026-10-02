@@ -63,13 +63,14 @@ class OrderController extends Controller
         abort_unless($order->stand_id === $this->standId(), 403, 'Pesanan bukan milik stand Anda.');
 
         $validated = $request->validate([
-            'status' => ['required', 'in:pending,siap_diambil,selesai,dibatalkan'],
+            'status' => ['required', 'in:pending,diproses,siap_diambil,selesai,dibatalkan'],
         ]);
 
         $order->update(['status' => $validated['status']]);
 
         $labels = [
             'pending' => 'Menunggu Konfirmasi',
+            'diproses' => 'Sedang Diproses',
             'siap_diambil' => 'Siap Diambil',
             'selesai' => 'Selesai',
             'dibatalkan' => 'Dibatalkan',
