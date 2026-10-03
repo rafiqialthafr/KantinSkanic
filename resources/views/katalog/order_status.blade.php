@@ -299,7 +299,7 @@
     } catch (e) {}
 
     // Auto refresh status every 8 seconds if order is active
-    @if(in_array($order - > status, ['pending', 'diproses', 'siap_diambil']))
+    @if(in_array($order->status, ['pending', 'diproses', 'siap_diambil']))
     setInterval(() => {
         window.location.reload();
     }, 8000);

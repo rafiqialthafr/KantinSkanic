@@ -110,18 +110,20 @@ class StandController extends Controller
             'semua' => 'Keseluruhan',
         };
 
-        $orderQuery = Order::query();
-        match ($periode) {
-            'hari_ini' => $orderQuery->whereDate('created_at', today()),
-            'minggu_ini' => $orderQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-            'bulan_ini' => $orderQuery->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
-            'semua' => null,
-            default => $orderQuery->whereDate('created_at', today()),
+        $periodScope = match ($periode) {
+            'hari_ini' => fn ($q) => $q->whereDate('created_at', today()),
+            'minggu_ini' => fn ($q) => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+            'bulan_ini' => fn ($q) => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+            'semua' => fn ($q) => $q,
+            default => fn ($q) => $q->whereDate('created_at', today()),
         };
 
-        $totalOrdersInPeriod = $orderQuery->count();
+        $totalOrdersInPeriod = Order::query()->tap($periodScope)->count();
 
-        $query = Stand::with('user')->withCount(['orders', 'menus']);
+        $query = Stand::with('user')->withCount([
+            'menus',
+            'orders as orders_count' => $periodScope,
+        ]);
 
         if ($request->filled('search')) {
             $search = $request->search;

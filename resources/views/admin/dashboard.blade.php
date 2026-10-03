@@ -86,7 +86,7 @@
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h2 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">Manajemen Stand Kantin</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Kelola data stand kantin, akun login vendor, status operasional, serta aksi edit dan hapus</p>
+                <p class="text-xs text-slate-500 mt-0.5">Kelola data stand kantin, akun login vendor, status operasional, serta statistik pesanan periode <span class="font-semibold text-slate-700">{{ $periodeLabel }}</span></p>
             </div>
             <a href="{{ route('admin.stands.create') }}"
                 class="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all cursor-pointer shrink-0">
@@ -204,7 +204,7 @@
                         <th class="py-3 px-5">Stand</th>
                         <th class="py-3 px-4">Pemilik & Kontak</th>
                         <th class="py-3 px-4">Akun Login Vendor</th>
-                        <th class="py-3 px-4 text-center">Statistik</th>
+                        <th class="py-3 px-4 text-center">Statistik <span class="text-orange-500 font-bold">({{ $periodeLabel }})</span></th>
                         <th class="py-3 px-4 text-center">Status</th>
                         <th class="py-3 px-5 text-center">Aksi</th>
                     </tr>
@@ -250,7 +250,7 @@
                                     <span class="block font-black text-slate-800 text-xs leading-none">{{ $st->menus_count }}</span>
                                     <span class="block text-[9px] font-bold text-slate-400 mt-0.5">Menu</span>
                                 </div>
-                                <div class="px-2.5 py-1.5 rounded-xl bg-orange-50 text-center min-w-[52px]">
+                                <div class="px-2.5 py-1.5 rounded-xl bg-orange-50 text-center min-w-[52px]" title="Pesanan periode {{ $periodeLabel }}">
                                     <span class="block font-black text-orange-600 text-xs leading-none">{{ $st->orders_count }}</span>
                                     <span class="block text-[9px] font-bold text-orange-500 mt-0.5">Pesanan</span>
                                 </div>
