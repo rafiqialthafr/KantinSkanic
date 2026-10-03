@@ -47,16 +47,35 @@ class StandController extends Controller
         $totalRevenue = (clone $orderQuery)->where('status', 'selesai')->sum('total_harga');
         $completedOrdersCount = (clone $orderQuery)->where('status', 'selesai')->count();
 
+        // Build a period-scoped date constraint for reuse
+        $periodScope = match ($periode) {
+            'hari_ini' => fn ($q) => $q->whereDate('created_at', today()),
+            'minggu_ini' => fn ($q) => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+            'bulan_ini' => fn ($q) => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+            'semua' => fn ($q) => $q,
+            default => fn ($q) => $q->whereDate('created_at', today()),
+        };
+
         // Static / Master Data (constant cumulative)
-        $stands = Stand::with('user')->withCount(['orders', 'menus'])->get();
+        // orders_count dipersempit ke periode aktif agar badge di tabel stand konsisten
+        $stands = Stand::with('user')
+            ->withCount([
+                'menus',
+                'orders as orders_count' => $periodScope,
+            ])
+            ->get();
         $totalStands = $stands->count();
         $activeStands = $stands->where('is_active', true)->count();
         $totalUsers = User::count();
         $totalMenus = Menu::count();
         $availableMenus = Menu::where('is_available', true)->where('stok', '>', 0)->count();
 
-        // Recent orders (latest 20 transactions across all stands)
-        $recentOrders = Order::with(['stand', 'items.menu'])->latest()->take(20)->get();
+        // Recent orders: maksimum 50, difilter sesuai periode
+        $recentOrders = Order::with(['stand', 'items.menu'])
+            ->tap($periodScope)
+            ->latest()
+            ->take(50)
+            ->get();
 
         return view('admin.dashboard', compact(
             'stands',

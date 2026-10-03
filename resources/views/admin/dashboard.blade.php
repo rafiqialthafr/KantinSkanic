@@ -308,8 +308,8 @@
     <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
             <div>
-                <h2 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">20 Transaksi Terbaru (Seluruh Stand)</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Aktivitas pesanan pre-order masuk di seluruh kantin sekolah</p>
+                <h2 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">Transaksi Terbaru — {{ $periodeLabel }} (Seluruh Stand)</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Aktivitas pesanan pre-order masuk di seluruh kantin sekolah periode <span class="font-semibold text-slate-700">{{ $periodeLabel }}</span></p>
             </div>
             <a href="{{ route('admin.orders.index') }}" class="min-h-[44px] sm:min-h-0 text-xs font-bold text-orange-600 hover:text-orange-700 inline-flex items-center gap-1 transition-colors self-start sm:self-auto py-1">
                 <span>Lihat Semua Riwayat</span>
