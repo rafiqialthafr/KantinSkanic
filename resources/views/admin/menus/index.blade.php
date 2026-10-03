@@ -33,7 +33,7 @@
             </div>
             <p class="text-[10px] sm:text-xs font-bold text-emerald-100 uppercase tracking-wider">Menu Tersedia</p>
             <p class="text-2xl sm:text-3xl font-black mt-1 leading-tight">{{ number_format($availableMenusCount, 0, ',', '.') }}</p>
-            <p class="text-[11px] sm:text-xs text-emerald-100 mt-1.5 sm:mt-2 font-medium">Siap dipesan siswa di katalog</p>
+            <p class="text-[11px] sm:text-xs text-emerald-100 mt-1.5 sm:mt-2 font-medium">Siap dipesan siswa di daftar menu</p>
         </div>
 
         {{-- Menu Habis / Nonaktif --}}

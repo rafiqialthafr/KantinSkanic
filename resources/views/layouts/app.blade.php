@@ -101,7 +101,7 @@
                     <!-- Desktop Nav Links -->
                     <nav class="hidden md:flex items-center">
                         <a href="{{ route('katalog.index') }}" class="nav-link">Beranda</a>
-                        <a href="{{ route('katalog.index') }}#katalog-section" class="nav-link">Katalog Menu</a>
+                        <a href="{{ route('katalog.index') }}#katalog-section" class="nav-link">Daftar Menu</a>
                         <button type="button" onclick="openTrackOrderModal()" class="nav-link">Lacak Pesanan</button>
                     </nav>
 
@@ -179,22 +179,22 @@
                     🏠 Beranda
                 </a>
                 <a href="{{ route('katalog.index') }}#katalog-section" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-lg text-sm font-bold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors">
-                    🍱 Katalog Menu
+                    🍱 Daftar Menu
                 </a>
                 <button type="button" onclick="toggleMobileNav(); openTrackOrderModal()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between">
                     <span>🔍 Lacak Pesanan</span>
                     <span class="text-[10px] text-orange-600 font-extrabold bg-orange-100 px-2 py-0.5 rounded-full">Cek Kode</span>
                 </button>
                 @auth
-                    @if(Auth::user()->isAdmin())
-                    <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-bold text-orange-600 bg-orange-50">
-                        ⚡ Panel Admin
-                    </a>
-                    @elseif(Auth::user()->isPenjual())
-                    <a href="{{ route('vendor.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-bold text-orange-600 bg-orange-50">
-                        🏪 Dashboard Stand
-                    </a>
-                    @endif
+                @if(Auth::user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-bold text-orange-600 bg-orange-50">
+                    ⚡ Panel Admin
+                </a>
+                @elseif(Auth::user()->isPenjual())
+                <a href="{{ route('vendor.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-bold text-orange-600 bg-orange-50">
+                    🏪 Dashboard Stand
+                </a>
+                @endif
                 @else
                 <a href="{{ route('login') }}" class="block px-3 py-2 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors">
                     🔐 Masuk ke Akun

@@ -7,7 +7,7 @@
 
     <!-- Breadcrumb -->
     <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
-        <a href="{{ route('katalog.index') }}" class="hover:text-orange-600 transition-colors">Katalog Menu</a>
+        <a href="{{ route('katalog.index') }}" class="hover:text-orange-600 transition-colors">Daftar Menu</a>
         <span>&rsaquo;</span>
         <span class="text-orange-600 font-bold">Checkout Pre-Order</span>
     </div>
@@ -25,9 +25,9 @@
             </svg>
         </div>
         <h3 class="text-base font-bold text-slate-900">Keranjang Belanja Kamu Masih Kosong</h3>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm mx-auto">Silakan pilih makanan atau minuman favoritmu terlebih dahulu dari katalog kantin.</p>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm mx-auto">Silakan pilih makanan atau minuman favoritmu terlebih dahulu dari daftar menu kantin.</p>
         <a href="{{ route('katalog.index') }}#katalog-section" class="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-orange-500/20 transition-all">
-            <span>&larr; Pilih Menu di Katalog</span>
+            <span>&larr; Pilih Menu di Daftar Menu</span>
         </a>
     </div>
 
@@ -79,14 +79,14 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pemesan *</label>
                         <input type="text" id="chk-nama" required value="{{ $user->name }}"
-                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
                     </div>
 
                     <!-- Kelas Siswa -->
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Kelas Siswa *</label>
                         <input type="text" id="chk-kelas" required placeholder="Contoh: XI PPLG 1 / XII AKL 2" value="{{ $defaultKelas }}"
-                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
                     </div>
 
                     <!-- Jam Pengambilan -->
@@ -117,7 +117,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Pesanan (Opsional)</label>
                         <textarea id="chk-catatan" rows="2" placeholder="Contoh: Sambal dipisah, es sedikit..."
-                                  class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"></textarea>
+                            class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"></textarea>
                     </div>
 
                     <!-- Total Section -->
@@ -133,7 +133,7 @@
                     </div>
 
                     <button type="submit" id="chk-submit-btn"
-                            class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-98 text-white font-black text-sm shadow-lg shadow-orange-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-98 text-white font-black text-sm shadow-lg shadow-orange-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
                         <span>Konfirmasi & Kirim Pesanan</span>
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />

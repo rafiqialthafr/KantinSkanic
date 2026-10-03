@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Katalog Menu & Pesan Makanan')
+@section('title', 'Daftar Menu & Pesan Makanan')
 
 @section('content')
 <div class="relative pb-24">
@@ -70,7 +70,7 @@
             <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200/80 pb-3">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-orange-600 block">Pilihan Menu Siswa</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Katalog Makanan & Minuman</h2>
+                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Daftar Makanan & Minuman</h2>
                 </div>
                 <span class="text-xs font-medium text-slate-500">
                     Menampilkan <strong class="text-slate-800">{{ $menus->count() }}</strong> menu siap dipesan
@@ -108,15 +108,27 @@
                     </a>
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'makanan'])) }}#katalog-section"
                         class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'makanan' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 21.8 6.4-6.3"/><path d="m19 5-7 7"/></svg> Makanan
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
+                            <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
+                            <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
+                            <path d="m2.1 21.8 6.4-6.3" />
+                            <path d="m19 5-7 7" />
+                        </svg> Makanan
                     </a>
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'minuman'])) }}#katalog-section"
                         class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'minuman' ? 'bg-sky-600 text-white shadow-xs' : 'bg-sky-50 text-sky-800 hover:bg-sky-100 border border-sky-200/60' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"/><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"/></svg> Minuman
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
+                            <path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z" />
+                            <path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0" />
+                        </svg> Minuman
                     </a>
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'snack'])) }}#katalog-section"
                         class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'snack' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5"><path d="M12 2a5 5 0 1 1 5 5H7a5 5 0 0 1 0-10 5 5 0 0 1 5 5"/><path d="M12 7v5"/><path d="M8 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3"/></svg> Snack
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
+                            <path d="M12 2a5 5 0 1 1 5 5H7a5 5 0 0 1 0-10 5 5 0 0 1 5 5" />
+                            <path d="M12 7v5" />
+                            <path d="M8 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3" />
+                        </svg> Snack
                     </a>
                 </div>
 
@@ -230,11 +242,23 @@
                             </span>
 
                             @if($menu->kategori === 'makanan')
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-amber-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 21.8 6.4-6.3"/><path d="m19 5-7 7"/></svg> Makanan</span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-amber-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
+                                    <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
+                                    <path d="m2.1 21.8 6.4-6.3" />
+                                    <path d="m19 5-7 7" />
+                                </svg> Makanan</span>
                             @elseif($menu->kategori === 'minuman')
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-sky-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"/><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"/></svg> Minuman</span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-sky-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z" />
+                                    <path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0" />
+                                </svg> Minuman</span>
                             @else
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-emerald-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 1 1 5 5H7a5 5 0 0 1 0-10 5 5 0 0 1 5 5"/><path d="M12 7v5"/><path d="M8 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3"/></svg> Snack</span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-emerald-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2a5 5 0 1 1 5 5H7a5 5 0 0 1 0-10 5 5 0 0 1 5 5" />
+                                    <path d="M12 7v5" />
+                                    <path d="M8 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3" />
+                                </svg> Snack</span>
                             @endif
                         </div>
 
@@ -610,7 +634,7 @@
                                 </svg>
                             </div>
                             <p class="text-xs font-semibold">Keranjang Anda masih kosong.</p>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Pilih menu favorit Anda dari katalog.</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Pilih menu favorit Anda dari daftar menu.</p>
                         </div>
                     `;
                 } else {

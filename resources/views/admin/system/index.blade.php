@@ -96,7 +96,7 @@
                     <span class="font-extrabold text-slate-900 font-mono">v{{ $systemStats['laravel_version'] }}</span>
                 </div>
                 <div class="flex items-center justify-between border-t border-slate-100 pt-3">
-                    <span class="font-semibold text-slate-600">Tautan Katalog Publik</span>
+                    <span class="font-semibold text-slate-600">Tautan Daftar Menu Publik</span>
                     <a href="{{ route('katalog.index') }}" target="_blank" class="font-bold text-orange-600 hover:underline flex items-center gap-1">
                         <span>Buka Website</span>
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
