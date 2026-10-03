@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Stand;
 use App\Models\User;
@@ -51,6 +52,8 @@ class StandController extends Controller
         $totalStands = $stands->count();
         $activeStands = $stands->where('is_active', true)->count();
         $totalUsers = User::count();
+        $totalMenus = Menu::count();
+        $availableMenus = Menu::where('is_available', true)->where('stok', '>', 0)->count();
 
         // Recent orders (latest 20 transactions across all stands)
         $recentOrders = Order::with(['stand', 'items.menu'])->latest()->take(20)->get();
@@ -60,6 +63,8 @@ class StandController extends Controller
             'totalStands',
             'activeStands',
             'totalUsers',
+            'totalMenus',
+            'availableMenus',
             'totalOrders',
             'totalRevenue',
             'completedOrdersCount',

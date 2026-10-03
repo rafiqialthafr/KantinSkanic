@@ -65,22 +65,18 @@
             </x-slot:icon>
         </x-stat-card>
 
-        {{-- Card 4: Jam Operasional PO (Statis / Master Data) --}}
+        {{-- Card 4: Total Menu (Statis / Master Data) --}}
         <x-stat-card
-            title="Jam Operasional PO"
-            sublabel="Sistem PO Aktif"
-            :badge="true"
+            title="Total Menu Kantin"
+            :value="$totalMenus"
+            :sublabel="$availableMenus . ' menu tersedia & siap pesan'"
             :isTimeSensitive="false"
             color="sky">
             <x-slot:icon>
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                 </svg>
             </x-slot:icon>
-            <div class="space-y-0.5">
-                <p class="text-xs sm:text-sm font-extrabold text-white leading-tight">Ist. 1: 09:30 - 10:00</p>
-                <p class="text-xs sm:text-sm font-extrabold text-white leading-tight">Ist. 2: 12:00 - 13:00</p>
-            </div>
         </x-stat-card>
 
     </div>
