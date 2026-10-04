@@ -143,10 +143,6 @@
                                 @else bg-rose-100 text-rose-700 @endif">
                                 {{ str_replace('_', ' ', $order->status) }}
                             </span>
-                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
-                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                                {{ $order->jam_pengambilan }}
-                            </span>
                         </div>
                         <div class="text-xs text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                             <span>Pemesan: <strong class="text-slate-800">{{ $order->nama_pemesan }}</strong></span>

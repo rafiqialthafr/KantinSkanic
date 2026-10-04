@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\StandController as AdminStandController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KatalogController;
@@ -44,6 +45,12 @@ Route::middleware('guest')->group(function () {
     // Siswa quick register (retains intended URL for guest cart)
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+
+    // ---- Lupa Kata Sandi ----
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
@@ -84,6 +91,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:penjual'])->group(function () {
     // Orders Dashboard (main landing after login)
     Route::get('/dashboard', [VendorOrderController::class, 'index'])->name('dashboard');
+    Route::get('/omset', [VendorOrderController::class, 'omset'])->name('omset');
     Route::post('/orders/{order}/status', [VendorOrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::post('/orders/verify', [VendorOrderController::class, 'verify'])->name('orders.verify');
 

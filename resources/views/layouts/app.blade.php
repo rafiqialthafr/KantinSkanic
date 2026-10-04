@@ -296,12 +296,12 @@
 
                 <!-- Tagline -->
                 <p class="text-slate-500 font-medium">
-                    Memangkas antrean siswa saat jam istirahat. Cepat, higienis, & teratur.
+                    Pesan makanan favoritmu di Kantin Skanic. Cepat, praktis, & efisien.
                 </p>
 
                 <!-- Copyright -->
                 <div class="text-slate-400 text-[11px] font-medium">
-                    &copy; {{ date('Y') }} SMK Negeri 1 Ciamis
+                    &copy; {{ date('Y') }} SMK Negeri 1 Ciomas
                 </div>
             </div>
         </div>

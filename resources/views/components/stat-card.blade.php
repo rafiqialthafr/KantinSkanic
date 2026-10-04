@@ -57,7 +57,8 @@
         </p>
 
         {{-- Main Value --}}
-        <div class="text-xl sm:text-2xl lg:text-3xl font-black mt-1 leading-tight tracking-tight">
+        @php $isRupiah = is_string($value) && str_starts_with($value, 'Rp'); @endphp
+        <div class="{{ $isRupiah ? 'text-sm sm:text-base font-black mt-1 leading-snug tracking-tight break-all' : 'text-xl sm:text-2xl lg:text-3xl font-black mt-1 leading-tight tracking-tight' }}">
             @if($value !== null)
                 {{ $value }}
             @else

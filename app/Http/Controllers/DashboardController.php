@@ -68,10 +68,6 @@ class DashboardController extends Controller
             $ordersQuery->where('status', $request->status);
         }
 
-        if ($request->filled('jam') && in_array($request->jam, ['Istirahat 1', 'Istirahat 2'])) {
-            $ordersQuery->where('jam_pengambilan', $request->jam);
-        }
-
         $orders = $ordersQuery->latest()->get();
 
         return view('dashboard.index', [
@@ -82,7 +78,6 @@ class DashboardController extends Controller
             'completedOrdersCount' => $completedOrdersCount,
             'revenueToday' => $revenueToday,
             'activeStatus' => $request->status ?? 'all',
-            'activeJam' => $request->jam ?? 'all',
         ]);
     }
 

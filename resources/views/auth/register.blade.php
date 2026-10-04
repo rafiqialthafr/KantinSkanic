@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('title', 'Daftar Akun Siswa - Pre-Order Kantin Skanic')
 
 @section('content')
-<div class="max-w-md mx-auto px-4 py-8 sm:py-12">
+<div class="max-w-md mx-auto px-4 py-4 sm:py-8 w-full">
     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50 p-6 sm:p-8">
 
         <!-- Header -->

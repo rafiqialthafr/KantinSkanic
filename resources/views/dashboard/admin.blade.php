@@ -116,7 +116,6 @@
                             <th class="py-3 px-4">Kode & Waktu</th>
                             <th class="py-3 px-4">Stand</th>
                             <th class="py-3 px-4">Pemesan</th>
-                            <th class="py-3 px-4">Jam Ambil</th>
                             <th class="py-3 px-4">Total</th>
                             <th class="py-3 px-4">Status</th>
                         </tr>
@@ -134,9 +133,6 @@
                             <td class="py-3 px-4">
                                 <span class="font-bold text-slate-800 block">{{ $ro->nama_pemesan }}</span>
                                 <span class="text-[10px] text-slate-400">Kelas {{ $ro->kelas }}</span>
-                            </td>
-                            <td class="py-3 px-4">
-                                <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-bold text-[10px] border border-orange-100">{{ $ro->jam_pengambilan }}</span>
                             </td>
                             <td class="py-3 px-4 font-black text-orange-600">
                                 Rp {{ number_format($ro->total_harga, 0, ',', '.') }}

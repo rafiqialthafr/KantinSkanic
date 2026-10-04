@@ -78,7 +78,7 @@ class AdminPeriodFilterTest extends TestCase
         $response = $this->get(route('admin.system.index'));
         $response->assertStatus(200);
         $response->assertSee('Status & Info Sistem');
-        $response->assertSee('Jadwal Operasional Pre-Order Kantin');
+        $response->assertSee('Statistik Pengguna Terdaftar');
     }
 
     public function test_stands_order_count_respects_period_filter(): void
@@ -93,7 +93,6 @@ class AdminPeriodFilterTest extends TestCase
             'stand_id' => $stand->id,
             'nama_pemesan' => 'Tester',
             'kelas' => 'XII',
-            'jam_pengambilan' => 'Istirahat 1',
             'total_harga' => 15000,
             'status' => 'selesai',
             'catatan' => null,

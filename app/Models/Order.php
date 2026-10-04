@@ -17,7 +17,6 @@ class Order extends Model
         'nama_pemesan',
         'kelas',
         'total_harga',
-        'jam_pengambilan',
         'status',
         'catatan',
     ];

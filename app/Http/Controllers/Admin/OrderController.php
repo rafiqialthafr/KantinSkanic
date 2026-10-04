@@ -56,10 +56,6 @@ class OrderController extends Controller
             });
         }
 
-        if ($request->filled('jam_pengambilan')) {
-            $query->where('jam_pengambilan', 'like', '%'.$request->string('jam_pengambilan').'%');
-        }
-
         $orders = $query->paginate(15)->withQueryString();
 
         $stands = Stand::orderBy('nomor_stand')->get();

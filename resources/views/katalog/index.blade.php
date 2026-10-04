@@ -33,7 +33,7 @@
 
                 <!-- Subtitle paragraph -->
                 <p class="mt-3 sm:mt-4 text-sm sm:text-base lg:text-base xl:text-lg text-white/90 max-w-2xl leading-relaxed font-medium">
-                    Wadah digital resmi untuk memesan seluruh menu makanan dan minuman siswa di Kantin SMK Negeri 1 Ciomas. Pilih menu stand favoritmu dan langsung ambil saat jam istirahat tanpa perlu berdesakan.
+                    Wadah digital resmi untuk memesan seluruh menu makanan dan minuman siswa di Kantin SMK Negeri 1 Ciomas. Pilih menu stand favoritmu dan langsung ambil pesananmu tanpa perlu berdesakan.
                 </p>
 
                 <!-- Dual CTA Buttons (Solid with arrow + Ghost outline) -->
@@ -453,30 +453,6 @@
                                 class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
                         </div>
 
-                        <!-- Jam Pengambilan -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Jam Pengambilan Pesanan *</label>
-                            <div class="grid grid-cols-2 gap-2.5">
-                                <label class="relative flex flex-col p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-orange-50/50 has-checked:border-orange-500 has-checked:bg-orange-50/80 transition-all">
-                                    <input type="radio" name="jam_pengambilan" value="Istirahat 1" checked class="sr-only">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-xs font-extrabold text-slate-800">Istirahat 1</span>
-                                        <span class="w-2 h-2 rounded-full bg-orange-500"></span>
-                                    </div>
-                                    <span class="text-[11px] text-slate-500 font-medium mt-1">09:45 - 10:15 WIB</span>
-                                </label>
-
-                                <label class="relative flex flex-col p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-orange-50/50 has-checked:border-orange-500 has-checked:bg-orange-50/80 transition-all">
-                                    <input type="radio" name="jam_pengambilan" value="Istirahat 2" class="sr-only">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-xs font-extrabold text-slate-800">Istirahat 2</span>
-                                        <span class="w-2 h-2 rounded-full bg-orange-500"></span>
-                                    </div>
-                                    <span class="text-[11px] text-slate-500 font-medium mt-1">12:00 - 12:45 WIB</span>
-                                </label>
-                            </div>
-                        </div>
-
                         <!-- Catatan Pesanan -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
@@ -700,11 +676,6 @@
 
         const nama = document.getElementById('input-nama').value.trim();
         const kelas = document.getElementById('input-kelas').value.trim();
-        const jamRadios = document.getElementsByName('jam_pengambilan');
-        let jam = 'Istirahat 1';
-        for (const r of jamRadios) {
-            if (r.checked) jam = r.value;
-        }
         const catatan = document.getElementById('input-catatan').value.trim();
 
         const submitBtn = document.getElementById('btn-submit-order');
@@ -721,7 +692,6 @@
             const payload = {
                 nama_pemesan: nama,
                 kelas: kelas,
-                jam_pengambilan: jam,
                 catatan: catatan,
                 items: items.map(i => ({
                     menu_id: i.menu_id,

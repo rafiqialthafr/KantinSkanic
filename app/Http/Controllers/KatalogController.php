@@ -70,7 +70,6 @@ class KatalogController extends Controller
         $request->validate([
             'nama_pemesan' => ['required', 'string', 'max:100'],
             'kelas' => ['required', 'string', 'max:50'],
-            'jam_pengambilan' => ['required', 'in:Istirahat 1,Istirahat 2'],
             'catatan' => ['nullable', 'string', 'max:500'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.menu_id' => ['required', 'exists:menus,id'],
@@ -78,7 +77,6 @@ class KatalogController extends Controller
         ], [
             'nama_pemesan.required' => 'Nama pemesan wajib diisi.',
             'kelas.required' => 'Kelas wajib diisi.',
-            'jam_pengambilan.required' => 'Pilih jam pengambilan.',
             'items.required' => 'Keranjang belanja masih kosong.',
             'items.min' => 'Pilih minimal satu menu untuk dipesan.',
         ]);
@@ -136,7 +134,6 @@ class KatalogController extends Controller
                 'nama_pemesan' => $request->nama_pemesan,
                 'kelas' => $request->kelas,
                 'total_harga' => $standTotal,
-                'jam_pengambilan' => $request->jam_pengambilan,
                 'status' => 'pending',
                 'catatan' => $request->catatan,
             ]);

@@ -55,7 +55,7 @@
             </div>
 
             <p class="text-xs sm:text-sm text-white/90 mt-2 font-medium">
-                Tunjukkan kode ini kepada penjual saat jam istirahat tiba
+                Tunjukkan kode ini kepada penjual saat mengambil pesanan
             </p>
         </div>
 
@@ -160,12 +160,9 @@
                 <span class="text-orange-600 font-bold block mt-0.5">{{ $order->stand->nomor_stand }}</span>
             </div>
             <div>
-                <span class="text-slate-400 block mb-0.5 font-bold uppercase tracking-wider text-[10px]">Jam Pengambilan</span>
-                <span class="inline-flex items-center gap-1 font-extrabold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200/70">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-                    {{ $order->jam_pengambilan }}
+                <span class="text-slate-400 block mb-0.5 font-bold uppercase tracking-wider text-[10px]">Status Pesanan</span>
+                <span class="inline-flex items-center gap-1 font-extrabold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200/70 capitalize">
+                    {{ str_replace('_', ' ', $order->status) }}
                 </span>
             </div>
             <div>
@@ -241,7 +238,7 @@
         <a href="{{ route('order.status', $o->kode_tr) }}" class="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 hover:border-orange-300 transition-all shadow-xs group">
             <div>
                 <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-orange-600 transition-colors">#{{ $o->kode_tr }} &bull; {{ $o->stand->nama_stand }}</span>
-                <span class="text-xs text-slate-400 block mt-0.5">{{ $o->jam_pengambilan }} &bull; Rp {{ number_format($o->total_harga, 0, ',', '.') }}</span>
+                <span class="text-xs text-slate-400 block mt-0.5">Rp {{ number_format($o->total_harga, 0, ',', '.') }}</span>
             </div>
             <span class="px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-lg
                             @if($o->status === 'siap_diambil') bg-emerald-100 text-emerald-700

@@ -81,7 +81,6 @@ class KantinOrderTest extends TestCase
         $payload = [
             'nama_pemesan' => 'Ahmad Budi',
             'kelas' => 'XI PPLG 2',
-            'jam_pengambilan' => 'Istirahat 1',
             'catatan' => 'Pedas sedang ya',
             'items' => [
                 ['menu_id' => $menu1->id, 'jumlah' => 2],
@@ -144,7 +143,6 @@ class KantinOrderTest extends TestCase
             'nama_pemesan' => 'Siti',
             'kelas' => 'XII AKL 1',
             'total_harga' => 14000,
-            'jam_pengambilan' => 'Istirahat 1',
             'status' => 'pending',
         ]);
 
@@ -168,7 +166,6 @@ class KantinOrderTest extends TestCase
             'nama_pemesan' => 'Rina',
             'kelas' => 'X TKJ 1',
             'total_harga' => 15000,
-            'jam_pengambilan' => 'Istirahat 1',
             'status' => 'pending',
         ]);
 
@@ -193,6 +190,36 @@ class KantinOrderTest extends TestCase
         ]);
         $resp3->assertSessionHas('success');
         $this->assertEquals('selesai', $order->fresh()->status);
+    }
+
+    public function test_vendor_dashboard_filters_orders_by_period(): void
+    {
+        $vendor = User::where('email', 'buagus@kantin.com')->first();
+        $this->actingAs($vendor);
+
+        foreach (['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'] as $periode) {
+            $resp = $this->get(route('vendor.dashboard', ['periode' => $periode]));
+            $resp->assertStatus(200);
+            $resp->assertSee('Statistik');
+            $resp->assertSee('Dashboard Pesanan');
+        }
+    }
+
+    public function test_vendor_can_view_omset_page_for_all_periods(): void
+    {
+        $vendor = User::where('email', 'buagus@kantin.com')->first();
+        $this->actingAs($vendor);
+
+        foreach (['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'] as $periode) {
+            $resp = $this->get(route('vendor.omset', ['periode' => $periode]));
+            $resp->assertStatus(200);
+            $resp->assertSee('Laporan Omset');
+            $resp->assertSee('Total Omset');
+            $resp->assertSee('Menu Terlaris');
+            $resp->assertSee('Status Pesanan');
+            $resp->assertSee('Menunggu');
+            $resp->assertSee('Siap Diambil');
+        }
     }
 
     public function test_vendor_can_crud_menu_scoped_to_stand(): void

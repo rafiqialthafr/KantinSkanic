@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,23 +29,46 @@ class OrderController extends Controller
         $stand = Auth::user()->stand;
         $standId = $stand->id;
 
+        // ── Periode filter (same logic as admin ReportController) ──
+        $periode = $request->query('periode', 'hari_ini');
+        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
+            $periode = 'hari_ini';
+        }
+
+        $periodeLabel = match ($periode) {
+            'hari_ini' => 'Hari Ini',
+            'minggu_ini' => 'Minggu Ini',
+            'bulan_ini' => 'Bulan Ini',
+            'semua' => 'Keseluruhan',
+        };
+
+        $applyPeriode = function ($q) use ($periode) {
+            match ($periode) {
+                'hari_ini' => $q->whereDate('created_at', today()),
+                'minggu_ini' => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'bulan_ini' => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+                'semua' => null,
+                default => $q->whereDate('created_at', today()),
+            };
+        };
+
         $today = now()->startOfDay();
 
-        // Stat metrics
-        $activeOrdersCount = Order::where('stand_id', $standId)->whereIn('status', ['pending', 'diproses', 'siap_diambil'])->count();
-        $totalOrdersToday = Order::where('stand_id', $standId)->where('created_at', '>=', $today)->count();
-        $completedOrdersCount = Order::where('stand_id', $standId)->where('status', 'selesai')->where('created_at', '>=', $today)->count();
-        $revenueToday = Order::where('stand_id', $standId)->where('status', 'selesai')->where('created_at', '>=', $today)->sum('total_harga');
+        // Stat metrics — scoped by selected periode
+        $baseQuery = Order::where('stand_id', $standId);
+        $applyPeriode($baseQuery);
 
-        // Orders listing with strict stand scoping
+        $activeOrdersCount = Order::where('stand_id', $standId)->whereIn('status', ['pending', 'diproses', 'siap_diambil'])->count();
+        $totalOrdersToday = (clone $baseQuery)->count();
+        $completedOrdersCount = (clone $baseQuery)->where('status', 'selesai')->count();
+        $revenueToday = (clone $baseQuery)->where('status', 'selesai')->sum('total_harga');
+
+        // Orders listing with strict stand scoping and selected periode
         $query = Order::with('items.menu')->where('stand_id', $standId);
+        $applyPeriode($query);
 
         if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
-        }
-
-        if ($request->filled('jam') && in_array($request->jam, ['Istirahat 1', 'Istirahat 2'])) {
-            $query->where('jam_pengambilan', $request->jam);
         }
 
         $orders = $query->latest()->get();
@@ -52,7 +76,74 @@ class OrderController extends Controller
         return view('vendor.dashboard', compact(
             'stand', 'orders',
             'activeOrdersCount', 'totalOrdersToday', 'completedOrdersCount', 'revenueToday',
-        ) + ['activeStatus' => $request->status ?? 'all', 'activeJam' => $request->jam ?? 'all']);
+            'periode', 'periodeLabel',
+        ) + ['activeStatus' => $request->status ?? 'all']);
+    }
+
+    /**
+     * Omset / revenue report page — scoped to vendor's own stand.
+     */
+    public function omset(Request $request)
+    {
+        $stand = Auth::user()->stand;
+        $standId = $stand->id;
+
+        $periode = $request->query('periode', 'hari_ini');
+        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
+            $periode = 'hari_ini';
+        }
+
+        $periodeLabel = match ($periode) {
+            'hari_ini' => 'Hari Ini',
+            'minggu_ini' => 'Minggu Ini',
+            'bulan_ini' => 'Bulan Ini',
+            'semua' => 'Keseluruhan',
+        };
+
+        $applyPeriode = function ($q) use ($periode) {
+            match ($periode) {
+                'hari_ini' => $q->whereDate('created_at', today()),
+                'minggu_ini' => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'bulan_ini' => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+                'semua' => null,
+                default => $q->whereDate('created_at', today()),
+            };
+        };
+
+        $baseQuery = Order::where('stand_id', $standId);
+        $applyPeriode($baseQuery);
+
+        $totalOmset = (clone $baseQuery)->where('status', 'selesai')->sum('total_harga');
+        $totalOrders = (clone $baseQuery)->count();
+        $selesaiOrders = (clone $baseQuery)->where('status', 'selesai')->count();
+        $batalOrders = (clone $baseQuery)->where('status', 'dibatalkan')->count();
+
+        // Top selling menus in the period (using 'jumlah' and 'subtotal' columns from order_items)
+        $topMenus = OrderItem::selectRaw('menu_id, SUM(jumlah) as total_qty, SUM(subtotal) as total_revenue')
+            ->whereHas('order', function ($q) use ($standId, $applyPeriode) {
+                $q->where('stand_id', $standId)->where('status', 'selesai');
+                $applyPeriode($q);
+            })
+            ->with('menu')
+            ->groupBy('menu_id')
+            ->orderByDesc('total_qty')
+            ->limit(10)
+            ->get();
+
+        // Orders list for detail in the period
+        $ordersQuery = Order::where('stand_id', $standId)
+            ->where('status', 'selesai')
+            ->with('items.menu');
+        $applyPeriode($ordersQuery);
+        $orders = $ordersQuery->latest()->get();
+
+        $activeOrdersCount = Order::where('stand_id', $standId)->whereIn('status', ['pending', 'diproses', 'siap_diambil'])->count();
+
+        return view('vendor.omset', compact(
+            'stand', 'periode', 'periodeLabel',
+            'totalOmset', 'totalOrders', 'selesaiOrders', 'batalOrders',
+            'topMenus', 'orders', 'activeOrdersCount',
+        ));
     }
 
     /**

@@ -14,7 +14,7 @@
 
     <div class="mb-6">
         <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Konfirmasi & Checkout Pesanan</h1>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1">Periksa kembali menu pilihanmu dan lengkapi detail waktu pengambilan makanan.</p>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Periksa kembali menu pilihanmu dan lengkapi data pemesanan.</p>
     </div>
 
     <!-- Empty Cart Alert (Shown if cart is empty) -->
@@ -70,7 +70,7 @@
         <!-- Right Column: Checkout Form & Summary -->
         <div class="lg:col-span-5 space-y-4">
             <div class="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs sticky top-24">
-                <h2 class="text-sm font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-4">Informasi Pengambilan</h2>
+                <h2 class="text-sm font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-4">Informasi Pemesan</h2>
 
                 <form id="page-checkout-form" onsubmit="submitPageCheckout(event)" class="space-y-4">
                     @csrf
@@ -87,30 +87,6 @@
                         <label class="block text-xs font-bold text-slate-700 mb-1">Kelas Siswa *</label>
                         <input type="text" id="chk-kelas" required placeholder="Contoh: XI PPLG 1 / XII AKL 2" value="{{ $defaultKelas }}"
                             class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
-                    </div>
-
-                    <!-- Jam Pengambilan -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Jam Pengambilan *</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label class="relative flex flex-col p-2.5 rounded-xl border-2 border-slate-200 cursor-pointer hover:bg-orange-50/50 has-checked:border-orange-500 has-checked:bg-orange-50/80 transition-all">
-                                <input type="radio" name="chk_jam" value="Istirahat 1" checked class="sr-only">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-black text-slate-900">Istirahat 1</span>
-                                    <span class="w-2 h-2 rounded-full bg-orange-500"></span>
-                                </div>
-                                <span class="text-[10px] text-slate-500 mt-1 font-semibold">09:45 - 10:15</span>
-                            </label>
-
-                            <label class="relative flex flex-col p-2.5 rounded-xl border-2 border-slate-200 cursor-pointer hover:bg-orange-50/50 has-checked:border-orange-500 has-checked:bg-orange-50/80 transition-all">
-                                <input type="radio" name="chk_jam" value="Istirahat 2" class="sr-only">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-black text-slate-900">Istirahat 2</span>
-                                    <span class="w-2 h-2 rounded-full bg-orange-500"></span>
-                                </div>
-                                <span class="text-[10px] text-slate-500 mt-1 font-semibold">12:00 - 12:45</span>
-                            </label>
-                        </div>
                     </div>
 
                     <!-- Catatan Tambahan -->
@@ -235,11 +211,6 @@
 
         const nama = document.getElementById('chk-nama').value.trim();
         const kelas = document.getElementById('chk-kelas').value.trim();
-        const jamRadios = document.getElementsByName('chk_jam');
-        let jam = 'Istirahat 1';
-        for (const r of jamRadios) {
-            if (r.checked) jam = r.value;
-        }
         const catatan = document.getElementById('chk-catatan').value.trim();
 
         const btn = document.getElementById('chk-submit-btn');
@@ -256,7 +227,6 @@
             const payload = {
                 nama_pemesan: nama,
                 kelas: kelas,
-                jam_pengambilan: jam,
                 catatan: catatan,
                 items: items.map(i => ({
                     menu_id: i.menu_id,

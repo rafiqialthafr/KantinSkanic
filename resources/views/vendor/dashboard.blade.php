@@ -14,14 +14,18 @@
 <a href="{{ route('vendor.menus.index') }}" class="sidebar-link {{ request()->routeIs('vendor.menus.*') ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" /></svg>
     Menu Saya
-    <span class="ml-auto text-[10px] font-black bg-orange-500/20 text-orange-300 px-1.5 py-0.5 rounded-md">{{ $stand->menus->count() }}</span>
+</a>
+
+<a href="{{ route('vendor.omset') }}" class="sidebar-link {{ request()->routeIs('vendor.omset') ? 'active' : '' }}">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
+    Lihat Omset
 </a>
 
 <div class="pt-3 pb-1 px-2">
     <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Status Pesanan</span>
 </div>
 
-<a href="{{ route('vendor.dashboard', ['status' => 'pending']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'pending' ? 'active' : '' }}">
+<a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'pending'])) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'pending' ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
     Menunggu
     @if($activeOrdersCount > 0)
@@ -29,13 +33,12 @@
     @endif
 </a>
 
-
-<a href="{{ route('vendor.dashboard', ['status' => 'siap_diambil']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'siap_diambil' ? 'active' : '' }}">
+<a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'siap_diambil'])) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'siap_diambil' ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
     Siap Diambil
 </a>
 
-<a href="{{ route('vendor.dashboard', ['status' => 'selesai']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'selesai' ? 'active' : '' }}">
+<a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'selesai'])) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'selesai' ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
     Selesai
 </a>
@@ -54,85 +57,84 @@
 <div class="p-4 sm:p-6 space-y-6">
 
 
-    {{-- STAT CARDS --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-
-        {{-- Omset Hari Ini --}}
-        <div class="col-span-2 sm:col-span-1 rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f97316,#ea580c)">
-            <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
-            <p class="text-xs font-bold text-orange-100 uppercase tracking-wider">Omset Hari Ini</p>
-            <p class="text-2xl sm:text-3xl font-black mt-1 leading-tight">Rp {{ number_format($revenueToday, 0, ',', '.') }}</p>
-            <div class="flex items-center gap-1.5 mt-2">
-                <svg class="w-3.5 h-3.5 text-orange-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
-                <span class="text-xs font-semibold text-orange-100">Pesanan selesai lunas</span>
+    {{-- PERIODE DROPDOWN + STAT CARDS --}}
+    <div class="flex items-center justify-between gap-4 flex-wrap">
+        <h2 class="text-base font-black text-slate-800">Statistik — <span class="text-orange-500">{{ $periodeLabel }}</span></h2>
+        {{-- Periode Dropdown --}}
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Periode:</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+                @foreach(['hari_ini' => 'Hari Ini', 'minggu_ini' => 'Minggu Ini', 'bulan_ini' => 'Bulan Ini', 'semua' => 'Keseluruhan'] as $key => $label)
+                <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['periode' => $key])) }}"
+                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ $periode === $key ? 'bg-orange-500 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
+                    {{ $label }}
+                </a>
+                @endforeach
             </div>
         </div>
+    </div>    {{-- STAT CARDS --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
-        {{-- Pesanan Aktif --}}
-        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
-            <p class="text-xs font-bold text-amber-100 uppercase tracking-wider">Pesanan Aktif</p>
-            <p class="text-3xl font-black mt-1">{{ $activeOrdersCount }}</p>
-            <p class="text-xs font-semibold text-amber-100 mt-2">Perlu disiapkan</p>
+        {{-- Omset (terpengaruh periode) --}}
+        <div class="col-span-2 sm:col-span-1 rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f97316,#ea580c)">
+            <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
+            <div class="flex items-center justify-between mb-2">
+                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+                    {{-- lucide: trending-up --}}
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
+            </div>
+            <p class="text-xs font-bold text-orange-100 uppercase tracking-wider">Omset {{ $periodeLabel }}</p>
+            <p class="text-sm sm:text-base font-black mt-1 leading-snug tracking-tight break-all">Rp {{ number_format($revenueToday, 0, ',', '.') }}</p>
+            <p class="text-xs font-semibold text-orange-100 mt-2">Dari pesanan selesai lunas</p>
         </div>
 
-        {{-- Pesanan Selesai --}}
+        {{-- Pesanan Aktif (real-time, tidak terikat periode) --}}
+        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
+            <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center mb-2">
+                {{-- lucide: clock --}}
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+            </div>
+            <p class="text-xs font-bold text-amber-100 uppercase tracking-wider">Pesanan Aktif</p>
+            <p class="text-3xl font-black mt-1">{{ $activeOrdersCount }}</p>
+            <p class="text-xs font-semibold text-amber-100 mt-2">Perlu disiapkan sekarang</p>
+        </div>
+
+        {{-- Pesanan Selesai (terpengaruh periode) --}}
         <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#059669,#10b981)">
             <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
+            <div class="flex items-center justify-between mb-2">
+                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+                    {{-- lucide: check-circle --}}
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
+            </div>
             <p class="text-xs font-bold text-emerald-100 uppercase tracking-wider">Pesanan Selesai</p>
             <p class="text-3xl font-black mt-1">{{ $completedOrdersCount }}</p>
             <p class="text-xs font-semibold text-emerald-100 mt-2">Sudah diambil siswa</p>
         </div>
 
-        {{-- Total Hari Ini --}}
-        <div class="rounded-2xl p-5 relative overflow-hidden bg-white border border-slate-200 shadow-xs">
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Pesanan</p>
-            <p class="text-3xl font-black mt-1 text-slate-900">{{ $totalOrdersToday }}</p>
-            <p class="text-xs font-semibold text-slate-400 mt-2">Semua status hari ini</p>
-        </div>
-    </div>
-
-    {{-- VERIFICATION BAR (Input/Scan Kode Pesanan) --}}
-    <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-3xl p-5 sm:p-6 text-white shadow-lg shadow-orange-500/20">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-orange-200 block">Verifikasi Cepat Pengambilan Makanan</span>
-                <h3 class="text-base sm:text-lg font-black text-white mt-0.5">Input Kode Pesanan Siswa</h3>
-                <p class="text-xs text-orange-100 mt-0.5">Ketik kode pesanan (contoh: PO-1234) untuk verifikasi pengambilan secara instan.</p>
-            </div>
-            <form action="{{ route('vendor.orders.verify') }}" method="POST" class="flex items-center gap-2">
-                @csrf
-                <div class="relative">
-                    <input type="text" name="kode_tr" required placeholder="PO-XXXX"
-                           class="w-40 sm:w-48 pl-3.5 pr-3 py-2.5 bg-white text-slate-900 placeholder-slate-400 font-black text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-white uppercase font-mono shadow-inner">
+        {{-- Total Pesanan (terpengaruh periode) - biru --}}
+        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
+            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
+            <div class="flex items-center justify-between mb-2">
+                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+                    {{-- lucide: shopping-bag --}}
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/></svg>
                 </div>
-                <button type="submit"
-                        class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black active:scale-95 text-white font-extrabold text-xs sm:text-sm transition-all shadow-md cursor-pointer whitespace-nowrap">
-                    Verifikasi
-                </button>
-            </form>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
+            </div>
+            <p class="text-xs font-bold text-blue-100 uppercase tracking-wider">Total Pesanan</p>
+            <p class="text-3xl font-black mt-1">{{ $totalOrdersToday }}</p>
+            <p class="text-xs font-semibold text-blue-100 mt-2">Semua status {{ strtolower($periodeLabel) }}</p>
         </div>
     </div>
 
-    {{-- FILTER TABS (Jam Istirahat & Status) --}}
-    <div class="space-y-3">
-        <!-- Jam Istirahat Filter -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-1">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">Jam Ambil:</span>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['jam' => 'all'])) }}"
-               class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ ($activeJam ?? 'all') === 'all' ? 'bg-orange-500 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
-                Semua Jam
-            </a>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['jam' => 'Istirahat 1'])) }}"
-               class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ ($activeJam ?? '') === 'Istirahat 1' ? 'bg-orange-500 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
-                Istirahat 1 (09:45)
-            </a>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['jam' => 'Istirahat 2'])) }}"
-               class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ ($activeJam ?? '') === 'Istirahat 2' ? 'bg-orange-500 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
-                Istirahat 2 (12:00)
-            </a>
-        </div>
-
+    {{-- FILTER TABS (Status) --}}
+    <div>
         <!-- Status Filter Tabs -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">Status:</span>
@@ -172,9 +174,6 @@
                 </div>
 
                 <div class="flex items-center gap-2.5">
-                    <span class="px-2.5 py-1 rounded-xl bg-orange-50 text-orange-700 font-bold text-xs border border-orange-100">
-                        {{ $order->jam_pengambilan }}
-                    </span>
                     <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
                         @if($order->status === 'pending') bg-orange-100 text-orange-700
                         @elseif($order->status === 'siap_diambil') bg-emerald-100 text-emerald-800
@@ -253,7 +252,7 @@
                 </svg>
             </div>
             <h3 class="text-sm font-bold text-slate-800">Tidak Ada Pesanan</h3>
-            <p class="text-xs text-slate-400 mt-1">Belum ada pesanan masuk dengan filter yang dipilih saat ini.</p>
+            <p class="text-xs text-slate-400 mt-1">Belum ada pesanan masuk untuk periode {{ strtolower($periodeLabel) }} dengan filter yang dipilih saat ini.</p>
         </div>
         @endforelse
     </div>

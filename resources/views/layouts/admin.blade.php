@@ -17,8 +17,28 @@
         .sidebar-link:hover { background:rgba(251,146,60,0.1); color:#fb923c; }
         .sidebar-link.active { background:linear-gradient(135deg,#f97316,#f59e0b); color:#fff; box-shadow:0 4px 14px rgba(249,115,22,0.35); }
         .sidebar-link svg { width:1.15rem; height:1.15rem; flex-shrink:0; }
+        .sidebar-link-logout { color:#94a3b8; }
+        .sidebar-link-logout:hover { background:rgba(239,68,68,0.12) !important; color:#ef4444 !important; }
+        .sidebar-link-logout:hover svg { color:#ef4444 !important; }
         .stat-card { background:linear-gradient(135deg,var(--from),var(--to)); border-radius:1.25rem; padding:1.25rem; position:relative; overflow:hidden; }
         .stat-card::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,0.05); border-radius:inherit; }
+
+        /* Sembunyikan indikator scrollbar di seluruh sidebar */
+        #sidebar,
+        #sidebar *,
+        .no-scrollbar,
+        .no-scrollbar * {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+        #sidebar::-webkit-scrollbar,
+        #sidebar *::-webkit-scrollbar,
+        .no-scrollbar::-webkit-scrollbar,
+        .no-scrollbar *::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
     </style>
 </head>
 <body class="flex h-full bg-slate-100 antialiased overflow-x-hidden" style="font-family:'Plus Jakarta Sans',sans-serif">
@@ -27,7 +47,7 @@
     <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity duration-300 lg:hidden"></div>
 
     <!-- ===== SIDEBAR ===== -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex flex-col w-72 max-w-[85vw] lg:w-64 bg-slate-900 border-r border-slate-800 shadow-2xl -translate-x-full lg:static lg:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex flex-col w-72 max-w-[85vw] lg:w-64 bg-slate-900 border-r border-slate-800 shadow-2xl -translate-x-full lg:static lg:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 no-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
 
         <!-- Brand & Mobile Close Button -->
         <div class="flex items-center justify-between px-5 py-4 sm:py-5 border-b border-slate-800">
@@ -50,37 +70,29 @@
         </div>
 
         <!-- Nav Links -->
-        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            @hasSection('sidebar-nav')
-                @yield('sidebar-nav')
-            @elseif(Auth::check() && Auth::user()->isAdmin())
-                @include('admin.partials.sidebar_nav')
-            @endif
-        </nav>
-
-        <!-- User Info at Bottom -->
-        @auth
-        <div class="px-4 py-4 border-t border-slate-800">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-400 to-rose-500 flex items-center justify-center text-white font-black text-xs shadow shrink-0">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="text-xs font-bold text-white truncate">{{ Auth::user()->name }}</div>
-                    <div class="text-[10px] text-slate-400 truncate">{{ Auth::user()->email }}</div>
-                </div>
+        <nav class="flex-1 px-3 py-4 flex flex-col justify-between overflow-y-auto no-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
+            <div class="space-y-1">
+                @hasSection('sidebar-nav')
+                    @yield('sidebar-nav')
+                @elseif(Auth::check() && Auth::user()->isAdmin())
+                    @include('admin.partials.sidebar_nav')
+                @endif
             </div>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="w-full flex items-center justify-center gap-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-rose-600/20 border border-slate-700 hover:border-rose-500/50 text-slate-400 hover:text-rose-400 text-xs font-semibold transition-all cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                    </svg>
-                    Keluar
-                </button>
-            </form>
-        </div>
-        @endauth
+
+            @auth
+            <div class="pt-4 mt-auto">
+                <form action="{{ route('logout') }}" method="POST" class="m-0">
+                    @csrf
+                    <button type="submit" class="w-full sidebar-link sidebar-link-logout cursor-pointer text-left">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                        </svg>
+                        <span>Keluar</span>
+                    </button>
+                </form>
+            </div>
+            @endauth
+        </nav>
     </aside>
 
     <!-- ===== MAIN AREA ===== -->

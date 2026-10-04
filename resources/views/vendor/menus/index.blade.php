@@ -14,7 +14,11 @@
 <a href="{{ route('vendor.menus.index') }}" class="sidebar-link active">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" /></svg>
     Menu Saya
-    <span class="ml-auto text-[10px] font-black bg-white/25 text-white px-1.5 py-0.5 rounded-md">{{ $menus->count() }}</span>
+</a>
+
+<a href="{{ route('vendor.omset') }}" class="sidebar-link {{ request()->routeIs('vendor.omset') ? 'active' : '' }}">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
+    Lihat Omset
 </a>
 
 <div class="pt-3 pb-1 px-2">
@@ -25,13 +29,13 @@
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
     Menunggu
 </a>
-<a href="{{ route('vendor.dashboard', ['status' => 'diproses']) }}" class="sidebar-link">
-    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
-    Diproses
-</a>
 <a href="{{ route('vendor.dashboard', ['status' => 'siap_diambil']) }}" class="sidebar-link">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
     Siap Diambil
+</a>
+<a href="{{ route('vendor.dashboard', ['status' => 'selesai']) }}" class="sidebar-link">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+    Selesai
 </a>
 
 <div class="pt-3 pb-1 px-2">
@@ -51,17 +55,7 @@
     <!-- Header with Add Button -->
     <div class="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <a href="{{ route('vendor.dashboard') }}" class="text-xs font-semibold text-slate-500 hover:text-orange-600 transition-colors flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-                    </svg>
-                    <span>Dashboard Pesanan</span>
-                </a>
-                <span class="text-xs text-slate-300">&bull;</span>
-                <span class="text-xs font-bold text-orange-600">{{ $stand->nama_stand }}</span>
-            </div>
-            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Manajemen Menu Stand</h1>
+            <h1 class="text-sm sm:text-xl font-black text-slate-900 tracking-tight">Manajemen Menu Stand</h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Tambah menu, perbarui harga, stok, dan toggle ketersediaan (Ready vs Habis).</p>
         </div>
 
@@ -76,6 +70,64 @@
         </div>
     </div>
 
+    {{-- STAT CARDS MENU --}}
+    @php
+        $totalMenu = $menus->count();
+        $menuAktif = $menus->where('is_available', true)->count();
+        $menuNonaktif = $menus->where('is_available', false)->count();
+        $menuHabis = $menus->where('stok', 0)->count();
+    @endphp
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+        {{-- Total Menu --}}
+        <div class="col-span-2 sm:col-span-1 rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f97316,#ea580c)">
+            <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
+            <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center mb-2">
+                {{-- lucide: list --}}
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg>
+            </div>
+            <p class="text-xs font-bold text-orange-100 uppercase tracking-wider">Total Menu</p>
+            <p class="text-3xl font-black mt-1">{{ $totalMenu }}</p>
+            <p class="text-xs font-semibold text-orange-100 mt-2">Seluruh item terdaftar</p>
+        </div>
+
+        {{-- Menu Aktif --}}
+        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#059669,#10b981)">
+            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
+            <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center mb-2">
+                {{-- lucide: check-circle --}}
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+            </div>
+            <p class="text-xs font-bold text-emerald-100 uppercase tracking-wider">Menu Aktif</p>
+            <p class="text-3xl font-black mt-1">{{ $menuAktif }}</p>
+            <p class="text-xs font-semibold text-emerald-100 mt-2">Tampil di katalog</p>
+        </div>
+
+        {{-- Stok Habis --}}
+        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
+            <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center mb-2">
+                {{-- lucide: alert-triangle --}}
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
+            </div>
+            <p class="text-xs font-bold text-amber-100 uppercase tracking-wider">Stok Habis</p>
+            <p class="text-3xl font-black mt-1">{{ $menuHabis }}</p>
+            <p class="text-xs font-semibold text-amber-100 mt-2">Perlu diisi ulang</p>
+        </div>
+
+        {{-- Menu Nonaktif - biru --}}
+        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#64748b,#475569)">
+            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
+            <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center mb-2">
+                {{-- lucide: eye-off --}}
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+            </div>
+            <p class="text-xs font-bold text-slate-200 uppercase tracking-wider">Nonaktif</p>
+            <p class="text-3xl font-black mt-1">{{ $menuNonaktif }}</p>
+            <p class="text-xs font-semibold text-slate-200 mt-2">Tidak tampil di katalog</p>
+        </div>
+    </div>
+
     <!-- Menus Table / List -->
     <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
         @if($menus->isEmpty())
@@ -86,7 +138,8 @@
                     </svg>
                 </div>
                 <h3 class="text-sm font-bold text-slate-800">Stand Anda Belum Memiliki Menu</h3>
-                <p class="text-xs text-slate-500 mt-1">Klik tombol di bawah untuk menambahkan menu pertama stand Anda.</p>
+                <p class="text-xs text-slate-500 mt-1">Klik tombol di bawah untu
+                    k menambahkan menu pertama stand Anda.</p>
                 <button type="button" onclick="openAddMenuModal()" class="mt-4 px-4 py-2 rounded-xl bg-orange-500 text-white font-bold text-xs cursor-pointer">
                     + Tambah Menu
                 </button>
@@ -144,7 +197,7 @@
                                                 class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase transition-all border cursor-pointer
                                                 {{ $menu->is_available ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100' }}"
                                                 title="Klik untuk ubah ketersediaan menu">
-                                            {{ $menu->is_available ? '● Ready (Tersedia)' : '○ Habis' }}
+                                            {{ $menu->is_available ? '● Tersedia' : '○ Habis' }}
                                         </button>
                                     </form>
                                 </td>

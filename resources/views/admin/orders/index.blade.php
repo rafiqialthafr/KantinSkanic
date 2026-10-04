@@ -67,7 +67,7 @@
 
     {{-- FILTER BOX --}}
     <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs p-4 sm:p-5">
-        <form method="GET" action="{{ route('admin.orders.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <form method="GET" action="{{ route('admin.orders.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {{-- Preserve current period filter --}}
             <input type="hidden" name="periode" value="{{ $periode }}">
 
@@ -101,20 +101,11 @@
                 </select>
             </div>
 
-            <div>
-                <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Jam Ambil</label>
-                <select name="jam_pengambilan" class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20">
-                    <option value="">Semua Jam</option>
-                    <option value="Istirahat 1" {{ str_contains(request('jam_pengambilan', ''), '1') ? 'selected' : '' }}>Istirahat 1 (09:45 - 10:15)</option>
-                    <option value="Istirahat 2" {{ str_contains(request('jam_pengambilan', ''), '2') ? 'selected' : '' }}>Istirahat 2 (12:00 - 12:45)</option>
-                </select>
-            </div>
-
             <div class="flex items-end gap-2">
                 <button type="submit" class="flex-1 min-h-[40px] py-2 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold text-xs shadow-sm transition-all cursor-pointer">
                     Filter
                 </button>
-                @if(request()->anyFilled(['search', 'stand_id', 'status', 'jam_pengambilan']))
+                @if(request()->anyFilled(['search', 'stand_id', 'status']))
                 <a href="{{ route('admin.orders.index', ['periode' => $periode]) }}" class="min-h-[40px] flex items-center py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors">
                     Reset
                 </a>
@@ -171,10 +162,7 @@
                     @endforeach
                 </div>
 
-                <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60">
-                    <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-bold text-[10px] border border-orange-100">
-                        {{ $ro->jam_pengambilan }}
-                    </span>
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200/60">
                     <span class="font-black text-slate-900 text-sm">
                         Rp {{ number_format($ro->total_harga, 0, ',', '.') }}
                     </span>
@@ -194,7 +182,6 @@
                         <th class="py-3 px-4">Stand</th>
                         <th class="py-3 px-4">Pemesan</th>
                         <th class="py-3 px-4">Detail Menu</th>
-                        <th class="py-3 px-4">Jam Ambil</th>
                         <th class="py-3 px-4">Total</th>
                         <th class="py-3 px-5 text-center">Status</th>
                     </tr>
@@ -223,9 +210,6 @@
                                 </div>
                                 @endforeach
                             </div>
-                        </td>
-                        <td class="py-3.5 px-4">
-                            <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-bold text-[10px] border border-orange-100">{{ $ro->jam_pengambilan }}</span>
                         </td>
                         <td class="py-3.5 px-4 font-black text-slate-900">
                             Rp {{ number_format($ro->total_harga, 0, ',', '.') }}

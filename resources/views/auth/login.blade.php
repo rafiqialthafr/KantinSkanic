@@ -1,17 +1,15 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('title', 'Masuk - KantinSkanic')
 
 @section('content')
-<div class="max-w-md mx-auto px-4 py-8 sm:py-12">
+<div class="max-w-md mx-auto px-4 py-4 sm:py-8 w-full">
     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50 p-6 sm:p-8">
 
         <!-- Logo & Header -->
         <div class="text-center mb-6">
-            <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 mb-3">
-                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                </svg>
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 p-1 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 mb-3">
+                <img src="{{ asset('img/kanic-logo.png') }}" alt="Logo KantinSkanic" class="w-full h-full object-contain">
             </div>
             <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Masuk ke KantinSkanic</h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">Satu portal masuk untuk Siswa, Penjual Stand, & Admin</p>
@@ -74,7 +72,12 @@
             </div>
 
             <div>
-                <label for="password" class="block text-xs font-bold text-slate-700 mb-1.5">Kata Sandi</label>
+                <div class="flex items-center justify-between mb-1.5">
+                    <label for="password" class="block text-xs font-bold text-slate-700">Kata Sandi</label>
+                    <a href="{{ route('password.request') }}" class="text-[11px] font-semibold text-orange-500 hover:text-orange-700 hover:underline transition-colors">
+                        Lupa Sandi?
+                    </a>
+                </div>
                 <div class="relative">
                     <input type="password" id="password" name="password" required placeholder="••••••••"
                         class="w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
@@ -90,6 +93,15 @@
                 </div>
             </div>
 
+            <!-- Ingat Saya Checkbox -->
+            <div class="flex items-center justify-between pt-0.5">
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" name="remember" id="remember" value="1" 
+                           class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500 border-slate-300 transition-all cursor-pointer">
+                    <span class="text-xs font-semibold text-slate-600">Ingat saya di perangkat ini</span>
+                </label>
+            </div>
+
             <button type="submit"
                 class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-98 text-white font-extrabold text-sm shadow-lg shadow-orange-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
                 <span>Masuk Sekarang</span>
@@ -99,16 +111,14 @@
             </button>
         </form>
 
-        <!-- Quick Register Banner for Siswa -->
-        <div class="mt-5 p-4 rounded-2xl bg-orange-50/70 border border-orange-200/80 text-center">
-            <p class="text-xs font-bold text-slate-800">Kamu siswa & belum punya akun?</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Daftar akun cepat dalam 30 detik untuk menyelesaikan pesanan.</p>
-            <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 mt-2.5 px-4 py-2 rounded-xl bg-white border border-orange-300 text-orange-600 font-extrabold text-xs shadow-xs hover:bg-orange-600 hover:text-white transition-all">
-                <span>Daftar Akun Siswa Baru</span>
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                </svg>
-            </a>
+        <!-- Teks Simpel Pendaftaran Siswa (Sesuai Permintaan) -->
+        <div class="mt-5 text-center">
+            <p class="text-xs text-slate-500">
+                Siswa baru belum punya akun? 
+                <a href="{{ route('register') }}" class="font-bold text-orange-600 hover:text-orange-700 hover:underline">
+                     Daftar
+                </a>
+            </p>
         </div>
 
         <!-- Quick Demo Autofill Box -->
@@ -143,8 +153,8 @@
         </div>
 
         <div class="mt-5 text-center">
-            <a href="{{ route('katalog.index') }}" class="text-xs text-slate-400 hover:text-slate-600 font-semibold hover:underline">
-                &larr; Kembali ke Daftar Menu Siswa
+            <a href="{{ route('katalog.index') }}" class="text-xs text-slate-400 hover:text-orange-600 font-semibold hover:underline">
+                &larr; Kembali ke Halaman Beranda
             </a>
         </div>
     </div>

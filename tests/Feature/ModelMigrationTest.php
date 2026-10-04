@@ -51,7 +51,6 @@ class ModelMigrationTest extends TestCase
             'nama_pemesan' => 'Budi',
             'kelas' => 'XI PPLG 1',
             'total_harga' => 15000,
-            'jam_pengambilan' => 'Istirahat 1',
             'status' => 'pending',
             'catatan' => 'Pedas, kuah banyak',
         ]);
