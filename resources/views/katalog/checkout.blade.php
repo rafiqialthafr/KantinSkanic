@@ -122,21 +122,24 @@
     </div>
 
 </div>
+@endsection
 
 @push('scripts')
 <script>
-    const CART_KEY = 'kantinskanic_cart_v1';
+    function getCartKey() {
+        return typeof getCartStorageKey === 'function' ? getCartStorageKey() : (window.AUTH_USER_ID ? ('kantinskanic_cart_user_' + window.AUTH_USER_ID) : 'kantinskanic_cart_guest');
+    }
 
     function getCart() {
         try {
-            return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+            return JSON.parse(localStorage.getItem(getCartKey())) || [];
         } catch (e) {
             return [];
         }
     }
 
     function saveCart(items) {
-        localStorage.setItem(CART_KEY, JSON.stringify(items));
+        localStorage.setItem(getCartKey(), JSON.stringify(items));
         renderCheckoutView();
         if (typeof syncNavbarCartBadge === 'function') {
             syncNavbarCartBadge();
@@ -247,7 +250,7 @@
             const data = await response.json();
 
             if (response.ok && data.success) {
-                localStorage.removeItem(CART_KEY);
+                localStorage.removeItem(getCartKey());
                 window.location.href = data.redirect_url;
             } else {
                 alert(data.message || 'Gagal membuat pesanan. Silakan periksa kembali data Anda.');
@@ -267,4 +270,3 @@
     });
 </script>
 @endpush
-@endsection

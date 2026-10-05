@@ -45,7 +45,16 @@ class MenuController extends Controller
             'harga' => ['required', 'integer', 'min:500'],
             'stok' => ['required', 'integer', 'min:0'],
             'is_available' => ['nullable'],
-            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,jfif,avif,gif', 'max:5120'],
+        ], [
+            'nama_menu.required' => 'Nama menu wajib diisi.',
+            'kategori.required' => 'Kategori menu wajib dipilih.',
+            'harga.required' => 'Harga wajib diisi.',
+            'harga.min' => 'Harga minimal Rp 500.',
+            'stok.required' => 'Jumlah stok awal wajib diisi.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus berupa JPG, JPEG, PNG, WEBP, JFIF, AVIF, atau GIF.',
+            'foto.max' => 'Ukuran foto maksimal 5 MB.',
         ]);
 
         $fotoPath = null;
@@ -80,7 +89,16 @@ class MenuController extends Controller
             'harga' => ['required', 'integer', 'min:500'],
             'stok' => ['required', 'integer', 'min:0'],
             'is_available' => ['nullable'],
-            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,jfif,avif,gif', 'max:5120'],
+        ], [
+            'nama_menu.required' => 'Nama menu wajib diisi.',
+            'kategori.required' => 'Kategori menu wajib dipilih.',
+            'harga.required' => 'Harga wajib diisi.',
+            'harga.min' => 'Harga minimal Rp 500.',
+            'stok.required' => 'Jumlah stok wajib diisi.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus berupa JPG, JPEG, PNG, WEBP, JFIF, AVIF, atau GIF.',
+            'foto.max' => 'Ukuran foto maksimal 5 MB.',
         ]);
 
         $data = [

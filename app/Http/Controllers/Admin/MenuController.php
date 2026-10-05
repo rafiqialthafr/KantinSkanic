@@ -37,7 +37,7 @@ class MenuController extends Controller
         $stands = Stand::orderBy('nomor_stand')->get();
 
         $totalMenusCount = Menu::count();
-        $availableMenusCount = Menu::where('is_available', true)->count();
+        $availableMenusCount = Menu::where('is_available', true)->where('stok', '>', 0)->count();
         $outOfStockCount = Menu::where('stok', '<=', 0)->orWhere('is_available', false)->count();
 
         return view('admin.menus.index', compact(

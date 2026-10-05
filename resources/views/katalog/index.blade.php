@@ -3,7 +3,7 @@
 @section('title', 'Daftar Menu & Pesan Makanan')
 
 @section('content')
-<div class="relative pb-24">
+<div class="relative pb-24 w-full overflow-x-hidden">
 
     <!-- ===================================================
          1. HERO SECTION (Full-Bleed Edge-to-Edge matching reference)
@@ -19,37 +19,37 @@
             <div class="max-w-2xl lg:max-w-3xl">
 
                 <!-- Pill Badge: ● PRE-ORDER KANTIN SKANIC 2026 -->
-                <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/15 border border-white/25 text-white text-xs sm:text-[13px] font-semibold mb-4 backdrop-blur-xs tracking-wider uppercase shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                    <span>Pre-Order Kantin Skanic</span>
+                <div class="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-white/15 border border-white/25 text-white text-[11px] sm:text-[13px] font-semibold mb-3 sm:mb-4 backdrop-blur-xs tracking-wider uppercase shadow-2xs">
+                    <span class="w-2 h-2 rounded-full bg-white animate-pulse shrink-0"></span>
+                    <span class="truncate">Pre-Order Kantin Skanic</span>
                 </div>
 
                 <!-- Balanced Large Heading (matching reference image) -->
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-[54px] font-black text-white leading-[1.15] tracking-tight">
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl xl:text-[54px] font-black text-white leading-tight sm:leading-[1.15] tracking-tight break-words">
                     Pesan Makanan <span class="text-amber-200">Tanpa Antre</span><br>
                     Kantin Skanic<br>
                     SMKN 1 Ciomas
                 </h1>
 
                 <!-- Subtitle paragraph -->
-                <p class="mt-3 sm:mt-4 text-sm sm:text-base lg:text-base xl:text-lg text-white/90 max-w-2xl leading-relaxed font-medium">
+                <p class="mt-3 sm:mt-4 text-xs sm:text-base lg:text-base xl:text-lg text-white/90 max-w-2xl leading-relaxed font-medium">
                     Wadah digital resmi untuk memesan seluruh menu makanan dan minuman siswa di Kantin SMK Negeri 1 Ciomas. Pilih menu stand favoritmu dan langsung ambil pesananmu tanpa perlu berdesakan.
                 </p>
 
                 <!-- Dual CTA Buttons (Solid with arrow + Ghost outline) -->
-                <div class="mt-5 sm:mt-6 flex flex-wrap items-center gap-3.5">
-                    <!-- CTA 1: Solid button with arrow (like "Lihat Semua Project →") -->
+                <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
+                    <!-- CTA 1: Solid button with arrow -->
                     <a href="#katalog-section"
-                        class="inline-flex items-center justify-center gap-2.5 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl bg-white text-orange-600 hover:bg-orange-50 font-black text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all">
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl bg-white text-orange-600 hover:bg-orange-50 font-black text-xs sm:text-base shadow-lg hover:shadow-xl active:scale-95 transition-all text-center">
                         <span>Pesan Sekarang</span>
-                        <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <svg class="w-4 h-4 text-orange-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>
                     </a>
 
-                    <!-- CTA 2: Ghost outline button (like "Tentang Uji Level") -->
+                    <!-- CTA 2: Ghost outline button -->
                     <button type="button" onclick="openTrackOrderModal()"
-                        class="inline-flex items-center justify-center gap-2.5 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-sm sm:text-base backdrop-blur-xs active:scale-95 transition-all cursor-pointer">
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-xs sm:text-base backdrop-blur-xs active:scale-95 transition-all cursor-pointer text-center">
                         <span>Cek Status Pesanan</span>
                     </button>
                 </div>
@@ -173,7 +173,7 @@
             </a>
         </div>
         @else
-        <div id="menus-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+        <div id="menus-grid-container" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             @foreach($menus as $menu)
             @php
             // Curated appetizing Indonesian food photos if no file uploaded
@@ -218,8 +218,8 @@
             }
             @endphp
 
-            <!-- Menu Card with 4:3 Ratio Photo -->
-            <div class="menu-card-item bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+            <!-- Menu Card with 4:3 Ratio Photo (2 cols on mobile) -->
+            <div class="menu-card-item bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs sm:shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
                 data-nama="{{ strtolower($menu->nama_menu) }}"
                 data-stand="{{ strtolower($menu->stand->nama_stand) }}">
 
@@ -233,54 +233,63 @@
                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';">
 
                         <!-- Overlaid Badges on Photo -->
-                        <div class="absolute inset-x-3 top-3 flex items-center justify-between gap-1.5 pointer-events-none">
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-800 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-xl shadow-xs border border-slate-100">
-                                <svg class="w-3 h-3 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <div class="absolute inset-x-2 top-2 sm:inset-x-3 sm:top-3 flex items-center justify-between gap-1 pointer-events-none">
+                            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[11px] font-bold text-slate-800 bg-white/95 backdrop-blur-md px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl shadow-xs border border-slate-100 max-w-[85px] sm:max-w-[130px] truncate">
+                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.25A2.25 2.25 0 0 1 0 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 18 7.5v11.25A2.25 2.25 0 0 1 15.75 21H13.5Z" />
                                 </svg>
-                                <span class="truncate max-w-[130px]">{{ $menu->stand->nama_stand }}</span>
+                                <span class="truncate">{{ $menu->stand->nama_stand }}</span>
                             </span>
 
                             @if($menu->kategori === 'makanan')
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-amber-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <span class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-extrabold uppercase rounded-lg sm:rounded-xl bg-amber-500 text-white shadow-xs">
+                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
                                     <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
                                     <path d="m2.1 21.8 6.4-6.3" />
                                     <path d="m19 5-7 7" />
-                                </svg> Makanan</span>
+                                </svg>
+                                <span class="hidden sm:inline">Makanan</span>
+                            </span>
                             @elseif($menu->kategori === 'minuman')
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-sky-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <span class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-extrabold uppercase rounded-lg sm:rounded-xl bg-sky-500 text-white shadow-xs">
+                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z" />
                                     <path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0" />
-                                </svg> Minuman</span>
+                                </svg>
+                                <span class="hidden sm:inline">Minuman</span>
+                            </span>
                             @else
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-extrabold uppercase rounded-xl bg-emerald-500 text-white shadow-xs"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <span class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-extrabold uppercase rounded-lg sm:rounded-xl bg-emerald-500 text-white shadow-xs">
+                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12 2a5 5 0 1 1 5 5H7a5 5 0 0 1 0-10 5 5 0 0 1 5 5" />
                                     <path d="M12 7v5" />
                                     <path d="M8 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3" />
-                                </svg> Snack</span>
+                                </svg>
+                                <span class="hidden sm:inline">Snack</span>
+                            </span>
                             @endif
                         </div>
 
                         <!-- Bottom Subtle Gradient -->
-                        <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/25 to-transparent pointer-events-none"></div>
+                        <div class="absolute inset-x-0 bottom-0 h-8 sm:h-10 bg-gradient-to-t from-black/25 to-transparent pointer-events-none"></div>
                     </div>
 
                     <!-- Card Body: Name, Stand info, Stock -->
-                    <div class="p-4 sm:p-5">
-                        <h3 class="font-bold text-slate-900 text-base sm:text-lg group-hover:text-orange-600 transition-colors line-clamp-1" title="{{ $menu->nama_menu }}">
+                    <div class="p-2.5 sm:p-5">
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-lg group-hover:text-orange-600 transition-colors line-clamp-2 sm:line-clamp-1 leading-snug" title="{{ $menu->nama_menu }}">
                             {{ $menu->nama_menu }}
                         </h3>
 
-                        <div class="mt-1 flex items-center justify-between gap-2 text-xs">
-                            <span class="text-slate-400 font-medium">{{ $menu->stand->nomor_stand }}</span>
+                        <div class="mt-1 sm:mt-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs">
+                            <span class="text-slate-400 font-medium truncate">{{ $menu->stand->nomor_stand }}</span>
                             @if($menu->stok > 0)
-                            <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
+                            <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-emerald-100 text-[9px] sm:text-xs shrink-0">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                 <span>Stok {{ $menu->stok }}</span>
                             </span>
                             @else
-                            <span class="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100">
+                            <span class="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-50 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-rose-100 text-[9px] sm:text-xs shrink-0">
                                 <span>Habis</span>
                             </span>
                             @endif
@@ -289,10 +298,10 @@
                 </div>
 
                 <!-- Card Bottom Bar: Price & "+ Tambah" Button -->
-                <div class="px-4 sm:px-5 py-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between">
+                <div class="px-2.5 py-2 sm:px-5 sm:py-3.5 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
                     <div>
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Harga</span>
-                        <span class="text-base sm:text-lg font-black text-orange-600">
+                        <span class="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block tracking-wider leading-none sm:leading-normal">Harga</span>
+                        <span class="text-xs sm:text-lg font-black text-orange-600 leading-tight">
                             Rp {{ number_format($menu->harga, 0, ',', '.') }}
                         </span>
                     </div>
@@ -305,15 +314,15 @@
                         data-stand="{{ e($menu->stand->nama_stand) }}"
                         data-stok="{{ $menu->stok }}"
                         onclick="cartStore.addItemFromBtn(this)"
-                        class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-95 text-white text-xs sm:text-sm font-extrabold rounded-xl shadow-md shadow-orange-500/20 transition-all duration-150 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-95 text-white text-[11px] sm:text-sm font-extrabold rounded-lg sm:rounded-xl shadow-xs sm:shadow-md sm:shadow-orange-500/20 transition-all duration-150 cursor-pointer">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         <span>Tambah</span>
                     </button>
                     @else
                     <button type="button" disabled
-                        class="inline-flex items-center gap-1 px-3.5 py-2 bg-slate-200 text-slate-400 text-xs font-bold rounded-xl cursor-not-allowed">
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-slate-200 text-slate-400 text-[11px] sm:text-xs font-bold rounded-lg sm:rounded-xl cursor-not-allowed">
                         <span>Habis</span>
                     </button>
                     @endif
@@ -327,30 +336,17 @@
     </div> <!-- Close max-w-7xl catalog wrapper -->
 
     <!-- ===================================================
-         4. FLOATING STICKY CART BAR
+         TOAST VALIDASI ALA SHOPEE: "Ditambahkan ke keranjang"
     =================================================== -->
-    <div id="floating-cart-bar" class="fixed bottom-4 right-4 sm:right-6 w-[calc(100%-2rem)] sm:w-auto sm:min-w-[380px] sm:max-w-md z-30 transition-all duration-300 transform translate-y-28 opacity-0 pointer-events-none">
-        <div class="text-white rounded-2xl p-3.5 sm:p-4 shadow-2xl border border-slate-800 flex items-center justify-between gap-5 sm:gap-8 pointer-events-auto" style="background-color: #fafafa; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);">
-            <div class="flex items-center gap-3 min-w-0">
-                <div class="relative w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white shrink-0 shadow-md">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                    </svg>
-                    <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
-                </div>
-                <div class="min-w-0">
-                    <span id="cart-total-display" class="block text-sm sm:text-base font-extrabold text-black whitespace-nowrap">Rp 0</span>
-                    <span id="cart-items-summary" class="block text-[11px] text-slate-600 whitespace-nowrap">0 Menu Dipilih</span>
-                </div>
-            </div>
-
-            <button type="button" onclick="openCartModal()" class="shrink-0 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-95 text-white text-xs sm:text-sm font-extrabold rounded-xl transition-all shadow-md shadow-orange-500/25 flex items-center gap-1.5 cursor-pointer">
-                <span>Checkout</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                </svg>
-            </button>
+    <div id="shopee-toast" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.85); background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; padding: 18px 24px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.35); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 99999; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;">
+            <svg style="width: 26px; height: 26px; color: #ffffff;" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
         </div>
+        <span style="font-size: 13.5px; font-weight: 600; color: #ffffff; text-align: center; letter-spacing: 0.2px; white-space: nowrap;">
+            Ditambahkan ke keranjang
+        </span>
     </div>
 
     <!-- ===================================================
@@ -434,9 +430,8 @@
                     <!-- Authenticated Siswa Checkout Form Section -->
                     <form id="checkout-form" onsubmit="handleCheckout(event)" class="border-t-2 border-slate-100 pt-5 space-y-4">
                         @csrf
-                        <div class="flex items-center justify-between">
+                        <div>
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Data Pemesan</span>
-                            <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">Siswa Terverifikasi</span>
                         </div>
 
                         <!-- Nama Lengkap Siswa -->
@@ -495,16 +490,18 @@
     // LocalStorage Shopping Cart Management
     // ==========================================
     const cartStore = {
-        key: 'kantinskanic_cart_v1',
+        getKey() {
+            return typeof getCartStorageKey === 'function' ? getCartStorageKey() : (window.AUTH_USER_ID ? ('kantinskanic_cart_user_' + window.AUTH_USER_ID) : 'kantinskanic_cart_guest');
+        },
         getItems() {
             try {
-                return JSON.parse(localStorage.getItem(this.key)) || [];
+                return JSON.parse(localStorage.getItem(this.getKey())) || [];
             } catch (e) {
                 return [];
             }
         },
         save(items) {
-            localStorage.setItem(this.key, JSON.stringify(items));
+            localStorage.setItem(this.getKey(), JSON.stringify(items));
             this.updateUI();
             if (typeof syncNavbarCartBadge === 'function') {
                 syncNavbarCartBadge();
@@ -539,7 +536,7 @@
                 });
             }
             this.save(items);
-            this.showFloatingBar();
+            showShopeeToast();
         },
         updateQty(menuId, delta) {
             let items = this.getItems();
@@ -560,7 +557,7 @@
             this.save(items);
         },
         clearCart() {
-            localStorage.removeItem(this.key);
+            localStorage.removeItem(this.getKey());
             this.updateUI();
             if (typeof syncNavbarCartBadge === 'function') {
                 syncNavbarCartBadge();
@@ -574,30 +571,12 @@
         },
         updateUI() {
             const items = this.getItems();
-            const totalCount = this.getTotalCount();
             const totalPrice = this.getTotalPrice();
 
-            const badge = document.getElementById('cart-badge-count');
-            const totalDisp = document.getElementById('cart-total-display');
-            const summary = document.getElementById('cart-items-summary');
             const container = document.getElementById('cart-items-container');
             const drawerSubtotal = document.getElementById('drawer-subtotal');
-            const bar = document.getElementById('floating-cart-bar');
 
-            if (badge) badge.innerText = totalCount;
-            if (totalDisp) totalDisp.innerText = 'Rp ' + totalPrice.toLocaleString('id-ID');
             if (drawerSubtotal) drawerSubtotal.innerText = 'Rp ' + totalPrice.toLocaleString('id-ID');
-            if (summary) summary.innerText = totalCount + ' Menu Dipilih';
-
-            if (totalCount > 0) {
-                if (bar) {
-                    bar.classList.remove('translate-y-28', 'opacity-0', 'pointer-events-none');
-                }
-            } else {
-                if (bar) {
-                    bar.classList.add('translate-y-28', 'opacity-0', 'pointer-events-none');
-                }
-            }
 
             // Render items in drawer
             if (container) {
@@ -630,14 +609,43 @@
                     `).join('');
                 }
             }
-        },
-        showFloatingBar() {
-            const bar = document.getElementById('floating-cart-bar');
-            if (bar && this.getTotalCount() > 0) {
-                bar.classList.remove('translate-y-28', 'opacity-0', 'pointer-events-none');
-            }
         }
     };
+
+    let toastTimeout = null;
+
+    function showShopeeToast() {
+        const toast = document.getElementById('shopee-toast');
+        if (!toast) return;
+
+        if (toastTimeout) {
+            clearTimeout(toastTimeout);
+        }
+
+        toast.style.visibility = 'visible';
+        toast.style.opacity = '1';
+        toast.style.transform = 'translate(-50%, -50%) scale(1)';
+
+        // Efek pop badge keranjang di navbar ala Shopee
+        const navBadge = document.getElementById('nav-cart-badge');
+        if (navBadge) {
+            navBadge.style.transition = 'transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            navBadge.style.transform = 'scale(1.4)';
+            setTimeout(() => {
+                navBadge.style.transform = 'scale(1)';
+            }, 180);
+        }
+
+        toastTimeout = setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translate(-50%, -50%) scale(0.85)';
+            setTimeout(() => {
+                if (toast.style.opacity === '0') {
+                    toast.style.visibility = 'hidden';
+                }
+            }, 220);
+        }, 1200);
+    }
 
     function openCartModal() {
         const modal = document.getElementById('cart-modal');
@@ -754,6 +762,15 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         cartStore.updateUI();
+        if (new URLSearchParams(window.location.search).get('cart') === 'open') {
+            openCartModal();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeCartModal();
+        }
     });
 </script>
 @endpush

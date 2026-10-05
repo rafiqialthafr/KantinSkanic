@@ -81,7 +81,7 @@
 
             @auth
             <div class="pt-4 mt-auto">
-                <form action="{{ route('logout') }}" method="POST" class="m-0">
+                <form action="{{ route('logout') }}" method="POST" class="m-0" onsubmit="try{ localStorage.removeItem('kantinskanic_cart_guest'); }catch(e){}">
                     @csrf
                     <button type="submit" class="w-full sidebar-link sidebar-link-logout cursor-pointer text-left">
                         <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
