@@ -48,10 +48,13 @@
                     </a>
 
                     <!-- CTA 2: Ghost outline button -->
-                    <button type="button" onclick="openTrackOrderModal()"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-xs sm:text-base backdrop-blur-xs active:scale-95 transition-all cursor-pointer text-center">
-                        <span>Cek Status Pesanan</span>
-                    </button>
+                    <a href="{{ route('order.history') }}"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-xs sm:text-base backdrop-blur-xs active:scale-95 transition-all text-center">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span>Riwayat Pesanan</span>
+                    </a>
                 </div>
 
             </div>
@@ -720,6 +723,9 @@
             const data = await response.json();
 
             if (response.ok && data.success) {
+                if (typeof saveOrderToHistoryStorage === 'function' && data.all_codes) {
+                    saveOrderToHistoryStorage(data.all_codes);
+                }
                 cartStore.clearCart();
                 window.location.href = data.redirect_url;
             } else {

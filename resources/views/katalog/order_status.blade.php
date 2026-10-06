@@ -287,11 +287,14 @@
     // Auto-save this order code to local storage for quick access in modal
     try {
         const code = '{{ $order->kode_tr }}';
-        let orders = JSON.parse(localStorage.getItem('kantinskanic_my_orders') || '[]');
-        if (!orders.includes(code)) {
-            orders.unshift(code);
-            if (orders.length > 5) orders = orders.slice(0, 5);
-            localStorage.setItem('kantinskanic_my_orders', JSON.stringify(orders));
+        if (typeof saveOrderToHistoryStorage === 'function') {
+            saveOrderToHistoryStorage(code);
+        } else {
+            let orders = JSON.parse(localStorage.getItem('kantinskanic_order_history') || '[]');
+            if (!orders.includes(code)) {
+                orders.unshift(code);
+                localStorage.setItem('kantinskanic_order_history', JSON.stringify(orders));
+            }
         }
     } catch (e) {}
 

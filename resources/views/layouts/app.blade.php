@@ -145,7 +145,7 @@
                     <nav class="hidden md:flex items-center">
                         <a href="{{ route('katalog.index') }}" class="nav-link">Beranda</a>
                         <a href="{{ route('katalog.index') }}#katalog-section" class="nav-link">Daftar Menu</a>
-                        <button type="button" onclick="openTrackOrderModal()" class="nav-link">Lacak Pesanan</button>
+                        <a href="{{ route('order.history') }}" class="nav-link {{ request()->routeIs('order.history') ? 'active' : '' }}">Riwayat Pesanan</a>
                     </nav>
 
                     <!-- Divider -->
@@ -311,17 +311,17 @@
                     <span id="mobile-nav-cart-badge" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-orange-500 text-white" style="display:none;">0</span>
                 </button>
 
-                <button type="button" onclick="toggleMobileNav(); openTrackOrderModal()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-orange-600 hover:bg-orange-50/70 transition-colors group cursor-pointer">
+                <a href="{{ route('order.history') }}" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-orange-600 hover:bg-orange-50/70 transition-colors group">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-orange-100 group-hover:text-orange-600 text-slate-500 flex items-center justify-center transition-colors">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         </div>
-                        <span>Lacak Pesanan</span>
+                        <span>Riwayat Pesanan</span>
                     </div>
-                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-orange-100 text-orange-700">Cek Status</span>
-                </button>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-orange-100 text-orange-700">Lihat Status</span>
+                </a>
 
                 @auth
                 @if(Auth::user()->isAdmin())
@@ -402,66 +402,7 @@
         @yield('content')
     </main>
 
-    <!-- Global Modal Lacak Pesanan -->
-    <div id="modal-track-order" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-track-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onclick="closeTrackOrderModal()"></div>
-        <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <div class="relative transform overflow-hidden rounded-3xl bg-white p-6 sm:p-8 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-100">
-                <!-- Close Button -->
-                <button type="button" onclick="closeTrackOrderModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                </button>
 
-                <div class="text-center mb-6">
-                    <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/25 mb-3">
-                        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
-                    </div>
-                    <h3 id="modal-track-title" class="text-lg sm:text-xl font-extrabold text-slate-900">Lacak Status Pesanan</h3>
-                    <p class="text-xs text-slate-500 mt-1">Masukkan kode unik transaksi yang Anda terima saat checkout.</p>
-                </div>
-
-                <form onsubmit="submitTrackOrderModal(event)" class="space-y-4">
-                    <div>
-                        <label for="track-order-input" class="block text-xs font-bold text-slate-700 mb-1.5">Kode Pesanan (PO-XXXX)</label>
-                        <div class="relative">
-                            <input type="text" id="track-order-input" required placeholder="Contoh: PO-8921 atau 8921"
-                                class="w-full uppercase font-mono tracking-wider pl-4 pr-10 py-3 text-sm font-bold bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
-                            <div class="absolute right-3 top-3 text-slate-400">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    @php $modalRecentOrders = session('recent_orders', []); @endphp
-                    @if(!empty($modalRecentOrders))
-                    <div class="pt-1">
-                        <span class="text-[11px] font-bold text-slate-400 block mb-1.5">Pesanan Terakhir Anda:</span>
-                        <div class="flex flex-wrap gap-1.5">
-                            @foreach($modalRecentOrders as $rc)
-                            <a href="{{ route('order.status', $rc) }}" class="px-2.5 py-1 text-xs font-bold text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition-colors font-mono">
-                                #{{ $rc }} &rarr;
-                            </a>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
-                    <button type="submit" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-98 text-white font-extrabold text-sm shadow-lg shadow-orange-500/25 transition-all flex items-center justify-center gap-2">
-                        <span>Cek Status Sekarang</span>
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                        </svg>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <!-- Footer -->
     <footer class="mt-auto border-t border-slate-200 bg-white py-6 sm:py-7 text-xs text-slate-500">
@@ -505,29 +446,38 @@
             }
         }
 
-        function openTrackOrderModal() {
-            const modal = document.getElementById('modal-track-order');
-            if (modal) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    const input = document.getElementById('track-order-input');
-                    if (input) input.focus();
-                }, 50);
+        function getOrderHistoryStorage() {
+            try {
+                const raw = localStorage.getItem('kantinskanic_order_history');
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                return [];
             }
         }
 
-        function closeTrackOrderModal() {
-            const modal = document.getElementById('modal-track-order');
-            if (modal) modal.classList.add('hidden');
+        function saveOrderToHistoryStorage(codes) {
+            try {
+                const existing = getOrderHistoryStorage();
+                const newCodes = Array.isArray(codes) ? codes : [codes];
+                const cleanCodes = newCodes.map(c => String(c).trim().toUpperCase()).filter(Boolean);
+                const merged = Array.from(new Set([...cleanCodes, ...existing])).filter(Boolean);
+                localStorage.setItem('kantinskanic_order_history', JSON.stringify(merged));
+            } catch (e) {
+                console.error(e);
+            }
         }
 
-        function submitTrackOrderModal(e) {
-            e.preventDefault();
-            const raw = (document.getElementById('track-order-input').value || '').trim().toUpperCase();
-            if (!raw) return;
-            const code = raw.startsWith('PO-') ? raw : 'PO-' + raw.replace(/^PO-?/i, '');
-            window.location.href = '/order/' + code;
+        function openOrderHistoryModal() {
+            window.location.href = '{{ route("order.history") }}';
         }
+
+        function closeOrderHistoryModal() {}
+
+        function openTrackOrderModal() {
+            window.location.href = '{{ route("order.history") }}';
+        }
+
+        function closeTrackOrderModal() {}
 
         window.AUTH_USER_ID = @json(Auth::id());
 

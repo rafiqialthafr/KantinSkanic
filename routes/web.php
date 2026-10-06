@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 // ==========================================================
 Route::get('/', [KatalogController::class, 'index'])->name('katalog.index');
 Route::get('/order/{kode_tr}', [KatalogController::class, 'orderStatus'])->name('order.status');
+Route::get('/riwayat-pesanan', [KatalogController::class, 'orderHistory'])->name('order.history');
+Route::post('/api/riwayat-pesanan', [KatalogController::class, 'orderHistoryApi'])->name('order.history.api');
 
 // ==========================================================
 // 2. CHECKOUT — requires auth (siswa/any role)

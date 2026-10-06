@@ -200,4 +200,214 @@ class KatalogController extends Controller
             'otherOrders' => $otherOrders,
         ]);
     }
+
+    /**
+     * Display customer order history page.
+     */
+    public function orderHistory(Request $request)
+    {
+        $statusFilter = $request->query('status', 'all');
+        $searchQuery = trim($request->query('q', ''));
+
+        // Collect all related codes
+        $recentCodes = session()->get('recent_orders', []);
+
+        $query = Order::with(['stand.user', 'items.menu']);
+
+        $candidateCodes = $recentCodes;
+        if ($request->filled('codes')) {
+            $inputCodes = is_array($request->input('codes')) ? $request->input('codes') : explode(',', (string) $request->input('codes'));
+            $candidateCodes = array_unique(array_merge($candidateCodes, array_filter(array_map('trim', $inputCodes))));
+        }
+
+        $query->where(function ($q) use ($candidateCodes, $searchQuery) {
+            $hasCondition = false;
+
+            if (! empty($candidateCodes)) {
+                $q->whereIn('kode_tr', $candidateCodes);
+                $hasCondition = true;
+            }
+
+            if (auth()->check()) {
+                if ($hasCondition) {
+                    $q->orWhere('nama_pemesan', auth()->user()->name);
+                } else {
+                    $q->where('nama_pemesan', auth()->user()->name);
+                }
+                $hasCondition = true;
+            }
+
+            if (! empty($searchQuery)) {
+                $cleanCode = strtoupper($searchQuery);
+                if (! str_starts_with($cleanCode, 'PO-') && is_numeric($cleanCode)) {
+                    $cleanCode = 'PO-'.$cleanCode;
+                }
+                $searchCallback = function ($sq) use ($searchQuery, $cleanCode) {
+                    $sq->where('kode_tr', 'like', "%{$searchQuery}%")
+                        ->orWhere('kode_tr', $cleanCode)
+                        ->orWhereHas('stand', function ($st) use ($searchQuery) {
+                            $st->where('nama_stand', 'like', "%{$searchQuery}%");
+                        })
+                        ->orWhereHas('items.menu', function ($mn) use ($searchQuery) {
+                            $mn->where('nama_menu', 'like', "%{$searchQuery}%");
+                        });
+                };
+
+                if ($hasCondition) {
+                    $q->orWhere($searchCallback);
+                } else {
+                    $q->where($searchCallback);
+                }
+                $hasCondition = true;
+            }
+
+            // Fallback if guest has no saved codes and no search: do not leak everyone's orders
+            if (! $hasCondition) {
+                $q->whereRaw('1 = 0');
+            }
+        });
+
+        // Calculate counts for each Shopee tab
+        $countsQuery = clone $query;
+        $allOrdersForCounts = $countsQuery->select('id', 'status')->get();
+        $statusCounts = [
+            'all' => $allOrdersForCounts->count(),
+            'pending' => $allOrdersForCounts->where('status', 'pending')->count(),
+            'diproses' => $allOrdersForCounts->where('status', 'diproses')->count(),
+            'siap_diambil' => $allOrdersForCounts->where('status', 'siap_diambil')->count(),
+            'selesai' => $allOrdersForCounts->where('status', 'selesai')->count(),
+            'dibatalkan' => $allOrdersForCounts->where('status', 'dibatalkan')->count(),
+        ];
+
+        if ($statusFilter === 'aktif') {
+            $query->whereIn('status', ['pending', 'diproses', 'siap_diambil']);
+        } elseif (in_array($statusFilter, ['pending', 'diproses', 'siap_diambil', 'selesai', 'dibatalkan'])) {
+            $query->where('status', $statusFilter);
+        }
+
+        $orders = $query->latest()->take(50)->get();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'count' => $orders->count(),
+                'orders' => $this->formatOrdersForResponse($orders),
+            ]);
+        }
+
+        return view('katalog.riwayat', [
+            'orders' => $orders,
+            'statusFilter' => $statusFilter,
+            'searchQuery' => $searchQuery,
+            'statusCounts' => $statusCounts,
+        ]);
+    }
+
+    /**
+     * API for Riwayat Pesanan modal.
+     */
+    public function orderHistoryApi(Request $request)
+    {
+        $inputCodes = $request->input('codes', []);
+        if (is_string($inputCodes)) {
+            $inputCodes = array_filter(array_map('trim', explode(',', $inputCodes)));
+        }
+        $recentCodes = session()->get('recent_orders', []);
+        $allCodes = array_unique(array_merge($recentCodes, is_array($inputCodes) ? $inputCodes : []));
+
+        $searchCode = trim((string) $request->input('search_code', ''));
+        if (! empty($searchCode)) {
+            $cleanCode = strtoupper($searchCode);
+            if (! str_starts_with($cleanCode, 'PO-') && is_numeric($cleanCode)) {
+                $cleanCode = 'PO-'.$cleanCode;
+            }
+            $allCodes[] = $cleanCode;
+            $allCodes[] = strtoupper($searchCode);
+            $allCodes = array_unique($allCodes);
+        }
+
+        $query = Order::with(['stand.user', 'items.menu']);
+
+        $query->where(function ($q) use ($allCodes, $searchCode) {
+            $hasCondition = false;
+            if (! empty($allCodes)) {
+                $q->whereIn('kode_tr', $allCodes);
+                $hasCondition = true;
+            }
+
+            if (auth()->check()) {
+                if ($hasCondition) {
+                    $q->orWhere('nama_pemesan', auth()->user()->name);
+                } else {
+                    $q->where('nama_pemesan', auth()->user()->name);
+                }
+                $hasCondition = true;
+            }
+
+            if (! empty($searchCode)) {
+                if ($hasCondition) {
+                    $q->orWhere('kode_tr', 'like', "%{$searchCode}%");
+                } else {
+                    $q->where('kode_tr', 'like', "%{$searchCode}%");
+                }
+                $hasCondition = true;
+            }
+
+            if (! $hasCondition) {
+                $q->whereRaw('1 = 0');
+            }
+        });
+
+        $statusFilter = $request->input('status', 'all');
+        if ($statusFilter === 'aktif') {
+            $query->whereIn('status', ['pending', 'diproses', 'siap_diambil']);
+        } elseif ($statusFilter === 'selesai') {
+            $query->where('status', 'selesai');
+        } elseif ($statusFilter === 'dibatalkan') {
+            $query->where('status', 'dibatalkan');
+        }
+
+        $orders = $query->latest()->take(30)->get();
+
+        return response()->json([
+            'success' => true,
+            'count' => $orders->count(),
+            'orders' => $this->formatOrdersForResponse($orders),
+        ]);
+    }
+
+    /**
+     * Format orders for API / JSON response.
+     */
+    protected function formatOrdersForResponse($orders): array
+    {
+        return $orders->map(function ($order) {
+            $statusLabels = [
+                'pending' => 'Menunggu Konfirmasi',
+                'diproses' => 'Sedang Disiapkan',
+                'siap_diambil' => 'Siap Diambil',
+                'selesai' => 'Selesai',
+                'dibatalkan' => 'Dibatalkan',
+            ];
+
+            return [
+                'id' => $order->id,
+                'kode_tr' => $order->kode_tr,
+                'stand_nama' => $order->stand->nama_stand ?? 'Stand Kantin',
+                'nama_pemesan' => $order->nama_pemesan,
+                'kelas' => $order->kelas,
+                'status' => $order->status,
+                'status_label' => $statusLabels[$order->status] ?? ucfirst($order->status),
+                'total_harga' => $order->total_harga,
+                'total_harga_formatted' => 'Rp '.number_format($order->total_harga, 0, ',', '.'),
+                'created_at_formatted' => $order->created_at->format('d M Y, H:i').' WIB',
+                'created_at_relative' => $order->created_at->diffForHumans(),
+                'items_count' => $order->items->sum('jumlah'),
+                'items_summary' => $order->items->map(function ($item) {
+                    return $item->jumlah.'x '.($item->menu->nama_menu ?? 'Menu');
+                })->join(', '),
+                'url' => route('order.status', $order->kode_tr),
+            ];
+        })->values()->all();
+    }
 }

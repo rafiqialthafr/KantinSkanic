@@ -250,6 +250,9 @@
             const data = await response.json();
 
             if (response.ok && data.success) {
+                if (typeof saveOrderToHistoryStorage === 'function' && data.all_codes) {
+                    saveOrderToHistoryStorage(data.all_codes);
+                }
                 localStorage.removeItem(getCartKey());
                 window.location.href = data.redirect_url;
             } else {
