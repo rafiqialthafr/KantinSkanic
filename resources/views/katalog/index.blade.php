@@ -273,12 +273,12 @@
 
                     <!-- Card Body: Name, Seller, Stock -->
                     <div class="p-2.5 sm:p-4">
-                        <h3 class="font-bold text-slate-900 text-xs sm:text-base group-hover:text-orange-600 transition-colors line-clamp-2 leading-tight sm:leading-snug min-h-[2.25rem] sm:min-h-[2.5rem]" title="{{ $menu->nama_menu }}">
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-base group-hover:text-orange-600 transition-colors line-clamp-2 leading-tight sm:leading-snug min-h-[2.25rem] sm:min-h-[2.5rem]">
                             {{ $menu->nama_menu }}
                         </h3>
 
                         <div class="mt-1.5 flex items-center justify-between gap-1 text-[11px] sm:text-xs">
-                            <span class="text-slate-500 font-medium truncate shrink min-w-0" title="{{ $sellerName }}">{{ $sellerName }}</span>
+                            <span class="text-slate-500 font-medium truncate shrink min-w-0">{{ $sellerName }}</span>
                             <div class="menu-stock-wrapper shrink-0">
                                 @if($menu->stok > 0)
                                 <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-xs whitespace-nowrap">
@@ -311,8 +311,7 @@
                             data-stand="{{ e($menu->stand->nama_stand) }}"
                             data-stok="{{ $menu->stok }}"
                             onclick="cartStore.addItemFromBtn(this)"
-                            class="w-8 h-8 sm:w-auto sm:h-9 sm:px-3 sm:py-2 bg-orange-500 hover:bg-orange-600 active:scale-90 text-white font-bold rounded-lg sm:rounded-xl shadow-xs transition-all duration-150 inline-flex items-center justify-center gap-1 cursor-pointer"
-                            title="Tambah ke Keranjang">
+                            class="w-8 h-8 sm:w-auto sm:h-9 sm:px-3 sm:py-2 bg-orange-500 hover:bg-orange-600 active:scale-90 text-white font-bold rounded-lg sm:rounded-xl shadow-xs transition-all duration-150 inline-flex items-center justify-center gap-1 cursor-pointer">
                             <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
@@ -811,8 +810,7 @@
                         data-stand="${rawStand}"
                         data-stok="${newStock}"
                         onclick="cartStore.addItemFromBtn(this)"
-                        class="w-8 h-8 sm:w-auto sm:h-9 sm:px-3 sm:py-2 bg-orange-500 hover:bg-orange-600 active:scale-90 text-white font-bold rounded-lg sm:rounded-xl shadow-xs transition-all duration-150 inline-flex items-center justify-center gap-1 cursor-pointer"
-                        title="Tambah ke Keranjang">
+                        class="w-8 h-8 sm:w-auto sm:h-9 sm:px-3 sm:py-2 bg-orange-500 hover:bg-orange-600 active:scale-90 text-white font-bold rounded-lg sm:rounded-xl shadow-xs transition-all duration-150 inline-flex items-center justify-center gap-1 cursor-pointer">
                         <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>

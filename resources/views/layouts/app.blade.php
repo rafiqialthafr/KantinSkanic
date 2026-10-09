@@ -208,11 +208,13 @@
                         </form>
                     </div>
                     @else
-                    <!-- Tombol Masuk / Login -->
-                    <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-orange-600 hover:bg-slate-100 border border-slate-200 transition-all shrink-0">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
+                    <!-- Tombol Masuk / Login (Corporate & Modern Clean Pill) -->
+                    <a href="{{ route('login') }}" class="group inline-flex items-center gap-2 pl-1.5 pr-3.5 py-1 sm:pl-2 sm:pr-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold text-slate-700 hover:text-orange-600 bg-white hover:bg-orange-50/60 border border-slate-200/90 hover:border-orange-300 shadow-xs hover:shadow-md hover:shadow-orange-500/10 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 shrink-0">
+                        <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-orange-100/80 group-hover:bg-gradient-to-tr group-hover:from-orange-500 group-hover:to-amber-500 text-orange-600 group-hover:text-white border border-orange-200/60 group-hover:border-transparent flex items-center justify-center transition-all duration-200 shrink-0 shadow-2xs">
+                            <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke-width="2.3" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
+                            </svg>
+                        </span>
                         <span>Masuk</span>
                     </a>
                     @endauth
@@ -373,8 +375,8 @@
                 @else
                 <div class="pt-2 border-t border-slate-100">
                     <a href="{{ route('login') }}" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
                         </svg>
                         <span>Masuk ke Akun</span>
                     </a>
