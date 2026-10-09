@@ -18,10 +18,9 @@
         <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
             <div class="max-w-2xl lg:max-w-3xl">
 
-                <!-- Pill Badge: ● PRE-ORDER KANTIN SKANIC 2026 -->
-                <div class="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-white/15 border border-white/25 text-white text-[11px] sm:text-[13px] font-semibold mb-3 sm:mb-4 backdrop-blur-xs tracking-wider uppercase shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-white animate-pulse shrink-0"></span>
-                    <span class="truncate">Pre-Order Kantin Skanic</span>
+                <!-- Parallelogram (Jajar Genjang) Badge: PRE-ORDER KANTIN SKANIC -->
+                <div class="inline-flex items-center px-3.5 py-1 sm:px-4.5 sm:py-1.5 rounded-xs bg-white/15 border border-white/25 text-white text-[11px] sm:text-[13px] font-semibold mb-3 sm:mb-4 backdrop-blur-xs tracking-wider uppercase shadow-2xs -skew-x-12 origin-center" style="transform: skewX(-12deg);">
+                    <span class="skew-x-12 truncate block" style="transform: skewX(12deg);">Pre-Order Kantin Skanic</span>
                 </div>
 
                 <!-- Balanced Large Heading (matching reference image) -->
@@ -40,19 +39,16 @@
                 <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
                     <!-- CTA 1: Solid button with arrow -->
                     <a href="#katalog-section"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl bg-white text-orange-600 hover:bg-orange-50 font-black text-xs sm:text-base shadow-lg hover:shadow-xl active:scale-95 transition-all text-center">
+                        class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl bg-white text-orange-600 hover:bg-orange-50 font-black text-xs sm:text-base shadow-lg hover:shadow-xl active:scale-95 transition-all text-center">
                         <span>Pesan Sekarang</span>
-                        <svg class="w-4 h-4 text-orange-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <svg class="w-4 h-4 text-orange-600 shrink-0 transform group-hover:translate-x-1.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>
                     </a>
 
                     <!-- CTA 2: Ghost outline button -->
                     <a href="{{ route('order.history') }}"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-xs sm:text-base backdrop-blur-xs active:scale-95 transition-all text-center">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-xs sm:text-base backdrop-blur-xs active:scale-95 transition-all text-center"> 
                         <span>Riwayat Pesanan</span>
                     </a>
                 </div>
@@ -179,25 +175,23 @@
         <div id="menus-grid-container" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             @foreach($menus as $menu)
             @php
-            // Curated appetizing Indonesian food photos if no file uploaded
             $defaultPhotos = [
-            'nasi goreng' => 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80',
-            'mie ayam' => 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80',
-            'bakso' => 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
-            'tahu bakso' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
-            'nasi kuning' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
-            'nasi uduk' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
-            'siomay' => 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=600&q=80',
-            'batagor' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
-            'risol' => 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=600&q=80',
-            'es teh' => 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80',
-            'es jeruk' => 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80',
-            'kopi susu' => 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80',
-            'jus alpukat' => 'https://images.unsplash.com/photo-1546039907-7fa05f864c02?auto=format&fit=crop&w=600&q=80',
-            'es cincau' => 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=600&q=80',
-            'air mineral' => 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=600&q=80',
+                'nasi goreng' => 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80',
+                'mie ayam' => 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80',
+                'bakso' => 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+                'tahu bakso' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
+                'nasi kuning' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
+                'nasi uduk' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
+                'siomay' => 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=600&q=80',
+                'batagor' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
+                'risol' => 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=600&q=80',
+                'es teh' => 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80',
+                'es jeruk' => 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80',
+                'kopi susu' => 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80',
+                'jus alpukat' => 'https://images.unsplash.com/photo-1546039907-7fa05f864c02?auto=format&fit=crop&w=600&q=80',
+                'es cincau' => 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=600&q=80',
+                'air mineral' => 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=600&q=80',
             ];
-
             $lowerName = strtolower($menu->nama_menu);
             $imageUrl = null;
             if ($menu->foto) {
@@ -219,10 +213,16 @@
             }
             }
             }
+            $sellerName = $menu->stand->pemilik ?: trim(preg_replace('/^kantin\s+/i', '', $menu->stand->nama_stand));
             @endphp
 
             <!-- Menu Card with 4:3 Ratio Photo (2 cols on mobile) -->
             <div class="menu-card-item bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs sm:shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+                data-menu-id="{{ $menu->id }}"
+                data-stok="{{ $menu->stok }}"
+                data-nama-raw="{{ e($menu->nama_menu) }}"
+                data-harga-raw="{{ $menu->harga }}"
+                data-stand-raw="{{ e($menu->stand->nama_stand) }}"
                 data-nama="{{ strtolower($menu->nama_menu) }}"
                 data-stand="{{ strtolower($menu->stand->nama_stand) }}">
 
@@ -235,41 +235,34 @@
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';">
 
-                        <!-- Overlaid Badges on Photo -->
-                        <div class="absolute inset-x-2 top-2 sm:inset-x-3 sm:top-3 flex items-center justify-between gap-1 pointer-events-none">
-                            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[11px] font-bold text-slate-800 bg-white/95 backdrop-blur-md px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl shadow-xs border border-slate-100 max-w-[85px] sm:max-w-[130px] truncate">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.25A2.25 2.25 0 0 1 0 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 18 7.5v11.25A2.25 2.25 0 0 1 15.75 21H13.5Z" />
-                                </svg>
-                                <span class="truncate">{{ $menu->stand->nama_stand }}</span>
-                            </span>
-
+                        <!-- Category Badge (Pastel Badge matching reference & filter tabs) -->
+                        <div class="absolute right-1.5 top-1.5 sm:right-3 sm:top-3 pointer-events-none">
                             @if($menu->kategori === 'makanan')
-                            <span class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-extrabold uppercase rounded-lg sm:rounded-xl bg-amber-500 text-white shadow-xs">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-xs font-bold rounded-full bg-amber-50/95 text-amber-900 border border-amber-200/90 shadow-xs backdrop-blur-xs">
+                                <svg class="w-3 h-3 shrink-0 text-amber-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
                                     <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
                                     <path d="m2.1 21.8 6.4-6.3" />
                                     <path d="m19 5-7 7" />
                                 </svg>
-                                <span class="hidden sm:inline">Makanan</span>
+                                <span>Makanan</span>
                             </span>
                             @elseif($menu->kategori === 'minuman')
-                            <span class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-extrabold uppercase rounded-lg sm:rounded-xl bg-sky-500 text-white shadow-xs">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-xs font-bold rounded-full bg-sky-50/95 text-sky-900 border border-sky-200/90 shadow-xs backdrop-blur-xs">
+                                <svg class="w-3 h-3 shrink-0 text-sky-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z" />
                                     <path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0" />
                                 </svg>
-                                <span class="hidden sm:inline">Minuman</span>
+                                <span>Minuman</span>
                             </span>
                             @else
-                            <span class="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-extrabold uppercase rounded-lg sm:rounded-xl bg-emerald-500 text-white shadow-xs">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-xs font-bold rounded-full bg-emerald-50/95 text-emerald-900 border border-emerald-200/90 shadow-xs backdrop-blur-xs">
+                                <svg class="w-3 h-3 shrink-0 text-emerald-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12 2a5 5 0 1 1 5 5H7a5 5 0 0 1 0-10 5 5 0 0 1 5 5" />
                                     <path d="M12 7v5" />
                                     <path d="M8 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3" />
                                 </svg>
-                                <span class="hidden sm:inline">Snack</span>
+                                <span>Snack</span>
                             </span>
                             @endif
                         </div>
@@ -278,57 +271,60 @@
                         <div class="absolute inset-x-0 bottom-0 h-8 sm:h-10 bg-gradient-to-t from-black/25 to-transparent pointer-events-none"></div>
                     </div>
 
-                    <!-- Card Body: Name, Stand info, Stock -->
-                    <div class="p-2.5 sm:p-5">
-                        <h3 class="font-bold text-slate-900 text-xs sm:text-lg group-hover:text-orange-600 transition-colors line-clamp-2 sm:line-clamp-1 leading-snug" title="{{ $menu->nama_menu }}">
+                    <!-- Card Body: Name, Seller, Stock -->
+                    <div class="p-2.5 sm:p-4">
+                        <h3 class="font-bold text-slate-900 text-xs sm:text-base group-hover:text-orange-600 transition-colors line-clamp-2 leading-tight sm:leading-snug min-h-[2.25rem] sm:min-h-[2.5rem]" title="{{ $menu->nama_menu }}">
                             {{ $menu->nama_menu }}
                         </h3>
 
-                        <div class="mt-1 sm:mt-1.5 flex items-center justify-between gap-1 text-[10px] sm:text-xs">
-                            <span class="text-slate-400 font-medium truncate">{{ $menu->stand->nomor_stand }}</span>
-                            @if($menu->stok > 0)
-                            <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-emerald-100 text-[9px] sm:text-xs shrink-0">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                <span>Stok {{ $menu->stok }}</span>
-                            </span>
-                            @else
-                            <span class="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-50 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-rose-100 text-[9px] sm:text-xs shrink-0">
-                                <span>Habis</span>
-                            </span>
-                            @endif
+                        <div class="mt-1.5 flex items-center justify-between gap-1 text-[11px] sm:text-xs">
+                            <span class="text-slate-500 font-medium truncate shrink min-w-0" title="{{ $sellerName }}">{{ $sellerName }}</span>
+                            <div class="menu-stock-wrapper shrink-0">
+                                @if($menu->stok > 0)
+                                <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-xs whitespace-nowrap">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span>Stok {{ $menu->stok }}</span>
+                                </span>
+                                @else
+                                <span class="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-50 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-xs whitespace-nowrap">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                    <span>Habis</span>
+                                </span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card Bottom Bar: Price & "+ Tambah" Button -->
-                <div class="px-2.5 py-2 sm:px-5 sm:py-3.5 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
-                    <div>
-                        <span class="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block tracking-wider leading-none sm:leading-normal">Harga</span>
-                        <span class="text-xs sm:text-lg font-black text-orange-600 leading-tight">
-                            Rp {{ number_format($menu->harga, 0, ',', '.') }}
-                        </span>
-                    </div>
+                <!-- Card Footer: Price & "+ Tambah" Button -->
+                <div class="px-2.5 py-2 sm:px-4 sm:py-3 border-t border-slate-100 flex items-center justify-between gap-1.5">
+                    <span class="text-xs sm:text-base font-extrabold text-orange-600 leading-none whitespace-nowrap tracking-tight">
+                        Rp {{ number_format($menu->harga, 0, ',', '.') }}
+                    </span>
 
-                    @if($menu->stok > 0)
-                    <button type="button"
-                        data-id="{{ $menu->id }}"
-                        data-nama="{{ e($menu->nama_menu) }}"
-                        data-harga="{{ $menu->harga }}"
-                        data-stand="{{ e($menu->stand->nama_stand) }}"
-                        data-stok="{{ $menu->stok }}"
-                        onclick="cartStore.addItemFromBtn(this)"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-95 text-white text-[11px] sm:text-sm font-extrabold rounded-lg sm:rounded-xl shadow-xs sm:shadow-md sm:shadow-orange-500/20 transition-all duration-150 cursor-pointer">
-                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                        <span>Tambah</span>
-                    </button>
-                    @else
-                    <button type="button" disabled
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-slate-200 text-slate-400 text-[11px] sm:text-xs font-bold rounded-lg sm:rounded-xl cursor-not-allowed">
-                        <span>Habis</span>
-                    </button>
-                    @endif
+                    <div class="menu-btn-wrapper shrink-0">
+                        @if($menu->stok > 0)
+                        <button type="button"
+                            data-id="{{ $menu->id }}"
+                            data-nama="{{ e($menu->nama_menu) }}"
+                            data-harga="{{ $menu->harga }}"
+                            data-stand="{{ e($menu->stand->nama_stand) }}"
+                            data-stok="{{ $menu->stok }}"
+                            onclick="cartStore.addItemFromBtn(this)"
+                            class="w-8 h-8 sm:w-auto sm:h-9 sm:px-3 sm:py-2 bg-orange-500 hover:bg-orange-600 active:scale-90 text-white font-bold rounded-lg sm:rounded-xl shadow-xs transition-all duration-150 inline-flex items-center justify-center gap-1 cursor-pointer"
+                            title="Tambah ke Keranjang">
+                            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            <span class="hidden sm:inline text-xs font-bold">Tambah</span>
+                        </button>
+                        @else
+                        <button type="button" disabled
+                            class="px-2 py-1 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-bold text-slate-400 bg-slate-100 rounded-lg sm:rounded-xl cursor-not-allowed whitespace-nowrap">
+                            <span>Habis</span>
+                        </button>
+                        @endif
+                    </div>
                 </div>
 
             </div>
@@ -519,6 +515,10 @@
             this.addItem(id, nama, harga, stand, stok);
         },
         addItem(menuId, name, price, standName, maxStock) {
+            if (maxStock <= 0) {
+                alert('Maaf, stok menu ini sudah habis.');
+                return;
+            }
             let items = this.getItems();
             let existing = items.find(i => i.menu_id === menuId);
             if (existing) {
@@ -730,6 +730,7 @@
                 window.location.href = data.redirect_url;
             } else {
                 alert(data.message || 'Gagal membuat pesanan. Silakan periksa kembali data Anda.');
+                pollRealtimeStocks();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `
                     <span>Kirim Pesanan Sekarang</span>
@@ -766,8 +767,117 @@
         });
     }
 
+    // ==========================================
+    // Real-Time Menu Stock Sync Engine
+    // ==========================================
+    function updateMenuCardStock(menuId, newStock, isAvailable) {
+        const card = document.querySelector(`.menu-card-item[data-menu-id="${menuId}"]`);
+        if (!card) return;
+
+        const currentStock = parseInt(card.getAttribute('data-stok') || '0');
+        const available = isAvailable && newStock > 0;
+
+        // Jangan manipulasi DOM jika stok dan statusnya belum berubah
+        if (currentStock === newStock && card.getAttribute('data-synced') === (available ? '1' : '0')) {
+            return;
+        }
+
+        card.setAttribute('data-stok', newStock);
+        card.setAttribute('data-synced', available ? '1' : '0');
+
+        const stockWrapper = card.querySelector('.menu-stock-wrapper');
+        const btnWrapper = card.querySelector('.menu-btn-wrapper');
+
+        const rawNama = card.getAttribute('data-nama-raw') || '';
+        const rawHarga = card.getAttribute('data-harga-raw') || '0';
+        const rawStand = card.getAttribute('data-stand-raw') || '';
+
+        if (available) {
+            if (stockWrapper) {
+                stockWrapper.innerHTML = `
+                    <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-xs whitespace-nowrap">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Stok ${newStock}</span>
+                    </span>
+                `;
+            }
+
+            if (btnWrapper) {
+                btnWrapper.innerHTML = `
+                    <button type="button"
+                        data-id="${menuId}"
+                        data-nama="${rawNama}"
+                        data-harga="${rawHarga}"
+                        data-stand="${rawStand}"
+                        data-stok="${newStock}"
+                        onclick="cartStore.addItemFromBtn(this)"
+                        class="w-8 h-8 sm:w-auto sm:h-9 sm:px-3 sm:py-2 bg-orange-500 hover:bg-orange-600 active:scale-90 text-white font-bold rounded-lg sm:rounded-xl shadow-xs transition-all duration-150 inline-flex items-center justify-center gap-1 cursor-pointer"
+                        title="Tambah ke Keranjang">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        <span class="hidden sm:inline text-xs font-bold">Tambah</span>
+                    </button>
+                `;
+            }
+        } else {
+            // Cukup badge habis di samping nama kantin & tombol disabled
+            if (stockWrapper) {
+                stockWrapper.innerHTML = `
+                    <span class="inline-flex items-center gap-1 font-bold text-rose-700 bg-rose-50 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-xs whitespace-nowrap">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        <span>Habis</span>
+                    </span>
+                `;
+            }
+
+            if (btnWrapper) {
+                btnWrapper.innerHTML = `
+                    <button type="button" disabled
+                        class="px-2 py-1 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-bold text-slate-400 bg-slate-100 rounded-lg sm:rounded-xl cursor-not-allowed whitespace-nowrap">
+                        <span>Habis</span>
+                    </button>
+                `;
+            }
+        }
+    }
+
+    let stockPollTimer = null;
+
+    async function pollRealtimeStocks() {
+        if (document.hidden) return; // Hemat resource saat tab browser tidak aktif
+
+        try {
+            const res = await fetch('{{ route("katalog.stocks") }}');
+            if (!res.ok) return;
+            const json = await res.json();
+            if (json.success && Array.isArray(json.data)) {
+                json.data.forEach(item => {
+                    updateMenuCardStock(item.id, item.stok, item.is_available);
+                });
+            }
+        } catch (e) {
+            // Silently ignore network errors during background sync
+        }
+    }
+
+    function initRealtimeStockSync() {
+        // Polling setiap 3 detik agar pembeli melihat perubahan stok langsung
+        if (stockPollTimer) clearInterval(stockPollTimer);
+        stockPollTimer = setInterval(pollRealtimeStocks, 3000);
+
+        // Polling instan saat user membuka kembali tab browser
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                pollRealtimeStocks();
+            }
+        });
+        window.addEventListener('focus', pollRealtimeStocks);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         cartStore.updateUI();
+        initRealtimeStockSync();
         if (new URLSearchParams(window.location.search).get('cart') === 'open') {
             openCartModal();
         }

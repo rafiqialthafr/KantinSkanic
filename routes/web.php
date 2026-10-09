@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 // 1. PUBLIC — Katalog Siswa (accessible by anyone)
 // ==========================================================
 Route::get('/', [KatalogController::class, 'index'])->name('katalog.index');
+Route::get('/api/menu-stocks', [KatalogController::class, 'menuStocks'])->name('katalog.stocks');
 Route::get('/order/{kode_tr}', [KatalogController::class, 'orderStatus'])->name('order.status');
 Route::get('/riwayat-pesanan', [KatalogController::class, 'orderHistory'])->name('order.history');
 Route::post('/api/riwayat-pesanan', [KatalogController::class, 'orderHistoryApi'])->name('order.history.api');

@@ -3,7 +3,7 @@
 @section('title', 'Reset Kata Sandi - KantinSkanic')
 
 @section('content')
-<div class="max-w-md mx-auto px-4 py-4 sm:py-8 w-full">
+<div class="max-w-md mx-auto px-4 py-4 sm:py-8 w-full my-auto">
     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50 p-6 sm:p-8">
 
         <!-- Icon & Header -->

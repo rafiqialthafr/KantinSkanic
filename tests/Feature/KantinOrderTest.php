@@ -40,6 +40,32 @@ class KantinOrderTest extends TestCase
         $response->assertSee('Nasi Goreng Spesial Telur');
     }
 
+    public function test_catalog_stand_indicator_only_counts_available_menus(): void
+    {
+        $stand = Stand::where('nama_stand', 'Kantin Pak Jaka')->first();
+        $this->assertNotNull($stand);
+
+        // Deactivate one menu
+        $menuToDeactivate = $stand->menus()->first();
+        $menuToDeactivate->update(['is_available' => false]);
+
+        $availableCount = $stand->menus()->where('is_available', true)->count();
+        $totalCount = $stand->menus()->count();
+        $this->assertNotEquals($availableCount, $totalCount);
+
+        $response = $this->get('/?stand='.$stand->id);
+        $response->assertStatus(200);
+
+        // Verify that the stand's menus_count in view matches available count, not total count
+        $responseStands = $response->viewData('stands');
+        $targetStand = $responseStands->firstWhere('id', $stand->id);
+        $this->assertEquals($availableCount, $targetStand->menus_count);
+
+        // Verify that the rendered menus count matches
+        $renderedMenus = $response->viewData('menus');
+        $this->assertEquals($availableCount, $renderedMenus->count());
+    }
+
     public function test_guest_accessing_checkout_is_redirected_to_login(): void
     {
         $response = $this->get('/checkout');

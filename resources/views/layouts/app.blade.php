@@ -197,7 +197,7 @@
                         </span>
                         @endif
 
-                        <form action="{{ route('logout') }}" method="POST" class="hidden sm:inline" onsubmit="try{ localStorage.removeItem('kantinskanic_cart_guest'); }catch(e){}">
+                        <form action="{{ route('logout') }}" method="POST" class="hidden sm:inline" onsubmit="clearAuthStorageOnLogout()">
                             @csrf
                             <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 sm:px-3 sm:py-2 text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors border border-rose-100 cursor-pointer" title="Keluar">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -355,7 +355,7 @@
                 @endif
 
                 <div class="pt-2 border-t border-slate-100">
-                    <form action="{{ route('logout') }}" method="POST" onsubmit="try{ localStorage.removeItem('kantinskanic_cart_guest'); }catch(e){}">
+                    <form action="{{ route('logout') }}" method="POST" onsubmit="clearAuthStorageOnLogout()">
                         @csrf
                         <button type="submit" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors group cursor-pointer">
                             <div class="flex items-center gap-3">
@@ -446,6 +446,19 @@
             }
         }
 
+        function clearAuthStorageOnLogout() {
+            try {
+                localStorage.removeItem('kantinskanic_order_history');
+                localStorage.removeItem('kantinskanic_cart_guest');
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('kantinskanic_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                sessionStorage.clear();
+            } catch (e) {}
+        }
+
         function getOrderHistoryStorage() {
             try {
                 const raw = localStorage.getItem('kantinskanic_order_history');
@@ -529,6 +542,12 @@
                         localStorage.removeItem('kantinskanic_cart_guest');
                     }
                 }
+
+                @guest
+                try {
+                    localStorage.removeItem('kantinskanic_order_history');
+                } catch (e) {}
+                @endguest
 
                 const raw = localStorage.getItem(getCartStorageKey());
                 const items = raw ? JSON.parse(raw) : [];

@@ -6,6 +6,7 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Stand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KatalogController extends Controller
 {
@@ -14,9 +15,20 @@ class KatalogController extends Controller
      */
     public function index(Request $request)
     {
-        $stands = Stand::withCount('menus')->get();
+        $stands = Stand::where('is_active', true)
+            ->withCount(['menus' => function ($q) use ($request) {
+                $q->where('is_available', true);
+                if ($request->filled('kategori') && in_array($request->kategori, ['makanan', 'minuman', 'snack'])) {
+                    $q->where('kategori', $request->kategori);
+                }
+            }])
+            ->get();
 
-        $query = Menu::with('stand')->where('is_available', true);
+        $query = Menu::with('stand')
+            ->where('is_available', true)
+            ->whereHas('stand', function ($sq) {
+                $sq->where('is_active', true);
+            });
 
         // Filter by Stand
         if ($request->filled('stand') && $request->stand !== 'all') {
@@ -51,6 +63,25 @@ class KatalogController extends Controller
     }
 
     /**
+     * API endpoint for real-time stock sync across catalog cards.
+     */
+    public function menuStocks()
+    {
+        $stocks = Menu::select('id', 'stok', 'is_available')->get()->map(function ($menu) {
+            return [
+                'id' => $menu->id,
+                'stok' => max(0, (int) $menu->stok),
+                'is_available' => (bool) $menu->is_available,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $stocks,
+        ]);
+    }
+
+    /**
      * Show student checkout confirmation page.
      */
     public function showCheckout(Request $request)
@@ -63,7 +94,7 @@ class KatalogController extends Controller
     }
 
     /**
-     * Handle student guest checkout.
+     * Handle student checkout with strict real-time stock validation and decrement.
      */
     public function checkout(Request $request)
     {
@@ -83,96 +114,129 @@ class KatalogController extends Controller
 
         $itemInputs = $request->input('items');
         $menuIds = array_column($itemInputs, 'menu_id');
-        $menus = Menu::with('stand')->whereIn('id', $menuIds)->get()->keyBy('id');
 
-        // Group ordered items by stand_id
-        $itemsByStand = [];
-        foreach ($itemInputs as $item) {
-            $menuId = $item['menu_id'];
-            $qty = (int) $item['jumlah'];
+        return DB::transaction(function () use ($request, $itemInputs, $menuIds) {
+            // Lock menus row for update to guarantee atomic stock check
+            $menus = Menu::with('stand')->whereIn('id', $menuIds)->lockForUpdate()->get()->keyBy('id');
 
-            if (! isset($menus[$menuId])) {
-                continue;
-            }
+            // 1. Validasi ketersediaan dan jumlah stok
+            foreach ($itemInputs as $item) {
+                $menuId = $item['menu_id'];
+                $qty = (int) $item['jumlah'];
 
-            $menu = $menus[$menuId];
-            $standId = $menu->stand_id;
+                if (! isset($menus[$menuId])) {
+                    if ($request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => 'Menu yang dipilih tidak ditemukan.'], 422);
+                    }
 
-            if (! isset($itemsByStand[$standId])) {
-                $itemsByStand[$standId] = [];
-            }
+                    return back()->withErrors(['items' => 'Menu yang dipilih tidak ditemukan.']);
+                }
 
-            $itemsByStand[$standId][] = [
-                'menu' => $menu,
-                'jumlah' => $qty,
-                'harga_satuan' => $menu->harga,
-                'subtotal' => $menu->harga * $qty,
-            ];
-        }
+                $menu = $menus[$menuId];
 
-        if (empty($itemsByStand)) {
-            if ($request->wantsJson()) {
-                return response()->json(['message' => 'Menu yang dipilih tidak valid.'], 422);
-            }
+                if (! $menu->is_available) {
+                    $msg = "Maaf, menu '{$menu->nama_menu}' saat ini sedang tidak tersedia.";
+                    if ($request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => $msg], 422);
+                    }
 
-            return back()->withErrors(['items' => 'Menu yang dipilih tidak valid.']);
-        }
+                    return back()->withErrors(['items' => $msg]);
+                }
 
-        $createdOrders = [];
+                if ($menu->stok < $qty) {
+                    $msg = $menu->stok <= 0
+                        ? "Maaf, stok menu '{$menu->nama_menu}' sudah habis."
+                        : "Maaf, stok menu '{$menu->nama_menu}' hanya tersisa {$menu->stok} (Anda memesan {$qty}).";
 
-        foreach ($itemsByStand as $standId => $groupItems) {
-            // Generate unique kode_tr (e.g. PO-8921)
-            do {
-                $candidateCode = 'PO-'.rand(1000, 9999);
-            } while (Order::where('kode_tr', $candidateCode)->exists());
+                    if ($request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => $msg], 422);
+                    }
 
-            $standTotal = array_sum(array_column($groupItems, 'subtotal'));
-
-            $order = Order::create([
-                'kode_tr' => $candidateCode,
-                'stand_id' => $standId,
-                'nama_pemesan' => $request->nama_pemesan,
-                'kelas' => $request->kelas,
-                'total_harga' => $standTotal,
-                'status' => 'pending',
-                'catatan' => $request->catatan,
-            ]);
-
-            foreach ($groupItems as $gItem) {
-                $order->items()->create([
-                    'menu_id' => $gItem['menu']->id,
-                    'jumlah' => $gItem['jumlah'],
-                    'harga_satuan' => $gItem['harga_satuan'],
-                    'subtotal' => $gItem['subtotal'],
-                ]);
-
-                // Reduce stock
-                if ($gItem['menu']->stok >= $gItem['jumlah']) {
-                    $gItem['menu']->decrement('stok', $gItem['jumlah']);
+                    return back()->withErrors(['items' => $msg]);
                 }
             }
 
-            $createdOrders[] = $order;
-        }
+            // 2. Group items by stand_id
+            $itemsByStand = [];
+            foreach ($itemInputs as $item) {
+                $menu = $menus[$item['menu_id']];
+                $standId = $menu->stand_id;
+                $qty = (int) $item['jumlah'];
 
-        $firstOrder = $createdOrders[0];
-        $allCodes = array_column($createdOrders, 'kode_tr');
+                if (! isset($itemsByStand[$standId])) {
+                    $itemsByStand[$standId] = [];
+                }
 
-        // Store active orders in session for easy reference
-        session()->put('recent_orders', array_unique(array_merge(session()->get('recent_orders', []), $allCodes)));
+                $itemsByStand[$standId][] = [
+                    'menu' => $menu,
+                    'jumlah' => $qty,
+                    'harga_satuan' => $menu->harga,
+                    'subtotal' => $menu->harga * $qty,
+                ];
+            }
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Pesanan berhasil dibuat!',
-                'redirect_url' => route('order.status', $firstOrder->kode_tr),
-                'kode_tr' => $firstOrder->kode_tr,
-                'all_codes' => $allCodes,
-            ]);
-        }
+            if (empty($itemsByStand)) {
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Menu yang dipilih tidak valid.'], 422);
+                }
 
-        return redirect()->route('order.status', $firstOrder->kode_tr)
-            ->with('success', 'Pesanan Anda berhasil dikirim ke kantin!');
+                return back()->withErrors(['items' => 'Menu yang dipilih tidak valid.']);
+            }
+
+            $createdOrders = [];
+
+            // 3. Buat pesanan dan potong stok secara otomatis
+            foreach ($itemsByStand as $standId => $groupItems) {
+                do {
+                    $candidateCode = 'PO-'.rand(1000, 9999);
+                } while (Order::where('kode_tr', $candidateCode)->exists());
+
+                $standTotal = array_sum(array_column($groupItems, 'subtotal'));
+
+                $order = Order::create([
+                    'kode_tr' => $candidateCode,
+                    'stand_id' => $standId,
+                    'nama_pemesan' => $request->nama_pemesan,
+                    'kelas' => $request->kelas,
+                    'total_harga' => $standTotal,
+                    'status' => 'pending',
+                    'catatan' => $request->catatan,
+                ]);
+
+                foreach ($groupItems as $gItem) {
+                    $order->items()->create([
+                        'menu_id' => $gItem['menu']->id,
+                        'jumlah' => $gItem['jumlah'],
+                        'harga_satuan' => $gItem['harga_satuan'],
+                        'subtotal' => $gItem['subtotal'],
+                    ]);
+
+                    // Mengurangi stok menu secara otomatis real-time
+                    Menu::where('id', $gItem['menu']->id)->decrement('stok', $gItem['jumlah']);
+                }
+
+                $createdOrders[] = $order;
+            }
+
+            $firstOrder = $createdOrders[0];
+            $allCodes = array_column($createdOrders, 'kode_tr');
+
+            // Simpan riwayat kode pesanan ke session
+            session()->put('recent_orders', array_unique(array_merge(session()->get('recent_orders', []), $allCodes)));
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pesanan berhasil dibuat!',
+                    'redirect_url' => route('order.status', $firstOrder->kode_tr),
+                    'kode_tr' => $firstOrder->kode_tr,
+                    'all_codes' => $allCodes,
+                ]);
+            }
+
+            return redirect()->route('order.status', $firstOrder->kode_tr)
+                ->with('success', 'Pesanan Anda berhasil dikirim ke kantin!');
+        });
     }
 
     /**
@@ -209,40 +273,18 @@ class KatalogController extends Controller
         $statusFilter = $request->query('status', 'all');
         $searchQuery = trim($request->query('q', ''));
 
-        // Collect all related codes
-        $recentCodes = session()->get('recent_orders', []);
-
         $query = Order::with(['stand.user', 'items.menu']);
 
-        $candidateCodes = $recentCodes;
-        if ($request->filled('codes')) {
-            $inputCodes = is_array($request->input('codes')) ? $request->input('codes') : explode(',', (string) $request->input('codes'));
-            $candidateCodes = array_unique(array_merge($candidateCodes, array_filter(array_map('trim', $inputCodes))));
-        }
-
-        $query->where(function ($q) use ($candidateCodes, $searchQuery) {
-            $hasCondition = false;
-
-            if (! empty($candidateCodes)) {
-                $q->whereIn('kode_tr', $candidateCodes);
-                $hasCondition = true;
-            }
-
-            if (auth()->check()) {
-                if ($hasCondition) {
-                    $q->orWhere('nama_pemesan', auth()->user()->name);
-                } else {
-                    $q->where('nama_pemesan', auth()->user()->name);
-                }
-                $hasCondition = true;
-            }
+        if (auth()->check()) {
+            // User login: hanya tampilkan riwayat pesanan milik akun yang sedang login
+            $query->where('nama_pemesan', auth()->user()->name);
 
             if (! empty($searchQuery)) {
                 $cleanCode = strtoupper($searchQuery);
                 if (! str_starts_with($cleanCode, 'PO-') && is_numeric($cleanCode)) {
                     $cleanCode = 'PO-'.$cleanCode;
                 }
-                $searchCallback = function ($sq) use ($searchQuery, $cleanCode) {
+                $query->where(function ($sq) use ($searchQuery, $cleanCode) {
                     $sq->where('kode_tr', 'like', "%{$searchQuery}%")
                         ->orWhere('kode_tr', $cleanCode)
                         ->orWhereHas('stand', function ($st) use ($searchQuery) {
@@ -251,21 +293,31 @@ class KatalogController extends Controller
                         ->orWhereHas('items.menu', function ($mn) use ($searchQuery) {
                             $mn->where('nama_menu', 'like', "%{$searchQuery}%");
                         });
-                };
-
-                if ($hasCondition) {
-                    $q->orWhere($searchCallback);
-                } else {
-                    $q->where($searchCallback);
+                });
+            }
+        } else {
+            // User TIDAK login (guest / setelah logout):
+            // JANGAN pernah menampilkan riwayat pesanan otomatis dari session/localStorage sebelumnya.
+            if (! empty($searchQuery)) {
+                $cleanCode = strtoupper($searchQuery);
+                if (! str_starts_with($cleanCode, 'PO-') && is_numeric($cleanCode)) {
+                    $cleanCode = 'PO-'.$cleanCode;
                 }
-                $hasCondition = true;
+                $query->where(function ($sq) use ($searchQuery, $cleanCode) {
+                    $sq->where('kode_tr', 'like', "%{$searchQuery}%")
+                        ->orWhere('kode_tr', $cleanCode)
+                        ->orWhereHas('stand', function ($st) use ($searchQuery) {
+                            $st->where('nama_stand', 'like', "%{$searchQuery}%");
+                        })
+                        ->orWhereHas('items.menu', function ($mn) use ($searchQuery) {
+                            $mn->where('nama_menu', 'like', "%{$searchQuery}%");
+                        });
+                });
+            } else {
+                // Jika belum login dan tidak ada kata kunci pencarian, kosongkan riwayat
+                $query->whereRaw('1 = 0');
             }
-
-            // Fallback if guest has no saved codes and no search: do not leak everyone's orders
-            if (! $hasCondition) {
-                $q->whereRaw('1 = 0');
-            }
-        });
+        }
 
         // Calculate counts for each Shopee tab
         $countsQuery = clone $query;

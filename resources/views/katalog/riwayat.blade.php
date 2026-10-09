@@ -256,6 +256,26 @@
             @endforeach
         </div>
         @else
+        @guest
+        <!-- Guest Not Logged In State -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-8 sm:p-14 text-center shadow-xs max-w-lg mx-auto">
+            <div class="w-16 h-16 rounded-2xl bg-orange-50 border border-orange-100 text-orange-500 mx-auto flex items-center justify-center mb-4">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+            </div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 mb-1">Kamu Belum Masuk ke Akun</h3>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto mb-6">
+                Silakan masuk ke akunmu untuk melihat riwayat pesanan yang pernah kamu buat.
+            </p>
+
+            <div class="flex items-center justify-center gap-3">
+                <a href="{{ route('login') }}" class="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-orange-500/25 active:scale-95 transition-all">
+                    Masuk ke Akun Sekarang
+                </a>
+            </div>
+        </div>
+        @else
         <!-- Shopee Empty State -->
         <div class="bg-white rounded-2xl border border-slate-200/90 p-10 sm:p-14 text-center shadow-xs">
             <div class="w-20 h-20 rounded-full bg-orange-50 border border-orange-100 text-orange-500 mx-auto flex items-center justify-center mb-4 shadow-inner">
@@ -274,6 +294,7 @@
                 </a>
             </div>
         </div>
+        @endguest
         @endif
 
     </div>
@@ -309,23 +330,11 @@
         }
     }
 
-    // Auto-sync local storage orders on mount if query was empty
-    document.addEventListener('DOMContentLoaded', () => {
-        try {
-            const raw = localStorage.getItem('kantinskanic_order_history');
-            if (raw) {
-                const codes = JSON.parse(raw);
-                if (Array.isArray(codes) && codes.length > 0 && !window.location.search.includes('codes=')) {
-                    @if($orders->count() === 0 && empty($searchQuery))
-                    const params = new URLSearchParams(window.location.search);
-                    params.set('codes', codes.join(','));
-                    window.location.href = window.location.pathname + '?' + params.toString();
-                    @endif
-                }
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    });
+    @guest
+    // Bersihkan storage riwayat lokal jika user tidak sedang login
+    try {
+        localStorage.removeItem('kantinskanic_order_history');
+    } catch (e) {}
+    @endguest
 </script>
 @endsection

@@ -27,11 +27,11 @@
     @stack('styles')
 </head>
 
-<body class="min-h-full bg-slate-50 text-slate-800 flex flex-col justify-center py-6 sm:py-10">
+<body class="min-h-screen bg-white text-slate-800 flex flex-col antialiased">
     <!-- Global Flash Messages (session error only) -->
     @if(session('error'))
-    <div class="max-w-md mx-auto px-4 w-full mb-3">
-        <div class="rounded-2xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3 shadow-xs">
+    <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-md px-4 w-full">
+        <div class="rounded-2xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3 shadow-lg">
             <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
             </svg>
@@ -40,7 +40,7 @@
     </div>
     @endif
 
-    <main class="w-full flex-1 flex items-center justify-center">
+    <main class="w-full flex-1 flex flex-col min-h-screen">
         @yield('content')
     </main>
 

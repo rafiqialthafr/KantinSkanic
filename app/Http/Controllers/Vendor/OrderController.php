@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -157,7 +158,26 @@ class OrderController extends Controller
             'status' => ['required', 'in:pending,diproses,siap_diambil,selesai,dibatalkan'],
         ]);
 
-        $order->update(['status' => $validated['status']]);
+        $previousStatus = $order->status;
+        $newStatus = $validated['status'];
+
+        // Jika pesanan dibatalkan, otomatis kembalikan stok menu
+        if ($previousStatus !== 'dibatalkan' && $newStatus === 'dibatalkan') {
+            foreach ($order->items as $item) {
+                if ($item->menu_id) {
+                    Menu::where('id', $item->menu_id)->increment('stok', $item->jumlah);
+                }
+            }
+        } elseif ($previousStatus === 'dibatalkan' && $newStatus !== 'dibatalkan') {
+            // Jika pesanan batal diaktifkan kembali, kurangi stok kembali
+            foreach ($order->items as $item) {
+                if ($item->menu_id) {
+                    Menu::where('id', $item->menu_id)->decrement('stok', $item->jumlah);
+                }
+            }
+        }
+
+        $order->update(['status' => $newStatus]);
 
         $labels = [
             'pending' => 'Menunggu Konfirmasi',
