@@ -24,7 +24,7 @@
                 </div>
 
                 <!-- Balanced Large Heading (matching reference image) -->
-                <h1 class="text-2xl sm:text-4xl lg:text-5xl xl:text-[54px] font-black text-white leading-tight sm:leading-[1.15] tracking-tight break-words">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-[54px] font-black text-white leading-tight sm:leading-[1.15] tracking-tight break-words">
                     Pesan Makanan <span class="text-amber-200">Tanpa Antre</span><br>
                     Kantin Skanic<br>
                     SMKN 1 Ciomas
@@ -48,7 +48,7 @@
 
                     <!-- CTA 2: Ghost outline button -->
                     <a href="{{ route('order.history') }}"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-xs sm:text-base backdrop-blur-xs active:scale-95 transition-all text-center"> 
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-xs sm:text-base backdrop-blur-xs active:scale-95 transition-all text-center">
                         <span>Riwayat Pesanan</span>
                     </a>
                 </div>
@@ -176,21 +176,21 @@
             @foreach($menus as $menu)
             @php
             $defaultPhotos = [
-                'nasi goreng' => 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80',
-                'mie ayam' => 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80',
-                'bakso' => 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
-                'tahu bakso' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
-                'nasi kuning' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
-                'nasi uduk' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
-                'siomay' => 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=600&q=80',
-                'batagor' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
-                'risol' => 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=600&q=80',
-                'es teh' => 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80',
-                'es jeruk' => 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80',
-                'kopi susu' => 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80',
-                'jus alpukat' => 'https://images.unsplash.com/photo-1546039907-7fa05f864c02?auto=format&fit=crop&w=600&q=80',
-                'es cincau' => 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=600&q=80',
-                'air mineral' => 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=600&q=80',
+            'nasi goreng' => 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80',
+            'mie ayam' => 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80',
+            'bakso' => 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+            'tahu bakso' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
+            'nasi kuning' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
+            'nasi uduk' => 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
+            'siomay' => 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=600&q=80',
+            'batagor' => 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=600&q=80',
+            'risol' => 'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=600&q=80',
+            'es teh' => 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80',
+            'es jeruk' => 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80',
+            'kopi susu' => 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80',
+            'jus alpukat' => 'https://images.unsplash.com/photo-1546039907-7fa05f864c02?auto=format&fit=crop&w=600&q=80',
+            'es cincau' => 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=600&q=80',
+            'air mineral' => 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=600&q=80',
             ];
             $lowerName = strtolower($menu->nama_menu);
             $imageUrl = null;
@@ -635,6 +635,26 @@
             navBadge.style.transform = 'scale(1.4)';
             setTimeout(() => {
                 navBadge.style.transform = 'scale(1)';
+            }, 180);
+        }
+
+        // Efek pop tombol keranjang pojok kiri bawah
+        const floatBtn = document.getElementById('floating-cart-btn');
+        if (floatBtn) {
+            floatBtn.classList.remove('cart-pop-anim');
+            void floatBtn.offsetWidth; // trigger reflow
+            floatBtn.classList.add('cart-pop-anim');
+            setTimeout(() => {
+                floatBtn.classList.remove('cart-pop-anim');
+            }, 360);
+        }
+
+        const floatBadge = document.getElementById('floating-cart-badge');
+        if (floatBadge) {
+            floatBadge.style.transition = 'transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            floatBadge.style.transform = 'scale(1.5)';
+            setTimeout(() => {
+                floatBadge.style.transform = 'scale(1)';
             }, 180);
         }
 
