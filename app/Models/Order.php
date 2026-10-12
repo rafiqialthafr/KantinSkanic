@@ -13,6 +13,7 @@ class Order extends Model
 
     protected $fillable = [
         'kode_tr',
+        'user_id',
         'stand_id',
         'nama_pemesan',
         'kelas',
@@ -26,6 +27,11 @@ class Order extends Model
         return [
             'total_harga' => 'integer',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function stand(): BelongsTo

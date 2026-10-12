@@ -432,18 +432,39 @@
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Data Pemesan</span>
                         </div>
 
-                        <!-- Nama Lengkap Siswa -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pemesan *</label>
-                            <input type="text" id="input-nama" required value="{{ auth()->user()->name }}"
-                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
-                        </div>
+                        <!-- Profil Pemesan (Otomatis dari Akun yang Sedang Login) -->
+                        @php
+                            $pemesanNama = auth()->user()->name;
+                            $pemesanKelas = auth()->user()->kelas ?: (session('siswa_kelas') ?: 'Siswa');
+                        @endphp
+                        <input type="hidden" id="input-nama" value="{{ $pemesanNama }}">
+                        <input type="hidden" id="input-kelas" value="{{ $pemesanKelas }}">
 
-                        <!-- Kelas -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Kelas Siswa *</label>
-                            <input type="text" id="input-kelas" required placeholder="Contoh: XI PPLG 1 / XII AKL 2" value="{{ session('siswa_kelas', '') }}"
-                                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
+                        <div class="rounded-2xl bg-gradient-to-r from-orange-50/80 to-amber-50/50 border border-orange-200/70 p-3.5 flex items-center justify-between gap-3 shadow-2xs">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                                    {{ strtoupper(substr($pemesanNama, 0, 1)) }}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-sm font-extrabold text-slate-900 truncate">{{ $pemesanNama }}</h4>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-orange-100 text-orange-700 shrink-0">
+                                            {{ $pemesanKelas }}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                                        {{ auth()->user()->email }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60">
+                                    <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                    <span>Akun Terverifikasi</span>
+                                </span>
+                            </div>
                         </div>
 
                         <!-- Catatan Pesanan -->

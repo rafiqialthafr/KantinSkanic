@@ -107,4 +107,54 @@ class RiwayatPesananTest extends TestCase
             'status' => 'siap_diambil',
         ]);
     }
+
+    public function test_orders_are_scoped_to_specific_student_account_even_if_names_are_identical(): void
+    {
+        $studentA = User::create([
+            'name' => 'Rafi',
+            'email' => 'rafi3@siswa.com',
+            'password' => bcrypt('password123'),
+            'role' => 'siswa',
+            'kelas' => 'X PPLG 3',
+        ]);
+
+        $studentB = User::create([
+            'name' => 'Rafi',
+            'email' => 'rafi5@siswa.com',
+            'password' => bcrypt('password123'),
+            'role' => 'siswa',
+            'kelas' => 'X PPLG 5',
+        ]);
+
+        $stand = Stand::first();
+        $menu = Menu::where('stand_id', $stand->id)->first();
+
+        // Order placed by Student A
+        $orderA = Order::create([
+            'kode_tr' => 'PO-4411',
+            'user_id' => $studentA->id,
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Rafi',
+            'kelas' => 'X PPLG 3',
+            'total_harga' => 3000,
+            'status' => 'selesai',
+        ]);
+        $orderA->items()->create([
+            'menu_id' => $menu->id,
+            'jumlah' => 1,
+            'harga_satuan' => 3000,
+            'subtotal' => 3000,
+        ]);
+
+        // Student B logs in (has never ordered)
+        $this->actingAs($studentB);
+
+        $response = $this->get('/riwayat-pesanan');
+        $response->assertStatus(200);
+        $response->assertDontSee('PO-4411');
+
+        $apiResponse = $this->postJson('/api/riwayat-pesanan');
+        $apiResponse->assertStatus(200);
+        $this->assertCount(0, $apiResponse->json('orders'));
+    }
 }

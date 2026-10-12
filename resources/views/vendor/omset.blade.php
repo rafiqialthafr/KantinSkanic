@@ -28,14 +28,17 @@
 <a href="{{ route('vendor.dashboard', ['status' => 'pending']) }}" class="sidebar-link">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
     Menunggu
-    @if(($activeOrdersCount ?? 0) > 0)
-    <span class="ml-auto text-[10px] font-black bg-orange-500 text-white px-1.5 py-0.5 rounded-md">{{ $activeOrdersCount }}</span>
+    @if(($pendingOrdersCount ?? 0) > 0)
+    <span class="ml-auto text-[10px] font-black bg-orange-500 text-white px-1.5 py-0.5 rounded-md">{{ $pendingOrdersCount }}</span>
     @endif
 </a>
 
 <a href="{{ route('vendor.dashboard', ['status' => 'siap_diambil']) }}" class="sidebar-link">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
     Siap Diambil
+    @if(($siapDiambilOrdersCount ?? 0) > 0)
+    <span class="ml-auto text-[10px] font-black bg-emerald-500 text-white px-1.5 py-0.5 rounded-md">{{ $siapDiambilOrdersCount }}</span>
+    @endif
 </a>
 
 <a href="{{ route('vendor.dashboard', ['status' => 'selesai']) }}" class="sidebar-link">

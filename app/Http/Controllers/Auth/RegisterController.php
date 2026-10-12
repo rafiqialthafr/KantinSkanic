@@ -49,9 +49,11 @@ class RegisterController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'siswa',
+            'kelas' => $validated['kelas'],
+            'no_wa' => $validated['no_wa'],
         ]);
 
-        // Store kelas in session for pre-filling checkout form
+        // Store kelas in session for compatibility
         session(['siswa_kelas' => $validated['kelas'], 'siswa_wa' => $validated['no_wa']]);
 
         Auth::login($user);

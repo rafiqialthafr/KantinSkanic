@@ -495,13 +495,16 @@
 
         function clearAuthStorageOnLogout() {
             try {
-                localStorage.removeItem('kantinskanic_order_history');
-                localStorage.removeItem('kantinskanic_cart_guest');
-                Object.keys(localStorage).forEach(key => {
-                    if (key.startsWith('kantinskanic_')) {
-                        localStorage.removeItem(key);
+                // Jangan hapus keranjang belanja saat logout!
+                // Salin keranjang user ke guest cart agar saat keluar, isi keranjang tetap terjaga
+                if (window.AUTH_USER_ID) {
+                    const userKey = 'kantinskanic_cart_user_' + window.AUTH_USER_ID;
+                    const userCart = localStorage.getItem(userKey);
+                    if (userCart) {
+                        localStorage.setItem('kantinskanic_cart_guest', userCart);
                     }
-                });
+                }
+                localStorage.removeItem('kantinskanic_order_history');
                 sessionStorage.clear();
             } catch (e) {}
         }

@@ -36,10 +36,8 @@
                     $tabs = [
                         'all' => ['label' => 'Semua', 'count' => $statusCounts['all'] ?? 0],
                         'pending' => ['label' => 'Menunggu', 'count' => $statusCounts['pending'] ?? 0],
-                        'diproses' => ['label' => 'Sedang Disiapkan', 'count' => $statusCounts['diproses'] ?? 0],
                         'siap_diambil' => ['label' => 'Siap Diambil', 'count' => $statusCounts['siap_diambil'] ?? 0],
                         'selesai' => ['label' => 'Selesai', 'count' => $statusCounts['selesai'] ?? 0],
-                        'dibatalkan' => ['label' => 'Dibatalkan', 'count' => $statusCounts['dibatalkan'] ?? 0],
                     ];
                 @endphp
 

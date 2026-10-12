@@ -74,15 +74,14 @@
 
             @php
             $steps = [
-            'pending' => ['label' => 'Pending', 'desc' => 'Menunggu konfirmasi'],
-            'diproses' => ['label' => 'Diproses', 'desc' => 'Sedang disiapkan'],
-            'siap_diambil' => ['label' => 'Siap Diambil', 'desc' => 'Ambil di stand!'],
-            'selesai' => ['label' => 'Selesai', 'desc' => 'Sudah diambil & bayar'],
+                'pending' => ['label' => 'Menunggu', 'desc' => 'Menunggu konfirmasi'],
+                'siap_diambil' => ['label' => 'Siap Diambil', 'desc' => 'Ambil di stand!'],
+                'selesai' => ['label' => 'Selesai', 'desc' => 'Sudah diambil & bayar'],
             ];
-            $statusOrder = ['pending', 'diproses', 'siap_diambil', 'selesai'];
+            $statusOrder = ['pending', 'siap_diambil', 'selesai'];
             $currentIndex = array_search($order->status, $statusOrder);
             if ($currentIndex === false && $order->status === 'dibatalkan') {
-            $currentIndex = -1;
+                $currentIndex = -1;
             }
             @endphp
 
@@ -97,7 +96,7 @@
                 <div class="absolute top-4 left-4 right-4 h-1.5 bg-slate-200 rounded-full -z-0"></div>
                 <!-- Active Progress Line -->
                 <div class="absolute top-4 left-4 h-1.5 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full transition-all duration-500 -z-0"
-                    style="width: {{ $currentIndex !== false ? ($currentIndex / 3) * 100 : 0 }}%;"></div>
+                    style="width: {{ $currentIndex !== false ? ($currentIndex / 2) * 100 : 0 }}%;"></div>
 
                 @foreach($steps as $key => $step)
                 @php

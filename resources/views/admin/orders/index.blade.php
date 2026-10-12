@@ -156,7 +156,7 @@
                 <div class="pt-1.5 border-t border-slate-200/60 space-y-1">
                     @foreach($ro->items as $item)
                     <div class="text-[11px] text-slate-700 truncate">
-                        <span class="font-bold text-orange-600">{{ $item->qty }}x</span>
+                        <span class="font-bold text-orange-600">{{ $item->jumlah }}x</span>
                         <span>{{ $item->menu->nama_menu ?? 'Menu' }}</span>
                     </div>
                     @endforeach
@@ -205,7 +205,7 @@
                             <div class="space-y-0.5 max-w-[220px]">
                                 @foreach($ro->items as $item)
                                 <div class="text-[11px] text-slate-700 truncate">
-                                    <span class="font-bold text-orange-600">{{ $item->qty }}x</span>
+                                    <span class="font-bold text-orange-600">{{ $item->jumlah }}x</span>
                                     <span>{{ $item->menu->nama_menu ?? 'Menu' }}</span>
                                 </div>
                                 @endforeach
@@ -227,7 +227,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-12 text-slate-400 font-medium">
+                        <td colspan="6" class="text-center py-12 text-slate-400 font-medium">
                             Tidak ada data transaksi yang sesuai filter.
                         </td>
                     </tr>

@@ -55,6 +55,10 @@ class AuthController extends Controller
             }
 
             // Siswa — honor intended URL (e.g. /checkout after guest cart)
+            if ($user->isSiswa() && ! empty($user->kelas)) {
+                session(['siswa_kelas' => $user->kelas, 'siswa_wa' => $user->no_wa]);
+            }
+
             return redirect()->intended(route('katalog.index'))
                 ->with('success', 'Selamat datang, '.$user->name.'!');
         }

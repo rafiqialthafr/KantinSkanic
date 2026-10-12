@@ -59,7 +59,9 @@ class OrderController extends Controller
         $baseQuery = Order::where('stand_id', $standId);
         $applyPeriode($baseQuery);
 
-        $activeOrdersCount = Order::where('stand_id', $standId)->whereIn('status', ['pending', 'diproses', 'siap_diambil'])->count();
+        $pendingOrdersCount = Order::where('stand_id', $standId)->where('status', 'pending')->count();
+        $siapDiambilOrdersCount = Order::where('stand_id', $standId)->where('status', 'siap_diambil')->count();
+        $activeOrdersCount = $pendingOrdersCount + $siapDiambilOrdersCount;
         $totalOrdersToday = (clone $baseQuery)->count();
         $completedOrdersCount = (clone $baseQuery)->where('status', 'selesai')->count();
         $revenueToday = (clone $baseQuery)->where('status', 'selesai')->sum('total_harga');
@@ -76,6 +78,7 @@ class OrderController extends Controller
 
         return view('vendor.dashboard', compact(
             'stand', 'orders',
+            'pendingOrdersCount', 'siapDiambilOrdersCount',
             'activeOrdersCount', 'totalOrdersToday', 'completedOrdersCount', 'revenueToday',
             'periode', 'periodeLabel',
         ) + ['activeStatus' => $request->status ?? 'all']);

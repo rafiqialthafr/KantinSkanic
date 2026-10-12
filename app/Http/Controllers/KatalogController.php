@@ -86,10 +86,12 @@ class KatalogController extends Controller
      */
     public function showCheckout(Request $request)
     {
+        $user = $request->user();
+
         return view('katalog.checkout', [
-            'user' => $request->user(),
-            'defaultKelas' => session('siswa_kelas', ''),
-            'defaultWa' => session('siswa_wa', ''),
+            'user' => $user,
+            'defaultKelas' => $user?->kelas ?: session('siswa_kelas', ''),
+            'defaultWa' => $user?->no_wa ?: session('siswa_wa', ''),
         ]);
     }
 
@@ -98,6 +100,18 @@ class KatalogController extends Controller
      */
     public function checkout(Request $request)
     {
+        if (auth()->check()) {
+            $user = auth()->user();
+            $userKelas = $user->kelas ?: (session('siswa_kelas') ?: $request->input('kelas', 'Siswa'));
+            $request->merge([
+                'nama_pemesan' => $user->name,
+                'kelas' => $userKelas,
+            ]);
+            if (empty($user->kelas) && ! empty($userKelas) && $userKelas !== 'Siswa') {
+                $user->update(['kelas' => $userKelas]);
+            }
+        }
+
         $request->validate([
             'nama_pemesan' => ['required', 'string', 'max:100'],
             'kelas' => ['required', 'string', 'max:50'],
@@ -195,6 +209,7 @@ class KatalogController extends Controller
 
                 $order = Order::create([
                     'kode_tr' => $candidateCode,
+                    'user_id' => auth()->id(),
                     'stand_id' => $standId,
                     'nama_pemesan' => $request->nama_pemesan,
                     'kelas' => $request->kelas,
@@ -276,8 +291,25 @@ class KatalogController extends Controller
         $query = Order::with(['stand.user', 'items.menu']);
 
         if (auth()->check()) {
-            // User login: hanya tampilkan riwayat pesanan milik akun yang sedang login
-            $query->where('nama_pemesan', auth()->user()->name);
+            // User login: hanya tampilkan riwayat pesanan milik akun yang sedang login (berdasarkan user_id)
+            $user = auth()->user();
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+
+                // Untuk pesanan legacy sebelum user_id ada: wajib cocokkan NAMA dan KELAS secara presisi
+                if (! empty($user->kelas)) {
+                    $q->orWhere(function ($sub) use ($user) {
+                        $sub->whereNull('user_id')
+                            ->where('nama_pemesan', $user->name)
+                            ->where('kelas', $user->kelas);
+                    });
+                } else {
+                    $q->orWhere(function ($sub) use ($user) {
+                        $sub->whereNull('user_id')
+                            ->where('nama_pemesan', $user->name);
+                    });
+                }
+            });
 
             if (! empty($searchQuery)) {
                 $cleanCode = strtoupper($searchQuery);
@@ -325,15 +357,13 @@ class KatalogController extends Controller
         $statusCounts = [
             'all' => $allOrdersForCounts->count(),
             'pending' => $allOrdersForCounts->where('status', 'pending')->count(),
-            'diproses' => $allOrdersForCounts->where('status', 'diproses')->count(),
             'siap_diambil' => $allOrdersForCounts->where('status', 'siap_diambil')->count(),
             'selesai' => $allOrdersForCounts->where('status', 'selesai')->count(),
-            'dibatalkan' => $allOrdersForCounts->where('status', 'dibatalkan')->count(),
         ];
 
         if ($statusFilter === 'aktif') {
-            $query->whereIn('status', ['pending', 'diproses', 'siap_diambil']);
-        } elseif (in_array($statusFilter, ['pending', 'diproses', 'siap_diambil', 'selesai', 'dibatalkan'])) {
+            $query->whereIn('status', ['pending', 'siap_diambil']);
+        } elseif (in_array($statusFilter, ['pending', 'siap_diambil', 'selesai'])) {
             $query->where('status', $statusFilter);
         }
 
@@ -388,10 +418,28 @@ class KatalogController extends Controller
             }
 
             if (auth()->check()) {
+                $user = auth()->user();
+                $userCondition = function ($sub) use ($user) {
+                    $sub->where('user_id', $user->id);
+
+                    if (! empty($user->kelas)) {
+                        $sub->orWhere(function ($s) use ($user) {
+                            $s->whereNull('user_id')
+                                ->where('nama_pemesan', $user->name)
+                                ->where('kelas', $user->kelas);
+                        });
+                    } else {
+                        $sub->orWhere(function ($s) use ($user) {
+                            $s->whereNull('user_id')
+                                ->where('nama_pemesan', $user->name);
+                        });
+                    }
+                };
+
                 if ($hasCondition) {
-                    $q->orWhere('nama_pemesan', auth()->user()->name);
+                    $q->orWhere($userCondition);
                 } else {
-                    $q->where('nama_pemesan', auth()->user()->name);
+                    $q->where($userCondition);
                 }
                 $hasCondition = true;
             }
