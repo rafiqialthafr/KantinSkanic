@@ -18,13 +18,26 @@ class KatalogController extends Controller
         $stands = Stand::where('is_active', true)
             ->withCount(['menus' => function ($q) use ($request) {
                 $q->where('is_available', true);
-                if ($request->filled('kategori') && in_array($request->kategori, ['makanan', 'minuman', 'snack'])) {
-                    $q->where('kategori', $request->kategori);
+                if ($request->filled('kategori')) {
+                    if ($request->kategori === 'terlaris') {
+                        $q->whereHas('orderItems', function ($oq) {
+                            $oq->whereHas('order', function ($o) {
+                                $o->where('status', '!=', 'dibatalkan');
+                            });
+                        });
+                    } elseif (in_array($request->kategori, ['makanan', 'minuman', 'snack'])) {
+                        $q->where('kategori', $request->kategori);
+                    }
                 }
             }])
             ->get();
 
         $query = Menu::with('stand')
+            ->withSum(['orderItems as total_terjual' => function ($q) {
+                $q->whereHas('order', function ($oq) {
+                    $oq->where('status', '!=', 'dibatalkan');
+                });
+            }], 'jumlah')
             ->where('is_available', true)
             ->whereHas('stand', function ($sq) {
                 $sq->where('is_active', true);
@@ -36,8 +49,20 @@ class KatalogController extends Controller
         }
 
         // Filter by Kategori
-        if ($request->filled('kategori') && in_array($request->kategori, ['makanan', 'minuman', 'snack'])) {
-            $query->where('kategori', $request->kategori);
+        if ($request->filled('kategori')) {
+            if ($request->kategori === 'terlaris') {
+                $query->whereHas('orderItems', function ($oq) {
+                    $oq->whereHas('order', function ($o) {
+                        $o->where('status', '!=', 'dibatalkan');
+                    });
+                })->orderByDesc('total_terjual')->limit(10);
+            } elseif (in_array($request->kategori, ['makanan', 'minuman', 'snack'])) {
+                $query->where('kategori', $request->kategori)->orderBy('nama_menu', 'asc');
+            } else {
+                $query->orderBy('nama_menu', 'asc');
+            }
+        } else {
+            $query->orderBy('nama_menu', 'asc');
         }
 
         // Search by keyword
@@ -51,7 +76,7 @@ class KatalogController extends Controller
             });
         }
 
-        $menus = $query->orderBy('nama_menu', 'asc')->get();
+        $menus = $query->get();
 
         return view('katalog.index', [
             'stands' => $stands,

@@ -35,7 +35,7 @@ class KantinOrderTest extends TestCase
     {
         $stand = Stand::where('nama_stand', 'Kantin Bu Agus')->first();
 
-        $response = $this->get('/?stand='.$stand->id.'&kategori=makanan');
+        $response = $this->get('/?stand=' . $stand->id . '&kategori=makanan');
         $response->assertStatus(200);
         $response->assertSee('Nasi Goreng Spesial Telur');
     }
@@ -53,7 +53,7 @@ class KantinOrderTest extends TestCase
         $totalCount = $stand->menus()->count();
         $this->assertNotEquals($availableCount, $totalCount);
 
-        $response = $this->get('/?stand='.$stand->id);
+        $response = $this->get('/?stand=' . $stand->id);
         $response->assertStatus(200);
 
         // Verify that the stand's menus_count in view matches available count, not total count
@@ -332,5 +332,36 @@ class KantinOrderTest extends TestCase
         $this->assertNotNull($vendorUser);
         $this->assertEquals('penjual', $vendorUser->role);
         $this->assertEquals($stand->id, $vendorUser->stand_id);
+    }
+
+    public function test_guest_can_filter_katalog_by_terlaris_and_see_terjual_counts(): void
+    {
+        $menu = Menu::first();
+        $stand = $menu->stand;
+
+        $order = $stand->orders()->create([
+            'kode_tr' => 'PO-TEST-1',
+            'nama_pemesan' => 'Siswa Test',
+            'kelas' => 'XII RPL 1',
+            'total_harga' => $menu->harga * 3,
+            'status' => 'selesai',
+        ]);
+
+        $order->items()->create([
+            'menu_id' => $menu->id,
+            'jumlah' => 3,
+            'harga_satuan' => $menu->harga,
+            'subtotal' => $menu->harga * 3,
+        ]);
+
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        $response->assertSee('Terlaris');
+        $response->assertSeeText('3 terjual');
+
+        $filteredResponse = $this->get('/?kategori=terlaris');
+        $filteredResponse->assertStatus(200);
+        $filteredResponse->assertSee($menu->nama_menu);
+        $this->assertEquals('terlaris', $filteredResponse->viewData('activeKategori'));
     }
 }

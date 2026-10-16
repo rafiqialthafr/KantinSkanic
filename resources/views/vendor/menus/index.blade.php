@@ -193,9 +193,9 @@
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center shrink-0 border border-slate-200">
                                     @if($menu->foto)
-                                        <img src="{{ asset('storage/' . $menu->foto) }}" alt="{{ $menu->nama_menu }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset('storage/' . $menu->foto) }}" alt="{{ $menu->nama_menu }}" class="w-full h-full object-cover">
                                     @else
-                                        <span class="text-sm font-black text-slate-400">{{ strtoupper(substr($menu->nama_menu, 0, 1)) }}</span>
+                                    <span class="text-sm font-black text-slate-400">{{ strtoupper(substr($menu->nama_menu, 0, 1)) }}</span>
                                     @endif
                                 </div>
                                 <div>

@@ -105,6 +105,12 @@
                         class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
                         Semua Kategori
                     </a>
+                    <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'terlaris'])) }}#katalog-section"
+                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'terlaris' ? 'bg-red-600 text-white shadow-xs' : 'bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 border border-red-200' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
+                            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                        </svg> Terlaris
+                    </a>
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'makanan'])) }}#katalog-section"
                         class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'makanan' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
@@ -293,6 +299,14 @@
                                 @endif
                             </div>
                         </div>
+
+                        <!-- Terjual Counter on ALL Cards -->
+                        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] sm:text-xs text-slate-500">
+                            <svg class="w-3.5 h-3.5 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119.993Z" />
+                            </svg>
+                            <span><strong class="text-slate-700 font-bold">{{ (int) ($menu->total_terjual ?? 0) }}</strong> terjual</span>
+                        </div>
                     </div>
                 </div>
 
@@ -434,8 +448,8 @@
 
                         <!-- Profil Pemesan (Otomatis dari Akun yang Sedang Login) -->
                         @php
-                            $pemesanNama = auth()->user()->name;
-                            $pemesanKelas = auth()->user()->kelas ?: (session('siswa_kelas') ?: 'Siswa');
+                        $pemesanNama = auth()->user()->name;
+                        $pemesanKelas = auth()->user()->kelas ?: (session('siswa_kelas') ?: 'Siswa');
                         @endphp
                         <input type="hidden" id="input-nama" value="{{ $pemesanNama }}">
                         <input type="hidden" id="input-kelas" value="{{ $pemesanKelas }}">
