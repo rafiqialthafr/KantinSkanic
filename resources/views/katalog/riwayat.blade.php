@@ -24,6 +24,19 @@
     background: #94a3b8;
 }
 
+/* Sembunyikan scrollbar slider bawaan abu-abu */
+.no-scrollbar,
+.no-scrollbar * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+}
+.no-scrollbar::-webkit-scrollbar,
+.no-scrollbar *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
 @media print {
     body * {
         visibility: hidden !important;
@@ -87,7 +100,7 @@
 
         <!-- Shopee Navigation Tabs Bar -->
         <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 mb-5 overflow-hidden">
-            <div class="flex items-center overflow-x-auto no-scrollbar scroll-smooth">
+            <div id="shopee-tabs-container" class="flex items-center overflow-x-auto no-scrollbar scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
                 @php
                     $tabs = [
                         'all' => ['label' => 'Semua', 'count' => $statusCounts['all'] ?? 0],
@@ -103,17 +116,28 @@
                     $isActive = ($statusFilter === $key) || ($key === 'all' && empty($statusFilter));
                 @endphp
                 <a href="{{ route('order.history', ['status' => $key]) }}"
-                   class="flex-1 min-w-[110px] sm:min-w-[130px] py-3.5 px-3 text-center text-xs sm:text-sm transition-all whitespace-nowrap border-b-2
+                   data-tab-key="{{ $key }}"
+                   data-active="{{ $isActive ? 'true' : 'false' }}"
+                   class="tab-item shrink-0 sm:flex-1 px-4 sm:px-5 py-3 sm:py-3.5 text-center text-xs sm:text-sm whitespace-nowrap select-none transition-colors duration-150 flex items-center justify-center relative
                           {{ $isActive
-                             ? 'text-orange-600 font-black border-orange-500 bg-orange-50/20'
-                             : 'text-slate-600 hover:text-orange-600 font-bold border-transparent hover:bg-slate-50' }}">
-                    <span>{{ $tab['label'] }}</span>
-                    @if($tab['count'] > 0)
-                    <span class="ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold
-                          {{ $isActive ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-500' }}">
-                        {{ $tab['count'] }}
+                             ? 'text-orange-600 font-black'
+                             : 'text-slate-600 hover:text-orange-600 font-bold' }}">
+                    <span class="inline-flex flex-col items-center relative">
+                        <span class="leading-normal flex items-center justify-center gap-1.5">
+                            <span>{{ $tab['label'] }}</span>
+                            @if($key !== 'all' && ($tab['count'] ?? 0) > 0)
+                            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black leading-none transition-colors
+                                  {{ $isActive
+                                     ? 'bg-orange-500 text-white shadow-2xs'
+                                     : 'bg-slate-100 text-slate-600 border border-slate-200/80' }}">
+                                {{ $tab['count'] }}
+                            </span>
+                            @endif
+                        </span>
+                        <!-- Garis underline aktif persis selebar teks -->
+                        <span class="w-full rounded-full transition-all"
+                              style="height: 3px; margin-top: 5px; {{ $isActive ? 'background-color: #ea580c;' : 'background-color: transparent;' }}"></span>
                     </span>
-                    @endif
                 </a>
                 @endforeach
             </div>
@@ -121,7 +145,7 @@
 
         <!-- Shopee Orders List Cards (SubOrder per Stand) -->
         @if($orders->count() > 0)
-        <div class="space-y-4">
+        <div class="space-y-3.5 sm:space-y-4">
             @foreach($orders as $order)
             @php
                 $isQris = $order->isQris();
@@ -138,118 +162,117 @@
                  data-is-qris="{{ $isQris ? '1' : '0' }}"
                  data-batch-code="{{ $batchCode }}">
 
-                <!-- 1. Header Stand & Tiket SubOrder -->
-                <div class="p-4 sm:p-5 pb-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2.5 bg-slate-50/50">
-                    <!-- Left: Shop Info + Kode Tiket -->
-                    <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap">
-                        <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.614A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.015a2.993 2.993 0 0 0 2.25 1.015c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72L4.318 3.44A1.5 1.5 0 0 1 5.378 3h13.244a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72m-13.5 0a3 3 0 0 0 3.75-.614A2.993 2.993 0 0 0 9.75 9.75" />
-                            </svg>
-                        </div>
-
-                        <div>
-                            <span class="font-black text-sm sm:text-base text-slate-900 block leading-tight">
+                <!-- 1. Header Stand & Tiket SubOrder (Terstruktur Rapi di Layar HP & Laptop) -->
+                <div class="p-3.5 sm:p-4 bg-slate-50/70 border-b border-slate-100">
+                    <!-- Baris Atas: Stand Name di kiri, Badges Status di kanan -->
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0 shadow-2xs">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.614A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.015a2.993 2.993 0 0 0 2.25 1.015c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72L4.318 3.44A1.5 1.5 0 0 1 5.378 3h13.244a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72m-13.5 0a3 3 0 0 0 3.75-.614A2.993 2.993 0 0 0 9.75 9.75" />
+                                </svg>
+                            </div>
+                            <span class="font-extrabold text-sm sm:text-base text-slate-800 truncate">
                                 {{ $order->stand->nama_stand ?? 'Stand Kantin' }}
                             </span>
-                            <span class="text-[11px] text-slate-400 font-medium">
-                                {{ $order->created_at->format('d M Y, H:i') }} WIB
-                            </span>
                         </div>
 
-                        <span class="text-slate-300 hidden sm:inline">&bull;</span>
+                        <!-- Right: Payment & Cooking Badges -->
+                        <div class="flex items-center gap-1.5 shrink-0" id="order-badges-{{ $order->id }}">
+                            <!-- 1. Status Pembayaran Lunas (jika sudah lunas) -->
+                            @if($isLunas)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-emerald-500 text-white shadow-2xs">
+                                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                                </svg>
+                                <span>QRIS</span>
+                            </span>
+                            @elseif(! $isQris)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-amber-500 text-white shadow-2xs">
+                                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <span>COD</span>
+                            </span>
+                            @endif
 
-                        <!-- Kode Tiket unik per Stand -->
-                        <div class="inline-flex items-center gap-1 font-mono text-xs font-bold bg-white text-slate-800 px-2.5 py-1 rounded-xl border border-slate-200 shadow-2xs">
+                            <!-- 2. Status Pengerjaan Makanan -->
+                            <span id="order-status-badge-{{ $order->id }}">
+                            @if($order->status === 'siap_diambil')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-teal-50 text-teal-700 border border-teal-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping"></span>
+                                <span>Siap Diambil</span>
+                            </span>
+                            @elseif($order->status === 'diproses')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-orange-50 text-orange-700 border border-orange-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                                <span>Dimasak</span>
+                            </span>
+                            @elseif($order->status === 'pending' || $order->status === 'menunggu_pembayaran')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-amber-50 text-amber-700 border border-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                <span>{{ ($order->status === 'menunggu_pembayaran' || $isMenungguBayar) ? 'Belum Bayar' : 'Menunggu' }}</span>
+                            </span>
+                            @elseif($order->status === 'selesai')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-slate-100 text-slate-700 border border-slate-200">
+                                <svg class="w-3 h-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                                <span>Selesai</span>
+                            </span>
+                            @elseif($order->status === 'dibatalkan')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-rose-50 text-rose-700 border border-rose-200">
+                                <span>Dibatalkan</span>
+                            </span>
+                            @endif
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Baris Bawah: Kode Tiket & Waktu Pemesanan -->
+                    <div class="mt-2.5 pt-2 border-t border-slate-200/50 flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+                        <div class="inline-flex items-center gap-1.5 font-mono font-bold bg-white px-2 py-0.5 rounded-lg border border-slate-200 shadow-2xs">
                             <span class="text-orange-600">#{{ $ticketCode }}</span>
-                            <button type="button" onclick="copyOrderCode('{{ $ticketCode }}')" title="Salin Kode Tiket" class="text-slate-400 hover:text-orange-600 ml-0.5 cursor-pointer">
+                            <button type="button" onclick="copyOrderCode('{{ $ticketCode }}')" title="Salin Kode Tiket" class="text-slate-400 hover:text-orange-600 cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
                                 </svg>
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Right: Payment & Cooking Badges -->
-                    <div class="flex items-center gap-2 flex-wrap" id="order-badges-{{ $order->id }}">
-                        <!-- 1. Status Pembayaran Lunas (jika sudah lunas) -->
-                        @if($isLunas)
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-emerald-500 text-white shadow-xs">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-                            </svg>
-                            <span>QRIS</span>
-                        </span>
-                        @elseif(! $isQris)
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black bg-amber-500 text-white shadow-xs">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            <span>COD</span>
-                        </span>
-                        @endif
-
-                        <!-- 2. Status Pengerjaan Makanan (Badge Kuning Menunggu Pembayaran, dsb) -->
-                        <span id="order-status-badge-{{ $order->id }}">
-                        @if($order->status === 'siap_diambil')
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-teal-50 text-teal-700 border border-teal-200">
-                            <span class="w-2 h-2 rounded-full bg-teal-500 animate-ping"></span>
-                            <span>Siap Diambil</span>
-                        </span>
-                        @elseif($order->status === 'diproses')
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-orange-50 text-orange-700 border border-orange-200">
-                            <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                            <span>Sedang Dimasak</span>
-                        </span>
-                        @elseif($order->status === 'pending' || $order->status === 'menunggu_pembayaran')
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-amber-50 text-amber-700 border border-amber-200">
-                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                            <span>{{ $order->status === 'menunggu_pembayaran' ? 'Menunggu Pembayaran' : 'Menunggu Dikonfirmasi' }}</span>
-                        </span>
-                        @elseif($order->status === 'selesai')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black bg-slate-100 text-slate-700 border border-slate-200">
-                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                            </svg>
-                            <span>Selesai</span>
-                        </span>
-                        @elseif($order->status === 'dibatalkan')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black bg-rose-50 text-rose-700 border border-rose-200">
-                            <span>Dibatalkan</span>
-                        </span>
-                        @endif
+                        <span class="text-slate-400 font-medium">
+                            {{ $order->created_at->format('d M Y, H:i') }} WIB
                         </span>
                     </div>
                 </div>
 
                 <!-- 2. Body Daftar Menu Khusus Stand Tersebut -->
-                <div class="p-4 sm:p-5 space-y-3.5 divide-y divide-slate-100">
+                <div class="p-3.5 sm:p-4 space-y-3 divide-y divide-slate-100">
                     @foreach($order->items as $item)
-                    <div class="pt-3.5 first:pt-0 flex items-start sm:items-center justify-between gap-3 sm:gap-4">
-                        <div class="flex items-start sm:items-center gap-3 min-w-0">
+                    <div class="pt-3 first:pt-0 flex items-start sm:items-center justify-between gap-3">
+                        <div class="flex items-start sm:items-center gap-3 min-w-0 flex-1">
                             <!-- Foto Menu -->
                             @if($item->menu && $item->menu->foto)
                             <img src="{{ asset('storage/' . $item->menu->foto) }}" alt="{{ $item->menu->nama_menu }}"
-                                 class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover bg-slate-100 border border-slate-200/80 shrink-0">
+                                 class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover bg-slate-100 border border-slate-200/80 shrink-0">
                             @else
-                            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-500 shrink-0">
-                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-500 shrink-0">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                                 </svg>
                             </div>
                             @endif
 
-                            <div class="min-w-0">
-                                <h3 class="font-extrabold text-sm sm:text-base text-slate-800 leading-snug">
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-extrabold text-xs sm:text-sm text-slate-800 leading-snug truncate">
                                     {{ $item->menu->nama_menu ?? 'Menu' }}
                                 </h3>
-                                <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
+                                <div class="flex items-center gap-1.5 mt-0.5 text-[11px] sm:text-xs text-slate-400">
                                     <span class="capitalize">{{ $item->menu->kategori ?? 'Umum' }}</span>
                                     <span>&bull;</span>
                                     <span class="font-semibold text-slate-600">{{ $item->jumlah }}x @ Rp {{ number_format($item->harga_satuan, 0, ',', '.') }}</span>
                                 </div>
                                 @if(!empty($item->notes))
-                                <p class="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md inline-block mt-1 font-medium">
+                                <p class="text-[10px] sm:text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md inline-block mt-1 font-medium max-w-full truncate">
                                     Catatan: {{ $item->notes }}
                                 </p>
                                 @endif
@@ -257,7 +280,7 @@
                         </div>
 
                         <!-- Harga Item -->
-                        <div class="text-right shrink-0">
+                        <div class="text-right shrink-0 pt-0.5">
                             <span class="text-xs sm:text-sm font-black text-slate-800 block">
                                 Rp {{ number_format($item->subtotal, 0, ',', '.') }}
                             </span>
@@ -267,51 +290,43 @@
 
                     <!-- Catatan Tambahan Global -->
                     @if($order->catatan)
-                    <div class="pt-3">
-                        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-2 text-xs text-slate-500">
-                            <svg class="w-4 h-4 text-orange-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <div class="pt-2.5">
+                        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-2 text-[11px] text-slate-500">
+                            <svg class="w-3.5 h-3.5 text-orange-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v4.018Z" />
                             </svg>
-                            <span class="italic">Catatan Tambahan: &ldquo;{{ $order->catatan }}&rdquo;</span>
+                            <span class="italic">Catatan: &ldquo;{{ $order->catatan }}&rdquo;</span>
                         </div>
                     </div>
                     @endif
                 </div>
 
-                <!-- 3. Footer Total Nominal Stand -->
-                <div class="px-4 sm:px-5 py-3.5 bg-slate-50/70 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                    <span class="text-xs text-slate-400 font-medium">
-                        Pemesan: <strong class="text-slate-700">{{ $order->nama_pemesan }}</strong> ({{ $order->kelas }})
-                    </span>
-
-                    <div class="flex items-baseline gap-2 self-end sm:self-auto">
-                        <span class="text-xs text-slate-500 font-bold">Total Pembayaran Stand:</span>
-                        <span class="text-lg sm:text-xl font-black text-orange-600 font-mono">
-                            Rp {{ number_format($order->total_harga, 0, ',', '.') }}
+                <!-- 3. Footer Total Nominal Stand & Tombol Aksi (Terpadu, Ringkas & Responsif) -->
+                <div class="p-3.5 sm:p-4 bg-slate-50/80 border-t border-slate-100">
+                    <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-200/60">
+                        <span class="text-[11px] sm:text-xs text-slate-500 truncate">
+                            Pemesan: <strong class="text-slate-800">{{ $order->nama_pemesan }}</strong> ({{ $order->kelas }})
                         </span>
-                    </div>
-                </div>
-
-                <!-- 4. Tombol Aksi: Lihat Struk Pengambilan -->
-                <div class="px-4 sm:px-5 py-3.5 bg-white border-t border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="copyOrderCode('{{ $ticketCode }}')"
-                                class="px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs transition-all active:scale-95 cursor-pointer">
-                            Salin Tiket #{{ $ticketCode }}
-                        </button>
+                        <div class="flex items-baseline gap-1.5 shrink-0">
+                            <span class="text-[11px] text-slate-500 font-bold">Total:</span>
+                            <span class="text-base sm:text-lg font-black text-orange-600 font-mono">
+                                Rp {{ number_format($order->total_harga, 0, ',', '.') }}
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-2" id="order-actions-{{ $order->id }}">
+                    <!-- Tombol Aksi -->
+                    <div class="flex items-center justify-end gap-2 pt-2.5" id="order-actions-{{ $order->id }}">
                         @if($isQris && ! $isLunas && $order->status !== 'dibatalkan')
-                        <!-- Tombol Bayar (Warna Oren di samping kiri Lihat Struk) -->
+                        <!-- Tombol Bayar -->
                         <button type="button" onclick="payWithSnap('{{ $batchCode }}', this)"
                                 id="btn-pay-{{ $order->id }}"
-                                class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs shadow-md shadow-orange-500/20 active:scale-95 transition-all flex items-center justify-center cursor-pointer gap-1.5">
-                            <span>Bayar</span>
+                                class="flex-1 sm:flex-none px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-md shadow-orange-500/20 active:scale-95 transition-all flex items-center justify-center cursor-pointer gap-1.5">
+                            <span>Bayar Sekarang</span>
                         </button>
                         @endif
 
-                        <!-- Tombol 'Lihat Struk Pengambilan' yang membuka popup digital bersih -->
+                        <!-- Tombol 'Lihat Struk' -->
                         @php
                             $receiptPayload = [
                                 'ticket_code' => $ticketCode,
@@ -339,11 +354,11 @@
                         <button type="button"
                                 data-receipt="{{ json_encode($receiptPayload) }}"
                                 onclick="openDigitalReceiptModal(JSON.parse(this.dataset.receipt))"
-                                class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs shadow-md shadow-orange-500/20 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                class="flex-1 sm:flex-none px-4 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-orange-50 text-slate-700 hover:text-orange-600 border border-slate-200/90 font-extrabold text-xs shadow-2xs active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                            <svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                             </svg>
-                            <span>Lihat Struk Pengambilan</span>
+                            <span>Lihat Struk</span>
                         </button>
                     </div>
                 </div>
@@ -373,27 +388,28 @@
         </div>
         @else
         <!-- Shopee Empty State -->
-        <div class="bg-white rounded-2xl border border-slate-200/90 p-10 sm:p-14 text-center shadow-xs">
-            <div class="w-20 h-20 rounded-full bg-orange-50 border border-orange-100 text-orange-500 mx-auto flex items-center justify-center mb-4 shadow-inner">
+        <div class="bg-white rounded-2xl border border-slate-200/90 py-14 sm:py-20 px-6 text-center shadow-xs flex flex-col items-center justify-center"
+             style="min-height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="w-20 h-20 rounded-full bg-orange-50 border border-orange-100 text-orange-500 flex items-center justify-center mb-4 shadow-inner">
                 <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                 </svg>
             </div>
             @if($statusFilter === 'belum_bayar')
-            <h3 class="text-base sm:text-lg font-black text-slate-900 mb-1">Tidak Ada Tagihan QRIS</h3>
-            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-6">
+            <h3 class="text-base sm:text-lg font-black text-slate-900 mb-1.5">Tidak Ada Tagihan QRIS</h3>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-6 leading-relaxed">
                 Semua pesanan QRIS kamu sudah dibayar atau kamu belum memiliki pesanan QRIS aktif.
             </p>
             @else
-            <h3 class="text-base sm:text-lg font-black text-slate-900 mb-1">Belum Ada Pesanan</h3>
-            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-6">
+            <h3 class="text-base sm:text-lg font-black text-slate-900 mb-1.5">Belum Ada Pesanan</h3>
+            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-6 leading-relaxed">
                 Yuk pesan makanan atau minuman favoritmu di Kantin Skanic sekarang tanpa antre!
             </p>
             @endif
 
-            <div class="flex items-center justify-center gap-3">
+            <div class="flex items-center justify-center">
                 <a href="{{ route('katalog.index') }}#katalog-section" class="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-orange-500/25 active:scale-95 transition-all">
-                    Mulai Pesan Sekarang
+                    Pesan Sekarang
                 </a>
             </div>
         </div>
@@ -540,6 +556,46 @@
 </div>
 
 <script>
+    // Auto-scroll tab container agar tab aktif (misal yang paling pojok) otomatis bergeser ke tengah
+    function autoScrollActiveTab(smooth = false) {
+        const container = document.getElementById('shopee-tabs-container');
+        if (!container) return;
+        const activeTab = container.querySelector('.tab-item[data-active="true"]');
+        if (!activeTab) return;
+
+        const scrollTarget = activeTab.offsetLeft - (container.clientWidth / 2) + (activeTab.offsetWidth / 2);
+        container.scrollTo({
+            left: Math.max(0, scrollTarget),
+            behavior: smooth ? 'smooth' : 'auto'
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            autoScrollActiveTab(false);
+            setTimeout(() => autoScrollActiveTab(true), 80);
+        });
+    } else {
+        autoScrollActiveTab(false);
+        setTimeout(() => autoScrollActiveTab(true), 80);
+    }
+
+    // Saat tab diklik, kontainer langsung bergeser ke tengah tab tersebut
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const container = document.getElementById('shopee-tabs-container');
+                if (container) {
+                    const scrollTarget = this.offsetLeft - (container.clientWidth / 2) + (this.offsetWidth / 2);
+                    container.scrollTo({
+                        left: Math.max(0, scrollTarget),
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+
     let currentModalTicketCode = '';
 
     function copyModalTicketCode() {
@@ -670,7 +726,7 @@
 
         // Badge header = STATUS PESANAN; Metode pembayaran = hanya "COD" atau "QRIS"
         const statusBadgeMap = {
-            menunggu_pembayaran: { label: 'Menunggu Pembayaran', cls: 'bg-amber-500 border-amber-200', dot: true },
+            menunggu_pembayaran: { label: 'Belum Bayar', cls: 'bg-amber-500 border-amber-200', dot: true },
             pending: { label: 'Menunggu Dikonfirmasi', cls: 'bg-amber-500 border-amber-200', dot: true },
             diproses: { label: 'Sedang Dimasak', cls: 'bg-orange-500 border-orange-200', dot: true },
             siap_diambil: { label: 'Siap Diambil', cls: 'bg-emerald-500 border-emerald-200', dot: true },
@@ -876,7 +932,7 @@
             statusBadgeHtml = `
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-amber-50 text-amber-700 border border-amber-200">
                     <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                    <span>${ord.status === 'menunggu_pembayaran' ? 'Menunggu Pembayaran' : 'Menunggu Dikonfirmasi'}</span>
+                    <span>${(ord.status === 'menunggu_pembayaran' || (!ord.is_lunas && ord.is_qris && ord.status !== 'dibatalkan')) ? 'Belum Bayar' : 'Menunggu'}</span>
                 </span>
             `;
         } else if (ord.status === 'selesai') {

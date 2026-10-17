@@ -32,6 +32,19 @@
             display: none !important;
         }
 
+        /* Sembunyikan indikator scrollbar bawaan browser */
+        .no-scrollbar,
+        .no-scrollbar * {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+        .no-scrollbar::-webkit-scrollbar,
+        .no-scrollbar *::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
         /* Animated underline hover — kiri ke kanan */
         .nav-link {
             position: relative;
@@ -232,13 +245,13 @@
                     </button>
 
                     @auth
-                    <!-- Authenticated User Menu: Avatar Only with Dropdown -->
-                    <div class="relative shrink-0 flex items-center" id="user-profile-menu-container">
-                        <!-- Avatar Button (Bulat sempurna presisi 1:1 tanpa distorsi & tanpa glow) -->
+                    <!-- Authenticated User Menu: Avatar Only with Dropdown (Hidden di mobile, hanya di desktop) -->
+                    <div class="relative shrink-0 hidden md:flex items-center" id="user-profile-menu-container">
+                        <!-- Avatar Button (Bulat dengan outline hitam) -->
                         <button type="button"
                             id="user-profile-btn"
                             onclick="toggleUserProfileDropdown(event)"
-                            class="shrink-0 aspect-square w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-black text-xs sm:text-lg flex items-center justify-center p-0 leading-none hover:opacity-95 active:scale-95 transition-all cursor-pointer focus:outline-hidden"
+                            class="shrink-0 aspect-square w-9 h-9 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-black text-xs sm:text-sm flex items-center justify-center p-0 leading-none border-2 active:scale-95 transition-all cursor-pointer focus:outline-hidden"
                             aria-expanded="false"
                             aria-haspopup="true"
                             title="{{ Auth::user()->name }}">
