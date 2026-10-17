@@ -139,7 +139,30 @@
         </div>
     </div>
 
-    {{-- TOP MENU + ORDER HISTORY --}}
+    {{-- PAYMENT REVENUE BREAKDOWN (Cash vs QRIS) --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
+            <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pendapatan Tunai di Stand (Fisik)</span>
+                <span class="text-xl font-black text-slate-800 block mt-1">Rp {{ number_format($cashRevenue ?? 0, 0, ',', '.') }}</span>
+                <span class="text-xs text-emerald-600 font-semibold block mt-1">✓ Uang tunai COD langsung diterima stand</span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-2xl shadow-xs">
+                💵
+            </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
+            <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pendapatan QRIS Online (Rekening Admin)</span>
+                <span class="text-xl font-black text-emerald-600 block mt-1">Rp {{ number_format($qrisRevenue ?? 0, 0, ',', '.') }}</span>
+                <span class="text-xs text-amber-600 font-semibold block mt-1">⏳ Menunggu transfer admin: Rp {{ number_format($qrisPendingPayout ?? 0, 0, ',', '.') }}</span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-2xl shadow-xs">
+                📱
+            </div>
+        </div>
+    </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {{-- Top Selling Menus --}}

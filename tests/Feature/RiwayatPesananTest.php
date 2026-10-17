@@ -98,7 +98,7 @@ class RiwayatPesananTest extends TestCase
         $response = $this->get('/riwayat-pesanan');
         $response->assertStatus(200);
         $response->assertSee('PO-9911');
-        $response->assertSee('SIAP DIAMBIL');
+        $response->assertSee('Siap Diambil');
 
         $apiResponse = $this->postJson('/api/riwayat-pesanan');
         $apiResponse->assertStatus(200);
@@ -156,5 +156,92 @@ class RiwayatPesananTest extends TestCase
         $apiResponse = $this->postJson('/api/riwayat-pesanan');
         $apiResponse->assertStatus(200);
         $this->assertCount(0, $apiResponse->json('orders'));
+    }
+
+    public function test_belum_bayar_category_filters_unpaid_qris_orders(): void
+    {
+        $student = User::create([
+            'name' => 'Doni Siswa',
+            'email' => 'doni@siswa.com',
+            'password' => bcrypt('password123'),
+            'role' => 'siswa',
+        ]);
+
+        $stand = Stand::first();
+        $menu = Menu::where('stand_id', $stand->id)->first();
+
+        // 1. Unpaid QRIS order
+        $unpaidQrisOrder = Order::create([
+            'kode_tr' => 'SKNC-STD1-1111',
+            'user_id' => $student->id,
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Doni Siswa',
+            'kelas' => 'XI RPL 1',
+            'total_harga' => 10000,
+            'metode_pembayaran' => 'qris',
+            'status_pembayaran' => 'belum_lunas',
+            'status' => 'menunggu_pembayaran',
+        ]);
+        $unpaidQrisOrder->items()->create([
+            'menu_id' => $menu->id,
+            'jumlah' => 1,
+            'harga_satuan' => 10000,
+            'subtotal' => 10000,
+        ]);
+
+        // 2. Paid QRIS order
+        $paidQrisOrder = Order::create([
+            'kode_tr' => 'SKNC-STD1-2222',
+            'user_id' => $student->id,
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Doni Siswa',
+            'kelas' => 'XI RPL 1',
+            'total_harga' => 15000,
+            'metode_pembayaran' => 'qris',
+            'status_pembayaran' => 'lunas',
+            'status' => 'diproses',
+        ]);
+        $paidQrisOrder->items()->create([
+            'menu_id' => $menu->id,
+            'jumlah' => 1,
+            'harga_satuan' => 15000,
+            'subtotal' => 15000,
+        ]);
+
+        // 3. Cash / COD order
+        $codOrder = Order::create([
+            'kode_tr' => 'SKNC-STD1-3333',
+            'user_id' => $student->id,
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Doni Siswa',
+            'kelas' => 'XI RPL 1',
+            'total_harga' => 8000,
+            'metode_pembayaran' => 'tunai',
+            'status_pembayaran' => 'belum_lunas',
+            'status' => 'pending',
+        ]);
+        $codOrder->items()->create([
+            'menu_id' => $menu->id,
+            'jumlah' => 1,
+            'harga_satuan' => 8000,
+            'subtotal' => 8000,
+        ]);
+
+        $this->actingAs($student);
+
+        // When viewing riwayat pesanan, Belum Bayar tab is visible
+        $responseAll = $this->get('/riwayat-pesanan');
+        $responseAll->assertStatus(200);
+        $responseAll->assertSee('Belum Bayar');
+        $responseAll->assertSee('SKNC-STD1-1111');
+        $responseAll->assertSee('SKNC-STD1-2222');
+        $responseAll->assertSee('SKNC-STD1-3333');
+
+        // When filtering specifically with ?status=belum_bayar
+        $responseBelumBayar = $this->get('/riwayat-pesanan?status=belum_bayar');
+        $responseBelumBayar->assertStatus(200);
+        $responseBelumBayar->assertSee('SKNC-STD1-1111');
+        $responseBelumBayar->assertDontSee('SKNC-STD1-2222');
+        $responseBelumBayar->assertDontSee('SKNC-STD1-3333');
     }
 }

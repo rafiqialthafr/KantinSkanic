@@ -18,6 +18,8 @@ class Menu extends Model
         'harga',
         'stok',
         'is_available',
+        'is_best_seller',
+        'total_sold',
         'foto',
     ];
 
@@ -27,6 +29,8 @@ class Menu extends Model
             'harga' => 'integer',
             'stok' => 'integer',
             'is_available' => 'boolean',
+            'is_best_seller' => 'boolean',
+            'total_sold' => 'integer',
         ];
     }
 

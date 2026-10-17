@@ -14,6 +14,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Midtrans Snap Preconnect & Script -->
+    <link rel="preconnect" href="https://app.sandbox.midtrans.com">
+    <link rel="dns-prefetch" href="https://app.sandbox.midtrans.com">
+    <link rel="preconnect" href="https://api.sandbox.midtrans.com">
+    <link rel="dns-prefetch" href="https://api.sandbox.midtrans.com">
+    <script src="{{ config('midtrans.snap_js_url') }}" data-client-key="{{ config('midtrans.client_key') }}" async></script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -495,15 +502,10 @@
 
         function clearAuthStorageOnLogout() {
             try {
-                // Jangan hapus keranjang belanja saat logout!
-                // Salin keranjang user ke guest cart agar saat keluar, isi keranjang tetap terjaga
-                if (window.AUTH_USER_ID) {
-                    const userKey = 'kantinskanic_cart_user_' + window.AUTH_USER_ID;
-                    const userCart = localStorage.getItem(userKey);
-                    if (userCart) {
-                        localStorage.setItem('kantinskanic_cart_guest', userCart);
-                    }
-                }
+                // Saat logout akun, kosongkan guest cart dan riwayat sesi.
+                // Keranjang akun user (kantinskanic_cart_user_<id>) TIDAK DIHAPUS agar saat login kembali
+                // ke akun yang sama, isi keranjang pengguna tetap tersimpan utuh.
+                localStorage.removeItem('kantinskanic_cart_guest');
                 localStorage.removeItem('kantinskanic_order_history');
                 sessionStorage.clear();
             } catch (e) {}
@@ -568,7 +570,7 @@
                     localStorage.removeItem('kantinskanic_cart_v1');
                 }
 
-                // If user logged in and has guest items, merge them into user's cart
+                // If user logged in and has guest items, merge them without duplicating quantities
                 if (window.AUTH_USER_ID) {
                     const guestRaw = localStorage.getItem('kantinskanic_cart_guest');
                     if (guestRaw) {
@@ -581,7 +583,8 @@
                                 guestItems.forEach(gItem => {
                                     const exist = userItems.find(u => u.menu_id === gItem.menu_id);
                                     if (exist) {
-                                        exist.jumlah = Math.min(exist.jumlah + gItem.jumlah, gItem.maxStock || 99);
+                                        // Jangan gandakan jika sudah ada di keranjang user
+                                        exist.jumlah = Math.max(exist.jumlah, gItem.jumlah);
                                     } else {
                                         userItems.push(gItem);
                                     }

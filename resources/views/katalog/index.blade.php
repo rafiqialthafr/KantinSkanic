@@ -426,8 +426,8 @@
                                 Menu di keranjang belanja Anda akan tetap tersimpan dan tidak akan hilang saat login atau mendaftar.
                             </p>
                             <div class="mt-3.5 flex flex-col sm:flex-row items-center justify-center gap-2">
-                                <a href="{{ route('checkout.show') }}" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-                                    <span>Masuk & Checkout</span>
+                                <a href="{{ route('login') }}" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <span>Masuk ke Akun</span>
                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                                     </svg>
@@ -481,6 +481,7 @@
                             </div>
                         </div>
 
+
                         <!-- Catatan Pesanan -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
@@ -488,21 +489,44 @@
                                 class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"></textarea>
                         </div>
 
-                        <!-- COD Payment Notice -->
-                        <div class="rounded-2xl bg-amber-50 p-3.5 border border-amber-200 flex items-start gap-2.5">
-                            <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            <div class="text-xs text-amber-900 leading-relaxed font-medium">
-                                <strong class="font-bold">Pembayaran Tunai (COD):</strong> Anda membayar langsung secara tunai saat mengambil pesanan di stand yang bersangkutan.
+                        <!-- Pilihan Metode Pembayaran (Midtrans QRIS Sandbox vs COD) -->
+                        <div class="pt-2">
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Metode Pembayaran</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label for="method-qris" class="relative flex flex-col p-3 rounded-2xl border-2 border-orange-500 bg-orange-50/40 cursor-pointer transition-all" id="card-method-qris">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <input type="radio" name="payment_method_choice" id="method-qris" value="qris" checked onchange="selectDrawerPaymentMethod('qris')" class="text-orange-600 focus:ring-orange-500 cursor-pointer">
+                                        <span class="text-[9px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">MIDTRANS</span>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-slate-900">QRIS Online</span>
+                                    <span class="text-[10px] text-slate-500 mt-0.5 leading-tight">Bayar 1x via Snap QRIS</span>
+                                </label>
+
+                                <label for="method-cod" class="relative flex flex-col p-3 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition-all" id="card-method-cod">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <input type="radio" name="payment_method_choice" id="method-cod" value="cod" onchange="selectDrawerPaymentMethod('cod')" class="text-orange-600 focus:ring-orange-500 cursor-pointer">
+                                        <span class="text-[9px] font-black text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">COD</span>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-slate-900">Bayar di Tempat</span>
+                                    <span class="text-[10px] text-slate-500 mt-0.5 leading-tight">Bayar tunai di stand</span>
+                                </label>
                             </div>
+                            <input type="hidden" id="selected-payment-method" value="qris">
                         </div>
 
-                        <!-- Submit Order Button -->
-                        <div class="pt-2">
+                        <!-- Total & Submit Order Button -->
+                        <div class="pt-3 border-t border-slate-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-500 block">Total Pembayaran</span>
+                                    <span class="text-[10px] text-slate-400" id="total-payment-note">Bayar 1x lunas via QRIS</span>
+                                </div>
+                                <span id="cart-drawer-total" class="text-xl font-black text-orange-600">Rp 0</span>
+                            </div>
+
                             <button type="submit" id="btn-submit-order"
                                 class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-98 text-white font-extrabold text-sm shadow-lg shadow-orange-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                                <span>Kirim Pesanan Sekarang</span>
+                                <span id="btn-submit-text">Bayar Sekarang via QRIS</span>
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                                 </svg>
@@ -593,9 +617,11 @@
             let items = this.getItems().filter(i => i.menu_id !== menuId);
             this.save(items);
         },
-        clearCart() {
+        clearCart(silent = false) {
             localStorage.removeItem(this.getKey());
-            this.updateUI();
+            if (!silent) {
+                this.updateUI();
+            }
             if (typeof syncNavbarCartBadge === 'function') {
                 syncNavbarCartBadge();
             }
@@ -612,8 +638,10 @@
 
             const container = document.getElementById('cart-items-container');
             const drawerSubtotal = document.getElementById('drawer-subtotal');
+            const drawerTotal = document.getElementById('cart-drawer-total');
 
             if (drawerSubtotal) drawerSubtotal.innerText = 'Rp ' + totalPrice.toLocaleString('id-ID');
+            if (drawerTotal) drawerTotal.innerText = 'Rp ' + totalPrice.toLocaleString('id-ID');
 
             // Render items in drawer
             if (container) {
@@ -731,6 +759,40 @@
         }, 300);
     }
 
+    function selectDrawerPaymentMethod(method) {
+        const qrisCard = document.getElementById('card-method-qris');
+        const codCard = document.getElementById('card-method-cod');
+        const hiddenInput = document.getElementById('selected-payment-method');
+        const btnText = document.getElementById('btn-submit-text');
+        const totalNote = document.getElementById('total-payment-note');
+
+        if (hiddenInput) hiddenInput.value = method;
+
+        if (method === 'qris') {
+            if (qrisCard) {
+                qrisCard.classList.remove('border-slate-200', 'bg-white');
+                qrisCard.classList.add('border-orange-500', 'bg-orange-50/40');
+            }
+            if (codCard) {
+                codCard.classList.remove('border-orange-500', 'bg-orange-50/40');
+                codCard.classList.add('border-slate-200', 'bg-white');
+            }
+            if (btnText) btnText.innerText = 'Bayar Sekarang via QRIS';
+            if (totalNote) totalNote.innerText = 'Bayar 1x lunas via QRIS';
+        } else {
+            if (codCard) {
+                codCard.classList.remove('border-slate-200', 'bg-white');
+                codCard.classList.add('border-orange-500', 'bg-orange-50/40');
+            }
+            if (qrisCard) {
+                qrisCard.classList.remove('border-orange-500', 'bg-orange-50/40');
+                qrisCard.classList.add('border-slate-200', 'bg-white');
+            }
+            if (btnText) btnText.innerText = 'Konfirmasi Pesanan (COD)';
+            if (totalNote) totalNote.innerText = 'Bayar tunai di masing-masing stand';
+        }
+    }
+
     async function handleCheckout(event) {
         event.preventDefault();
         const items = cartStore.getItems();
@@ -742,6 +804,7 @@
         const nama = document.getElementById('input-nama').value.trim();
         const kelas = document.getElementById('input-kelas').value.trim();
         const catatan = document.getElementById('input-catatan').value.trim();
+        const selectedMethod = document.getElementById('selected-payment-method')?.value || 'qris';
 
         const submitBtn = document.getElementById('btn-submit-order');
         submitBtn.disabled = true;
@@ -750,7 +813,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>Mengirim Pesanan...</span>
+            <span>Memproses Pesanan...</span>
         `;
 
         try {
@@ -758,13 +821,15 @@
                 nama_pemesan: nama,
                 kelas: kelas,
                 catatan: catatan,
+                payment_method: selectedMethod,
                 items: items.map(i => ({
                     menu_id: i.menu_id,
-                    jumlah: i.jumlah
+                    quantity: i.jumlah,
+                    notes: catatan
                 }))
             };
 
-            const response = await fetch('{{ route("checkout") }}', {
+            const response = await fetch('{{ route("api.orders.checkout") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -780,14 +845,111 @@
                 if (typeof saveOrderToHistoryStorage === 'function' && data.all_codes) {
                     saveOrderToHistoryStorage(data.all_codes);
                 }
-                cartStore.clearCart();
-                window.location.href = data.redirect_url;
+
+                // If QRIS: launch Midtrans Snap Sandbox popup or Simulator
+                if (selectedMethod === 'qris' && data.snap_token) {
+                    const syncOrder = async (result, forceConfirm) => {
+                        try {
+                            await fetch(`/api/orders/${data.order_id}/sync-status`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                },
+                                body: JSON.stringify({
+                                    result: result || {},
+                                    force_confirm: !!forceConfirm
+                                })
+                            });
+                        } catch (e) {}
+                    };
+
+                    const handleCancelQrisPayment = async () => {
+                        try {
+                            await fetch(`/api/orders/${data.order_id}/cancel-checkout`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                }
+                            });
+                        } catch (e) {}
+
+                        // Cart items and total price remain intact
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `
+                            <span id="btn-submit-text">Bayar Sekarang via QRIS</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                        `;
+                        openCartModal();
+                        pollRealtimeStocks();
+                    };
+
+                    // If mock token (demo keys in .env)
+                    if (data.snap_token.startsWith('SNAP-MOCK-')) {
+                        openIndexSimulatedQrisModal(data.order_id, data.gross_amount, data.redirect_url);
+                        return;
+                    }
+
+                    if (typeof window.snap !== 'undefined' && window.snap.pay) {
+                        window.snap.pay(data.snap_token, {
+                            onSuccess: async function(result) {
+                                submitBtn.innerHTML = `
+                                    <svg class="animate-spin h-4 w-4 text-white inline-block mr-2" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Pembayaran Berhasil! Mengalihkan...</span>
+                                `;
+                                await syncOrder(result, true);
+                                cartStore.clearCart(true);
+                                window.location.href = data.redirect_url || '{{ route("order.history") }}';
+                            },
+                            onPending: async function(result) {
+                                submitBtn.innerHTML = `
+                                    <svg class="animate-spin h-4 w-4 text-white inline-block mr-2" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Menunggu Pembayaran...</span>
+                                `;
+                                await syncOrder(result, false);
+                                cartStore.clearCart(true);
+                                window.location.href = '{{ route("order.history", ["status" => "belum_bayar"]) }}';
+                            },
+                            onError: function(result) {
+                                handleCancelQrisPayment();
+                            },
+                            onClose: function() {
+                                handleCancelQrisPayment();
+                            }
+                        });
+                        return;
+                    } else {
+                        openIndexSimulatedQrisModal(data.order_id, data.gross_amount, data.redirect_url);
+                        return;
+                    }
+                }
+
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin h-4 w-4 text-white inline-block mr-2" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Pesanan Berhasil! Mengalihkan...</span>
+                `;
+                cartStore.clearCart(true);
+                window.location.href = data.redirect_url || '{{ route("order.history") }}';
             } else {
                 alert(data.message || 'Gagal membuat pesanan. Silakan periksa kembali data Anda.');
                 pollRealtimeStocks();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `
-                    <span>Kirim Pesanan Sekarang</span>
+                    <span id="btn-submit-text">${selectedMethod === 'qris' ? 'Bayar Sekarang via QRIS' : 'Konfirmasi Pesanan (COD)'}</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>
@@ -798,7 +960,7 @@
             alert('Terjadi kesalahan saat memproses pesanan. Periksa koneksi internet Anda.');
             submitBtn.disabled = false;
             submitBtn.innerHTML = `
-                <span>Kirim Pesanan Sekarang</span>
+                <span id="btn-submit-text">Coba Lagi</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>
@@ -928,10 +1090,96 @@
         window.addEventListener('focus', pollRealtimeStocks);
     }
 
+    function openIndexSimulatedQrisModal(orderId, grossAmount, redirectUrl) {
+        let modal = document.getElementById('index-qris-simulator-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'index-qris-simulator-modal';
+            modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs';
+            modal.innerHTML = `
+                <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center animate-in fade-in zoom-in-95 duration-200">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-3 font-black text-xl">
+                        QR
+                    </div>
+                    <h3 class="font-black text-slate-800 text-base">QRIS Kantin Skanic</h3>
+                    <p class="text-xs text-slate-500 mt-1 mb-4">Mode Uji Coba / Sandbox Simulator</p>
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 inline-block mb-3">
+                        <img id="idx-sim-qris-img" src="" alt="QRIS" class="w-44 h-44 object-contain mx-auto bg-white rounded-xl">
+                    </div>
+                    <div class="font-mono text-sm font-black text-orange-600 mb-4" id="idx-sim-qris-amount">
+                        Rp 0
+                    </div>
+                    <div class="space-y-2">
+                        <button type="button" id="idx-sim-qris-confirm-btn" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xs shadow-md shadow-emerald-500/25 active:scale-95 transition-all cursor-pointer">
+                            ⚡ Simulasikan Pembayaran Berhasil (Lunas)
+                        </button>
+                        <button type="button" onclick="handleCancelSimulatedQris('${orderId}')" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer">
+                            Tutup & Kembali ke Keranjang
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        document.getElementById('idx-sim-qris-img').src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent('KANTINSKANIC-QRIS-' + orderId);
+        document.getElementById('idx-sim-qris-amount').textContent = 'Rp ' + Number(grossAmount || 0).toLocaleString('id-ID');
+
+        const confirmBtn = document.getElementById('idx-sim-qris-confirm-btn');
+        confirmBtn.onclick = async function() {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Memverifikasi Pelunasan...';
+            try {
+                await fetch(`/api/orders/${orderId}/sync-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        force_confirm: true
+                    })
+                });
+            } catch (e) {}
+            cartStore.clearCart(true);
+            window.location.href = redirectUrl || '{{ route("order.history") }}';
+        };
+    }
+
+    async function handleCancelSimulatedQris(orderId) {
+        const modal = document.getElementById('index-qris-simulator-modal');
+        if (modal) modal.remove();
+        try {
+            await fetch(`/api/orders/${orderId}/cancel-checkout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+        } catch (e) {}
+
+        const submitBtn = document.getElementById('btn-submit-order');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `
+                <span id="btn-submit-text">Bayar Sekarang via QRIS</span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+            `;
+        }
+        openCartModal();
+        pollRealtimeStocks();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         cartStore.updateUI();
         initRealtimeStockSync();
-        if (new URLSearchParams(window.location.search).get('cart') === 'open') {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('cart') === 'open' || urlParams.get('open_cart') === '1' || window.location.hash === '#cart') {
             openCartModal();
         }
     });

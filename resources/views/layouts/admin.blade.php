@@ -81,7 +81,7 @@
 
             @auth
             <div class="pt-4 mt-auto">
-                <form action="{{ route('logout') }}" method="POST" class="m-0">
+                <form action="{{ route('logout') }}" method="POST" class="m-0" onsubmit="clearAuthStorageOnLogout()">
                     @csrf
                     <button type="submit" class="w-full sidebar-link sidebar-link-logout cursor-pointer text-left">
                         <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -222,6 +222,13 @@
             if (sidebar) sidebar.classList.add('-translate-x-full');
             if (overlay) overlay.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
+        }
+        function clearAuthStorageOnLogout() {
+            try {
+                localStorage.removeItem('kantinskanic_cart_guest');
+                localStorage.removeItem('kantinskanic_order_history');
+                sessionStorage.clear();
+            } catch (e) {}
         }
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {

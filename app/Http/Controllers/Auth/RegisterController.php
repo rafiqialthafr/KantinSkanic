@@ -13,17 +13,21 @@ class RegisterController extends Controller
     /**
      * Show student quick-register form.
      */
-    public function showRegistrationForm()
+    public function showRegistrationForm(Request $request)
     {
         if (Auth::check()) {
             return redirect()->route('katalog.index');
+        }
+
+        if ($request->has('intended')) {
+            session()->put('url.intended', $request->input('intended'));
         }
 
         return view('auth.register');
     }
 
     /**
-     * Register a new siswa account and redirect to checkout/intended.
+     * Register a new siswa account and redirect to cart drawer in catalog.
      */
     public function register(Request $request)
     {
@@ -58,7 +62,12 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->intended(route('katalog.index'))
-            ->with('success', 'Akun berhasil dibuat! Selesaikan pesananmu.');
+        $intended = session()->pull('url.intended', route('katalog.index'));
+        if (empty($intended) || str_contains($intended, 'checkout') || str_contains($intended, 'open_cart')) {
+            $intended = route('katalog.index');
+        }
+
+        return redirect()->to($intended)
+            ->with('success', 'Akun berhasil dibuat!');
     }
 }

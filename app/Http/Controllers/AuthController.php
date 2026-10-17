@@ -10,10 +10,14 @@ class AuthController extends Controller
     /**
      * Show the login form. Redirect if already authenticated.
      */
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
         if (Auth::check()) {
             return $this->redirectByRole(Auth::user());
+        }
+
+        if ($request->has('intended')) {
+            session()->put('url.intended', $request->input('intended'));
         }
 
         if (str_contains(session()->get('url.intended', ''), 'checkout') && ! session()->has('info')) {
@@ -44,7 +48,7 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // Role-based redirect — respect intended() for siswa guest cart flow
+            // Role-based redirect
             if ($user->isAdmin()) {
                 return redirect()->route('admin.dashboard');
             }
@@ -54,12 +58,17 @@ class AuthController extends Controller
                     ->with('success', 'Selamat datang, '.$user->name.'!');
             }
 
-            // Siswa — honor intended URL (e.g. /checkout after guest cart)
+            // Siswa — redirect directly to catalog beranda
             if ($user->isSiswa() && ! empty($user->kelas)) {
                 session(['siswa_kelas' => $user->kelas, 'siswa_wa' => $user->no_wa]);
             }
 
-            return redirect()->intended(route('katalog.index'))
+            $intended = session()->pull('url.intended', route('katalog.index'));
+            if (empty($intended) || str_contains($intended, 'checkout') || str_contains($intended, 'open_cart')) {
+                $intended = route('katalog.index');
+            }
+
+            return redirect()->to($intended)
                 ->with('success', 'Selamat datang, '.$user->name.'!');
         }
 

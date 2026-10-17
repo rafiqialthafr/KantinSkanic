@@ -19,6 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->appendToGroup('web', NoCacheHeaders::class);
+
+        $middleware->validateCsrfTokens(except: [
+            'api/midtrans/webhook',
+            'midtrans/webhook',
+            'api/orders/*/sync-status',
+            'api/orders/*/sync-public',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -66,6 +66,30 @@ class OrderController extends Controller
         $completedOrdersCount = (clone $baseQuery)->where('status', 'selesai')->count();
         $revenueToday = (clone $baseQuery)->where('status', 'selesai')->sum('total_harga');
 
+        // Payment method breakdown
+        $cashRevenue = (clone $baseQuery)->where('status', 'selesai')
+            ->where(function ($q) {
+                $q->where('metode_pembayaran', 'tunai')->orWhereNull('metode_pembayaran');
+            })
+            ->where('status_pembayaran', 'lunas')
+            ->sum('total_harga');
+
+        $cashUnpaid = (clone $baseQuery)
+            ->where(function ($q) {
+                $q->where('metode_pembayaran', 'tunai')->orWhereNull('metode_pembayaran');
+            })
+            ->where('status_pembayaran', 'belum_lunas')
+            ->sum('total_harga');
+
+        $qrisRevenue = (clone $baseQuery)->where('status', 'selesai')
+            ->where('metode_pembayaran', 'qris')
+            ->sum('total_harga');
+
+        $qrisPendingPayout = (clone $baseQuery)->where('status', 'selesai')
+            ->where('metode_pembayaran', 'qris')
+            ->where('settlement_status', 'pending')
+            ->sum('total_harga');
+
         // Orders listing with strict stand scoping and selected periode
         $query = Order::with('items.menu')->where('stand_id', $standId);
         $applyPeriode($query);
@@ -80,6 +104,7 @@ class OrderController extends Controller
             'stand', 'orders',
             'pendingOrdersCount', 'siapDiambilOrdersCount',
             'activeOrdersCount', 'totalOrdersToday', 'completedOrdersCount', 'revenueToday',
+            'cashRevenue', 'cashUnpaid', 'qrisRevenue', 'qrisPendingPayout',
             'periode', 'periodeLabel',
         ) + ['activeStatus' => $request->status ?? 'all']);
     }
@@ -122,6 +147,22 @@ class OrderController extends Controller
         $selesaiOrders = (clone $baseQuery)->where('status', 'selesai')->count();
         $batalOrders = (clone $baseQuery)->where('status', 'dibatalkan')->count();
 
+        $cashRevenue = (clone $baseQuery)->where('status', 'selesai')
+            ->where(function ($q) {
+                $q->where('metode_pembayaran', 'tunai')->orWhereNull('metode_pembayaran');
+            })
+            ->where('status_pembayaran', 'lunas')
+            ->sum('total_harga');
+
+        $qrisRevenue = (clone $baseQuery)->where('status', 'selesai')
+            ->where('metode_pembayaran', 'qris')
+            ->sum('total_harga');
+
+        $qrisPendingPayout = (clone $baseQuery)->where('status', 'selesai')
+            ->where('metode_pembayaran', 'qris')
+            ->where('settlement_status', 'pending')
+            ->sum('total_harga');
+
         // Top selling menus in the period (using 'jumlah' and 'subtotal' columns from order_items)
         $topMenus = OrderItem::selectRaw('menu_id, SUM(jumlah) as total_qty, SUM(subtotal) as total_revenue')
             ->whereHas('order', function ($q) use ($standId, $applyPeriode) {
@@ -146,6 +187,7 @@ class OrderController extends Controller
         return view('vendor.omset', compact(
             'stand', 'periode', 'periodeLabel',
             'totalOmset', 'totalOrders', 'selesaiOrders', 'batalOrders',
+            'cashRevenue', 'qrisRevenue', 'qrisPendingPayout',
             'topMenus', 'orders', 'activeOrdersCount',
         ));
     }
@@ -163,6 +205,21 @@ class OrderController extends Controller
 
         $previousStatus = $order->status;
         $newStatus = $validated['status'];
+
+        // Jika pesanan selesai, tambahkan total_sold menu. Jika status selesai dibatalkan/diubah, kurangi total_sold
+        if ($previousStatus !== 'selesai' && $newStatus === 'selesai') {
+            foreach ($order->items as $item) {
+                if ($item->menu_id) {
+                    Menu::where('id', $item->menu_id)->increment('total_sold', $item->jumlah);
+                }
+            }
+        } elseif ($previousStatus === 'selesai' && $newStatus !== 'selesai') {
+            foreach ($order->items as $item) {
+                if ($item->menu_id) {
+                    Menu::where('id', $item->menu_id)->decrement('total_sold', $item->jumlah);
+                }
+            }
+        }
 
         // Jika pesanan dibatalkan, otomatis kembalikan stok menu
         if ($previousStatus !== 'dibatalkan' && $newStatus === 'dibatalkan') {
@@ -213,22 +270,55 @@ class OrderController extends Controller
         ]);
 
         $raw = strtoupper(trim($validated['kode_tr']));
-        $code = str_starts_with($raw, 'PO-') ? $raw : 'PO-'.ltrim($raw, 'PO-');
+        $raw = ltrim($raw, '#');
 
         $order = Order::with('items.menu')
             ->where('stand_id', $this->standId())
-            ->where('kode_tr', $code)
+            ->where(function ($q) use ($raw) {
+                $q->where('kode_tr', $raw)
+                    ->orWhere('ticket_code', $raw)
+                    ->orWhere('kode_tr', 'SKNC-'.$raw)
+                    ->orWhere('kode_tr', 'PO-'.$raw)
+                    ->orWhere('kode_tr', 'TKT-'.$raw)
+                    ->orWhere('kode_tr', 'like', '%-'.$raw);
+            })
             ->first();
 
         if (! $order) {
-            return back()->withErrors(['kode_tr' => "Pesanan {$code} tidak ditemukan di stand Anda."]);
+            return back()->withErrors(['kode_tr' => "Pesanan {$raw} tidak ditemukan di stand Anda."]);
         }
 
-        // Mark as selesai upon pickup verification
-        $order->update(['status' => 'selesai']);
+        // Mark as selesai upon pickup verification and increment total_sold
+        if ($order->status !== 'selesai') {
+            $order->update(['status' => 'selesai']);
+            foreach ($order->items as $item) {
+                if ($item->menu_id) {
+                    Menu::where('id', $item->menu_id)->increment('total_sold', $item->jumlah);
+                }
+            }
+        }
 
         return redirect()->route('vendor.dashboard')
             ->with('verified_order', $order->id)
             ->with('success', "Pesanan #{$order->kode_tr} berhasil diverifikasi & diselesaikan ({$order->nama_pemesan} - {$order->kelas})");
+    }
+
+    /**
+     * Mark a COD / Tunai order as paid in cash by vendor at pickup.
+     */
+    public function markPaid(Request $request, Order $order)
+    {
+        abort_unless($order->stand_id === $this->standId(), 403, 'Pesanan bukan milik stand Anda.');
+
+        $order->update(['status_pembayaran' => 'lunas']);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Pesanan #{$order->kode_tr} berhasil ditandai Lunas Tunai.",
+            ]);
+        }
+
+        return back()->with('success', "Pesanan #{$order->kode_tr} berhasil ditandai Lunas Tunai!");
     }
 }

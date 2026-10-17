@@ -3,8 +3,11 @@
 use App\Http\Controllers\Admin\MenuController as AdminMenuController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\SettlementController as AdminSettlementController;
 use App\Http\Controllers\Admin\StandController as AdminStandController;
 use App\Http\Controllers\Admin\SystemController as AdminSystemController;
+use App\Http\Controllers\Api\MidtransWebhookController;
+use App\Http\Controllers\Api\OrderCheckoutController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
@@ -28,15 +31,31 @@ Route::get('/order/{kode_tr}', [KatalogController::class, 'orderStatus'])->name(
 Route::get('/riwayat-pesanan', [KatalogController::class, 'orderHistory'])->name('order.history');
 Route::post('/api/riwayat-pesanan', [KatalogController::class, 'orderHistoryApi'])->name('order.history.api');
 
+// Midtrans Webhook (public notification handler excluded from CSRF)
+Route::post('/api/midtrans/webhook', [MidtransWebhookController::class, 'handle'])->name('midtrans.webhook');
+Route::post('/midtrans/webhook', [MidtransWebhookController::class, 'handle']);
+
 // ==========================================================
 // 2. CHECKOUT — requires auth (siswa/any role)
 //    Guest cart is retained in LocalStorage; on checkout
 //    press, guest is routed to /login (with intended /checkout)
 // ==========================================================
 Route::middleware('auth')->group(function () {
+    // Redirect standalone checkout URL directly to catalog drawer
     Route::get('/checkout', [KatalogController::class, 'showCheckout'])->name('checkout.show');
-    Route::post('/checkout', [KatalogController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout', [OrderCheckoutController::class, 'checkout'])->name('checkout');
+    Route::post('/api/orders/checkout', [OrderCheckoutController::class, 'checkout'])->name('api.orders.checkout');
+    Route::get('/api/orders/{orderId}/snap-token', [OrderCheckoutController::class, 'getSnapToken'])->name('api.orders.snap-token');
+    Route::post('/api/orders/{orderId}/sync-status', [OrderCheckoutController::class, 'syncStatus'])->name('api.orders.sync-status');
+    Route::get('/api/orders/{orderId}/status', [OrderCheckoutController::class, 'getStatus'])->name('api.orders.status');
+    Route::post('/api/orders/{orderId}/cancel-checkout', [OrderCheckoutController::class, 'cancelCheckout'])->name('api.orders.cancel-checkout');
+    Route::post('/api/orders/realtime-statuses', [OrderCheckoutController::class, 'getRealtimeStatuses'])->name('api.orders.realtime-statuses');
 });
+
+// Public status sync endpoint (accessible if user has ticket/order ID)
+Route::post('/api/orders/{orderId}/sync-public', [OrderCheckoutController::class, 'syncStatus'])->name('api.orders.sync-public');
+Route::post('/api/orders/{orderId}/cancel-checkout-public', [OrderCheckoutController::class, 'cancelCheckout'])->name('api.orders.cancel-checkout-public');
+Route::post('/api/orders/realtime-statuses-public', [OrderCheckoutController::class, 'getRealtimeStatuses'])->name('api.orders.realtime-statuses-public');
 
 // ==========================================================
 // 3. AUTHENTICATION GATEWAY — Single Login/Register
@@ -80,6 +99,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Laporan & Omset
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
 
+    // Settlement & Penarikan Saldo QRIS Stand Kantin
+    Route::get('/settlements', [AdminSettlementController::class, 'index'])->name('settlements.index');
+    Route::post('/settlements/payout', [AdminSettlementController::class, 'payout'])->name('settlements.payout');
+
     // Informasi Sistem & Operasional
     Route::get('/system', [AdminSystemController::class, 'index'])->name('system.index');
 
@@ -96,6 +119,7 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:penjual'])->
     Route::get('/dashboard', [VendorOrderController::class, 'index'])->name('dashboard');
     Route::get('/omset', [VendorOrderController::class, 'omset'])->name('omset');
     Route::post('/orders/{order}/status', [VendorOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::post('/orders/{order}/mark-paid', [VendorOrderController::class, 'markPaid'])->name('orders.markPaid');
     Route::post('/orders/verify', [VendorOrderController::class, 'verify'])->name('orders.verify');
 
     // Menu Management

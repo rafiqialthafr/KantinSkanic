@@ -16,6 +16,7 @@ class OrderItem extends Model
         'jumlah',
         'harga_satuan',
         'subtotal',
+        'notes',
     ];
 
     protected function casts(): array
@@ -25,6 +26,16 @@ class OrderItem extends Model
             'harga_satuan' => 'integer',
             'subtotal' => 'integer',
         ];
+    }
+
+    public function getQuantityAttribute(): int
+    {
+        return (int) $this->jumlah;
+    }
+
+    public function getPriceAttribute(): int
+    {
+        return (int) $this->harga_satuan;
     }
 
     public function order(): BelongsTo

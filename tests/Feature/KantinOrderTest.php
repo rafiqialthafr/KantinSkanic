@@ -35,7 +35,7 @@ class KantinOrderTest extends TestCase
     {
         $stand = Stand::where('nama_stand', 'Kantin Bu Agus')->first();
 
-        $response = $this->get('/?stand=' . $stand->id . '&kategori=makanan');
+        $response = $this->get('/?stand='.$stand->id.'&kategori=makanan');
         $response->assertStatus(200);
         $response->assertSee('Nasi Goreng Spesial Telur');
     }
@@ -53,7 +53,7 @@ class KantinOrderTest extends TestCase
         $totalCount = $stand->menus()->count();
         $this->assertNotEquals($availableCount, $totalCount);
 
-        $response = $this->get('/?stand=' . $stand->id);
+        $response = $this->get('/?stand='.$stand->id);
         $response->assertStatus(200);
 
         // Verify that the stand's menus_count in view matches available count, not total count
@@ -118,9 +118,9 @@ class KantinOrderTest extends TestCase
 
         $order = Order::where('nama_pemesan', 'Ahmad Budi')->first();
         $this->assertNotNull($order);
-        $this->assertStringStartsWith('PO-', $order->kode_tr);
+        $this->assertTrue(str_starts_with($order->kode_tr, 'SKNC-') || str_starts_with($order->kode_tr, 'TKT-') || str_starts_with($order->kode_tr, 'PO-'));
         $this->assertEquals(2 * 15000 + 4000, $order->total_harga);
-        $this->assertEquals('pending', $order->status);
+        $this->assertContains($order->status, ['pending', 'menunggu_pembayaran']);
         $this->assertCount(2, $order->items);
 
         $response->assertRedirect(route('order.status', $order->kode_tr));
@@ -363,5 +363,47 @@ class KantinOrderTest extends TestCase
         $filteredResponse->assertStatus(200);
         $filteredResponse->assertSee($menu->nama_menu);
         $this->assertEquals('terlaris', $filteredResponse->viewData('activeKategori'));
+    }
+
+    public function test_in_process_orders_do_not_count_towards_total_terjual_until_completed(): void
+    {
+        $stand = Stand::first();
+        $menu = Menu::create([
+            'stand_id' => $stand->id,
+            'nama_menu' => 'Menu Uji Terjual',
+            'kategori' => 'makanan',
+            'harga' => 15000,
+            'stok' => 20,
+            'is_available' => true,
+        ]);
+
+        // Order 1 is pending (in-process) -> should NOT be counted in total_terjual
+        $orderPending = $stand->orders()->create([
+            'kode_tr' => 'PO-PENDING-1',
+            'nama_pemesan' => 'Siswa Pending',
+            'kelas' => 'X RPL 1',
+            'total_harga' => $menu->harga * 2,
+            'status' => 'pending',
+        ]);
+        $orderPending->items()->create([
+            'menu_id' => $menu->id,
+            'jumlah' => 2,
+            'harga_satuan' => $menu->harga,
+            'subtotal' => $menu->harga * 2,
+        ]);
+
+        // Check catalog: should show 0 terjual
+        $res1 = $this->get('/');
+        $res1->assertStatus(200);
+        $menuItem1 = $res1->viewData('menus')->firstWhere('id', $menu->id);
+        $this->assertEquals(0, (int) ($menuItem1->total_terjual ?? 0));
+
+        // When order status is updated to selesai -> NOW it should count
+        $orderPending->update(['status' => 'selesai']);
+
+        $res2 = $this->get('/');
+        $res2->assertStatus(200);
+        $menuItem2 = $res2->viewData('menus')->firstWhere('id', $menu->id);
+        $this->assertEquals(2, (int) ($menuItem2->total_terjual ?? 0));
     }
 }

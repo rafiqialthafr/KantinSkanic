@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Stand;
 use Illuminate\Http\Request;
@@ -46,9 +47,15 @@ class DashboardController extends Controller
             ->where('created_at', '>=', $today)
             ->count();
 
-        $activeOrdersCount = Order::where('stand_id', $stand->id)
-            ->whereIn('status', ['pending', 'diproses', 'siap_diambil'])
+        $pendingOrdersCount = Order::where('stand_id', $stand->id)
+            ->where('status', 'pending')
             ->count();
+
+        $siapDiambilOrdersCount = Order::where('stand_id', $stand->id)
+            ->where('status', 'siap_diambil')
+            ->count();
+
+        $activeOrdersCount = $pendingOrdersCount + $siapDiambilOrdersCount;
 
         $completedOrdersCount = Order::where('stand_id', $stand->id)
             ->where('status', 'selesai')
@@ -75,6 +82,8 @@ class DashboardController extends Controller
             'orders' => $orders,
             'totalOrdersToday' => $totalOrdersToday,
             'activeOrdersCount' => $activeOrdersCount,
+            'pendingOrdersCount' => $pendingOrdersCount,
+            'siapDiambilOrdersCount' => $siapDiambilOrdersCount,
             'completedOrdersCount' => $completedOrdersCount,
             'revenueToday' => $revenueToday,
             'activeStatus' => $request->status ?? 'all',
@@ -111,12 +120,25 @@ class DashboardController extends Controller
             abort(403, 'Anda tidak memiliki akses untuk mengubah pesanan ini.');
         }
 
-        $validated = $request->validate([
-            'status' => ['required', 'in:pending,diproses,siap_diambil,selesai,dibatalkan'],
-        ]);
+        $previousStatus = $order->status;
+        $newStatus = $validated['status'];
+
+        if ($previousStatus !== 'selesai' && $newStatus === 'selesai') {
+            foreach ($order->items as $item) {
+                if ($item->menu_id) {
+                    Menu::where('id', $item->menu_id)->increment('total_sold', $item->jumlah);
+                }
+            }
+        } elseif ($previousStatus === 'selesai' && $newStatus !== 'selesai') {
+            foreach ($order->items as $item) {
+                if ($item->menu_id) {
+                    Menu::where('id', $item->menu_id)->decrement('total_sold', $item->jumlah);
+                }
+            }
+        }
 
         $order->update([
-            'status' => $validated['status'],
+            'status' => $newStatus,
         ]);
 
         $statusLabels = [

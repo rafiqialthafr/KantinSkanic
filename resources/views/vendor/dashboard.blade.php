@@ -136,7 +136,41 @@
         </div>
     </div>
 
-    {{-- FILTER TABS (Status) --}}
+    {{-- PAYMENT REVENUE BREAKDOWN (Cash vs QRIS) --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Kas Tunai di Stand (Fisik)</span>
+                <span class="text-lg font-black text-slate-800 block mt-0.5">Rp {{ number_format($cashRevenue ?? 0, 0, ',', '.') }}</span>
+                <span class="text-[10px] text-emerald-600 font-bold">Uang tunai COD sudah dipegang</span>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                💵
+            </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Saldo QRIS di Rekening Admin</span>
+                <span class="text-lg font-black text-emerald-600 block mt-0.5">Rp {{ number_format($qrisRevenue ?? 0, 0, ',', '.') }}</span>
+                <span class="text-[10px] text-amber-600 font-bold">Menunggu transfer admin: Rp {{ number_format($qrisPendingPayout ?? 0, 0, ',', '.') }}</span>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                📱
+            </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
+            <div>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">COD Menunggu Dibayar Siswa</span>
+                <span class="text-lg font-black text-amber-600 block mt-0.5">Rp {{ number_format($cashUnpaid ?? 0, 0, ',', '.') }}</span>
+                <span class="text-[10px] text-slate-400 font-medium">Tagih saat siswa mengambil pesanan</span>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg">
+                ⏳
+            </div>
+        </div>
+    </div>
     <div>
         <!-- Status Filter Tabs -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1">
@@ -176,7 +210,22 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <!-- Status Pembayaran Badge -->
+                    @if($order->isQris())
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        LUNAS (QRIS)
+                    </span>
+                    @elseif($order->isLunas())
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        LUNAS (TUNAI)
+                    </span>
+                    @else
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-200">
+                        BELUM LUNAS (COD)
+                    </span>
+                    @endif
+
                     <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
                         @if($order->status === 'pending') bg-orange-100 text-orange-700
                         @elseif($order->status === 'siap_diambil') bg-emerald-100 text-emerald-800
@@ -209,14 +258,36 @@
 
             <!-- Card Bottom Bar: Total & Status Flow Button -->
             <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs text-slate-400">Total Harga:</span>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs text-slate-400">Total:</span>
                     <span class="text-base font-black text-orange-600">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
-                    <span class="text-[10px] text-slate-400 font-medium">(Bayar di Tempat)</span>
+                    @if($order->isQris())
+                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        Sudah Lunas via QRIS Admin
+                    </span>
+                    @elseif($order->isLunas())
+                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        Lunas Tunai di Stand
+                    </span>
+                    @else
+                    <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                        Bayar Tunai di Stand
+                    </span>
+                    @endif
                 </div>
 
-                <!-- Sequential Status Progression -->
-                <div class="flex items-center gap-2">
+                <!-- Sequential Status Progression & Actions -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    @if($order->isTunai() && $order->isBelumLunas() && $order->status !== 'dibatalkan')
+                    <form action="{{ route('vendor.orders.markPaid', $order) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                            <span>Tandai Lunas Tunai</span>
+                        </button>
+                    </form>
+                    @endif
+
                     @if($order->status === 'pending')
                     <form action="{{ route('vendor.orders.updateStatus', $order) }}" method="POST" class="inline">
                         @csrf
