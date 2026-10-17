@@ -487,14 +487,27 @@
 
     <!-- Global Flash Messages (session error only; validation errors are shown inside each form) -->
     @if(session('error'))
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full">
-        <div class="mb-4 rounded-2xl bg-rose-50 p-4 border border-rose-200 flex items-start gap-3 shadow-xs">
-            <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-            </svg>
-            <div class="text-sm font-semibold text-rose-800">{{ session('error') }}</div>
+    <div id="app-flash-error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full transition-all duration-300">
+        <div class="mb-4 rounded-2xl bg-rose-50 p-4 border border-rose-200 flex items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+                <div class="text-sm font-semibold text-rose-800">{{ session('error') }}</div>
+            </div>
+            <button type="button" onclick="document.getElementById('app-flash-error').style.display='none'" class="text-rose-400 hover:text-rose-600 font-bold text-base cursor-pointer">&times;</button>
         </div>
     </div>
+    <script>
+        setTimeout(function() {
+            var el = document.getElementById('app-flash-error');
+            if (el) {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(-8px)';
+                setTimeout(function() { el.style.display = 'none'; }, 300);
+            }
+        }, 3500);
+    </script>
     @endif
 
     <!-- Main Content Area (Full width for hero section edge-to-edge) -->

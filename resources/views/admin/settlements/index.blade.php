@@ -1,95 +1,89 @@
 @extends('layouts.admin')
 
-@section('title', 'Settlement & Rekapitulasi Pembayaran - Super Admin')
+@section('title', 'Settlement QRIS Stand - Admin Kantin')
 @section('sidebar-role', 'Super Administrator')
 @section('page-title', 'Settlement QRIS Stand')
-@section('page-subtitle', \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('dddd') . ', ' . \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('d F Y'))
+@section('page-subtitle', 'Rekapitulasi pembayaran & transfer pencairan saldo QRIS ke rekening stand')
 
 @section('sidebar-nav')
 @include('admin.partials.sidebar_nav')
 @endsection
 
 @section('content')
-<div class="p-3.5 sm:p-6 space-y-6">
+<div class="p-3.5 sm:p-6 space-y-4 sm:space-y-6">
 
-    {{-- HEADER BANNER --}}
-    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-5 sm:p-6 text-white shadow-xl shadow-slate-900/10 relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none"></div>
-        <div class="max-w-2xl relative z-10">
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black uppercase tracking-wider mb-2 border border-emerald-500/30">
-                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                Sistem Settlement Keuangan Kantin
-            </div>
-            <h2 class="text-xl sm:text-2xl font-black tracking-tight">Rekapitulasi Pembayaran QRIS & Tunai</h2>
-            <p class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
-                Pembayaran via <strong>QRIS masuk ke rekening Admin Kantin</strong> dan perlu ditransfer ke masing-masing stand secara berkala. Sedangkan pembayaran <strong>Tunai (COD) langsung diterima fisik</strong> di meja stand masing-masing.
-            </p>
-        </div>
-    </div>
-
-    {{-- FLASH MESSAGES --}}
-    @if(session('success'))
-    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-        </svg>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
-        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-        </svg>
-        <span>{{ session('error') }}</span>
-    </div>
-    @endif
-
-    {{-- STAT CARDS (FINANCIAL OVERVIEW) --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-        {{-- Total Saldo QRIS Menunggu Transfer (Highlight) --}}
-        <div class="col-span-2 sm:col-span-1 rounded-3xl p-5 bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg shadow-emerald-600/20 relative overflow-hidden">
-            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
-            <span class="text-[10px] font-black uppercase tracking-wider text-emerald-200 block">Menunggu Ditransfer</span>
-            <span class="text-2xl font-black mt-1 block tracking-tight">Rp {{ number_format($qrisPendingPayout, 0, ',', '.') }}</span>
-            <span class="text-[11px] text-emerald-100 font-medium mt-2 block">Hak saldo QRIS stand kantin</span>
-        </div>
+    {{-- STAT CARDS (REUSABLE COMPONENT: SEIRAMA DENGAN HALAMAN ADMIN LAIN) --}}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        {{-- Total Saldo QRIS Menunggu Transfer --}}
+        <x-stat-card
+            title="Menunggu Ditransfer"
+            :value="'Rp ' . number_format($qrisPendingPayout, 0, ',', '.')"
+            sublabel="Hak saldo stand (Pesanan Selesai)"
+            color="emerald">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
         {{-- Total Pembayaran QRIS Masuk --}}
-        <div class="rounded-3xl p-5 bg-white border border-slate-200/90 shadow-2xs">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total QRIS Masuk</span>
-            <span class="text-xl font-black text-slate-900 mt-1 block">Rp {{ number_format($qrisRevenue, 0, ',', '.') }}</span>
-            <span class="text-[11px] text-slate-500 font-medium mt-1 block">Uang masuk rekening admin</span>
-        </div>
+        <x-stat-card
+            title="Total QRIS Masuk"
+            :value="'Rp ' . number_format($qrisRevenue, 0, ',', '.')"
+            sublabel="Dana lunas rekening admin"
+            color="orange">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM14.625 3.75c-.621 0-1.125.504-1.125 1.125v4.5c0 .621.504 1.125 1.125 1.125h4.5c.621 0 1.125-.504 1.125-1.125v-4.5c0-.621-.504-1.125-1.125-1.125h-4.5Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.625 14.625h2.25v2.25h-2.25v-2.25ZM19.125 14.625h.375a.75.75 0 0 1 .75.75v.375h-1.125v-1.125ZM14.625 19.125h1.125v1.125h-1.125v-1.125ZM18 18h2.25v2.25H18V18Z" />
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
         {{-- Total Pembayaran Tunai (Fisik di Stand) --}}
-        <div class="rounded-3xl p-5 bg-white border border-slate-200/90 shadow-2xs">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Tunai (COD) Stand</span>
-            <span class="text-xl font-black text-slate-900 mt-1 block">Rp {{ number_format($cashRevenue, 0, ',', '.') }}</span>
-            <span class="text-[11px] text-slate-500 font-medium mt-1 block">Uang fisik langsung ke stand</span>
-        </div>
+        <x-stat-card
+            title="Total Tunai (COD)"
+            :value="'Rp ' . number_format($cashRevenue, 0, ',', '.')"
+            sublabel="Uang fisik langsung ke stand"
+            color="amber">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v9.75c0 .414.336.75.75.75h.75m0-11.25H21a.75.75 0 0 1 .75.75v9.75a.75.75 0 0 1-.75.75h-.75m0-11.25V4.5m0 12v3.75m0 0a60.07 60.07 0 0 0-15.797 2.101M21 16.5H3" />
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
         {{-- Total QRIS Sudah Dicairkan --}}
-        <div class="rounded-3xl p-5 bg-white border border-slate-200/90 shadow-2xs">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total QRIS Sudah Ditransfer</span>
-            <span class="text-xl font-black text-emerald-600 mt-1 block">Rp {{ number_format($qrisSettledTotal, 0, ',', '.') }}</span>
-            <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">Histori payout berhasil</span>
-        </div>
+        <x-stat-card
+            title="Sudah Ditransfer"
+            :value="'Rp ' . number_format($qrisSettledTotal, 0, ',', '.')"
+            sublabel="Total riwayat payout berhasil"
+            color="sky">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
     </div>
+    
 
     {{-- STANDS SETTLEMENT / PAYOUT TABLE --}}
-    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
-        <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
+        <div class="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h3 class="text-base font-black text-slate-900">Daftar Rekening & Saldo QRIS Stand</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Transfer saldo QRIS pembeli ke masing-masing stand kantin sesuai rekening yang terdaftar.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Kelola rekening bank/e-wallet stand dan proses transfer pencairan saldo QRIS.</p>
+            </div>
+            <div class="text-xs text-slate-400">
+                Total Stand: <span class="font-bold text-slate-700">{{ $stands->count() }}</span>
             </div>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50/80 border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                <thead class="bg-slate-50/80 border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-extrabold">
                     <tr>
                         <th class="py-3 px-4 sm:px-6">Stand Kantin</th>
                         <th class="py-3 px-4">Rekening / E-Wallet Tujuan</th>
@@ -101,6 +95,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse($stands as $stand)
                     <tr class="hover:bg-slate-50/50 transition-colors">
+                        {{-- Stand Kantin --}}
                         <td class="py-4 px-4 sm:px-6">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 font-black text-xs flex items-center justify-center shrink-0">
@@ -113,35 +108,63 @@
                             </div>
                         </td>
 
+                        {{-- Rekening / E-Wallet (Diatur Mandiri oleh Vendor) --}}
                         <td class="py-4 px-4">
                             @if($stand->nomor_rekening)
                             <div class="inline-flex flex-col">
-                                <span class="font-black text-slate-800 text-xs">{{ $stand->bank_name ?? 'Bank / E-Wallet' }}</span>
-                                <span class="font-mono text-slate-600 font-bold text-[11px]">{{ $stand->nomor_rekening }}</span>
-                                <span class="text-slate-400 text-[10px]">a.n {{ $stand->atas_nama ?? $stand->pemilik }}</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-black text-slate-800 text-xs">{{ $stand->bank_name ?? 'Bank / E-Wallet' }}</span>
+                                    <span class="font-mono text-slate-700 font-bold text-[11px] bg-slate-100 px-1.5 py-0.5 rounded">{{ $stand->nomor_rekening }}</span>
+                                </div>
+                                <span class="text-slate-400 text-[10px] mt-0.5">a.n {{ $stand->atas_nama ?? $stand->pemilik }}</span>
                             </div>
                             @else
-                            <span class="text-rose-500 font-bold text-[11px] bg-rose-50 px-2 py-1 rounded-lg">Belum Atur Rekening</span>
+                            <div class="inline-flex items-center gap-1.5 text-amber-600 font-bold text-[10px] bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-lg" title="Rekening hanya dapat diatur oleh vendor di panel vendor">
+                                <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                                </svg>
+                                <span>Belum Diatur oleh Vendor</span>
+                            </div>
                             @endif
                         </td>
 
+                        {{-- Pesanan QRIS --}}
                         <td class="py-4 px-4 text-right">
-                            <span class="font-bold text-slate-700">{{ $stand->qris_completed_orders_count }} pesanan</span>
+                            <span class="font-bold text-slate-700">{{ $stand->qris_completed_orders_count }} selesai</span>
+                            @if(($stand->qris_in_progress_orders_count ?? 0) > 0)
+                            <span class="block text-[10px] text-amber-600 font-bold">
+                                {{ $stand->qris_in_progress_orders_count }} diproses
+                            </span>
+                            @endif
                         </td>
 
+                        {{-- Saldo Tertunda --}}
                         <td class="py-4 px-4 text-right">
                             @if($stand->saldo_pending > 0)
                             <span class="font-black text-sm text-emerald-600">Rp {{ number_format($stand->saldo_pending, 0, ',', '.') }}</span>
-                            <span class="block text-[10px] text-amber-600 font-bold">Siap Dicairkan</span>
+                            <span class="block text-[10px] text-emerald-600 font-bold">Siap Dicairkan</span>
+                            @if(($stand->saldo_in_progress ?? 0) > 0)
+                            <span class="block text-[10px] text-slate-400 font-medium mt-0.5">
+                                + Rp {{ number_format($stand->saldo_in_progress, 0, ',', '.') }} (Diproses)
+                            </span>
+                            @endif
                             @else
                             <span class="font-bold text-slate-400">Rp 0</span>
+                            @if(($stand->saldo_in_progress ?? 0) > 0)
+                            <span class="block text-[10px] text-amber-600 font-bold">
+                                Rp {{ number_format($stand->saldo_in_progress, 0, ',', '.') }} (Diproses)
+                            </span>
+                            @else
                             <span class="block text-[10px] text-slate-400">Nihil</span>
+                            @endif
                             @endif
                         </td>
 
+                        {{-- Aksi Payout --}}
                         <td class="py-4 px-4 sm:px-6 text-center">
                             @if($stand->saldo_pending > 0)
-                            <button type="button" onclick="openPayoutModal({{ $stand->id }}, '{{ addslashes($stand->nama_stand) }}', {{ $stand->saldo_pending }}, '{{ addslashes($stand->bank_name ?? 'Bank') }}', '{{ addslashes($stand->nomor_rekening ?? '-') }}', '{{ addslashes($stand->atas_nama ?? $stand->pemilik) }}')"
+                            <button type="button"
+                                    onclick="openPayoutModal({{ $stand->id }}, '{{ addslashes($stand->nama_stand) }}', {{ $stand->saldo_pending }}, '{{ addslashes($stand->bank_name ?? 'Bank') }}', '{{ addslashes($stand->nomor_rekening ?? '-') }}', '{{ addslashes($stand->atas_nama ?? $stand->pemilik) }}')"
                                     class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black text-xs shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -171,8 +194,8 @@
     </div>
 
     {{-- SETTLEMENT AUDIT HISTORY TABLE --}}
-    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
-        <div class="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between">
+    <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
+        <div class="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
             <div>
                 <h3 class="text-base font-black text-slate-900">Riwayat Transfer Payout (Audit Trail)</h3>
                 <p class="text-xs text-slate-500 mt-0.5">Catatan seluruh bukti transfer dan pencairan saldo QRIS admin ke stand kantin.</p>
@@ -181,7 +204,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50/80 border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                <thead class="bg-slate-50/80 border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-extrabold">
                     <tr>
                         <th class="py-3 px-4 sm:px-6">Kode Settlement</th>
                         <th class="py-3 px-4">Tanggal & Jam</th>
@@ -203,10 +226,10 @@
                         <td class="py-4 px-4 font-bold text-slate-800">
                             {{ $settle->stand->nama_stand ?? 'Stand' }}
                         </td>
-                        <td class="py-4 px-4 text-right font-black text-emerald-600">
+                        <td class="py-4 px-4 text-right font-black text-emerald-600 text-sm">
                             Rp {{ number_format($settle->total_dana, 0, ',', '.') }}
                         </td>
-                        <td class="py-4 px-4 text-slate-600">
+                        <td class="py-4 px-4 text-slate-600 font-medium">
                             {{ $settle->admin->name ?? 'Super Admin' }}
                         </td>
                         <td class="py-4 px-4 sm:px-6 text-slate-500 italic">
@@ -239,7 +262,7 @@
         <div class="relative bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 class="text-base font-black text-slate-900">Konfirmasi Transfer Saldo QRIS</h3>
-                <button type="button" onclick="closePayoutModal()" class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
+                <button type="button" onclick="closePayoutModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold text-lg">&times;</button>
             </div>
 
             <form action="{{ route('admin.settlements.payout') }}" method="POST" class="space-y-4">
@@ -275,6 +298,7 @@
 </div>
 
 <script>
+
     function openPayoutModal(standId, standName, amount, bankName, accountNo, ownerName) {
         document.getElementById('modal-stand-id').value = standId;
         document.getElementById('modal-stand-name').innerText = standName;

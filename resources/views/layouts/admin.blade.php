@@ -164,40 +164,48 @@
             $hasValidSuccess = session('success') && !str_contains(strtolower(session('success')), 'selamat datang');
         @endphp
         @if($hasValidSuccess || session('error') || $errors->any())
-        <div id="flash-alerts" class="px-4 sm:px-6 pt-4 transition-all duration-500">
+        <div id="flash-alerts" class="px-4 sm:px-6 pt-4 transition-all duration-300 ease-out">
             @if($hasValidSuccess)
-            <div class="mb-3 rounded-xl bg-emerald-50 p-3.5 border border-emerald-200 flex items-center gap-3 shadow-xs">
-                <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-                <div class="text-sm font-semibold text-emerald-800">{{ session('success') }}</div>
+            <div class="mb-3 rounded-2xl bg-emerald-50 p-3.5 border border-emerald-200 flex items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-3">
+                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                    <div class="text-xs sm:text-sm font-bold text-emerald-900">{{ session('success') }}</div>
+                </div>
+                <button type="button" onclick="dismissFlashAlerts()" class="text-emerald-500 hover:text-emerald-700 text-base font-bold px-1.5 py-0.5 rounded-lg hover:bg-emerald-100/60 transition-colors cursor-pointer" title="Tutup">&times;</button>
             </div>
             @endif
             @if(session('error'))
-            <div class="mb-3 rounded-xl bg-rose-50 p-3.5 border border-rose-200 flex items-center gap-3 shadow-xs">
-                <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                </svg>
-                <div class="text-sm font-semibold text-rose-800">{{ session('error') }}</div>
+            <div class="mb-3 rounded-2xl bg-rose-50 p-3.5 border border-rose-200 flex items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-3">
+                    <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                    <div class="text-xs sm:text-sm font-bold text-rose-900">{{ session('error') }}</div>
+                </div>
+                <button type="button" onclick="dismissFlashAlerts()" class="text-rose-500 hover:text-rose-700 text-base font-bold px-1.5 py-0.5 rounded-lg hover:bg-rose-100/60 transition-colors cursor-pointer" title="Tutup">&times;</button>
             </div>
             @endif
             @if($errors->any())
-            <div class="mb-3 rounded-xl bg-rose-50 p-3.5 border border-rose-200 shadow-xs">
-                <ul class="list-disc list-inside text-xs text-rose-700 font-medium space-y-0.5">
+            <div class="mb-3 rounded-2xl bg-rose-50 p-3.5 border border-rose-200 shadow-xs flex items-start justify-between gap-3">
+                <ul class="list-disc list-inside text-xs text-rose-800 font-medium space-y-0.5">
                     @foreach($errors->all() as $err)<li>{{ $err }}</li>@endforeach
                 </ul>
+                <button type="button" onclick="dismissFlashAlerts()" class="text-rose-500 hover:text-rose-700 text-base font-bold px-1.5 py-0.5 rounded-lg hover:bg-rose-100/60 transition-colors cursor-pointer" title="Tutup">&times;</button>
             </div>
             @endif
         </div>
         <script>
-            setTimeout(function () {
+            function dismissFlashAlerts() {
                 var el = document.getElementById('flash-alerts');
                 if (el) {
                     el.style.opacity = '0';
-                    el.style.transform = 'translateY(-6px)';
-                    setTimeout(function () { el.style.display = 'none'; }, 500);
+                    el.style.transform = 'translateY(-8px)';
+                    setTimeout(function () { el.style.display = 'none'; }, 300);
                 }
-            }, 3000);
+            }
+            setTimeout(dismissFlashAlerts, 3500);
         </script>
         @endif
 

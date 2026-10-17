@@ -21,6 +21,11 @@
     Lihat Omset
 </a>
 
+<a href="{{ route('vendor.rekening.index') }}" class="sidebar-link {{ request()->routeIs('vendor.rekening.*') ? 'active' : '' }}">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" /></svg>
+    Rekening Pencairan
+</a>
+
 <div class="pt-3 pb-1 px-2">
     <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Status Pesanan</span>
 </div>
@@ -59,10 +64,35 @@
 @section('content')
 <div class="p-4 sm:p-6 space-y-6">
 
+    @if(!$stand->nomor_rekening)
+    <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-xs font-black text-slate-800">Rekening Pencairan Saldo QRIS Belum Diatur</h4>
+                <p class="text-[11px] text-slate-500 mt-0.5">Agar Admin Kantin dapat mentransfer pencairan dana penjualan QRIS pesanan Anda, silakan daftarkan rekening Bank atau E-Wallet Anda sekarang.</p>
+            </div>
+        </div>
+        <a href="{{ route('vendor.rekening.index') }}" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shrink-0 inline-flex items-center gap-1.5 shadow-xs transition-all">
+            <span>Atur Rekening Sekarang</span>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+        </a>
+    </div>
+    @endif
+
 
     {{-- PERIODE DROPDOWN + STAT CARDS --}}
     <div class="flex items-center justify-between gap-4 flex-wrap">
-        <h2 class="text-base font-black text-slate-800">Statistik — <span class="text-orange-500">{{ $periodeLabel }}</span></h2>
+        <h2 class="text-base font-black text-slate-800 flex items-center gap-2">
+            <span>Statistik</span>
+            <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200/80">{{ $periodeLabel }}</span>
+        </h2>
         {{-- Periode Dropdown --}}
         <div class="flex items-center gap-2">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Periode:</span>
@@ -75,102 +105,69 @@
                 @endforeach
             </div>
         </div>
-    </div>    {{-- STAT CARDS --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    </div>
 
+    {{-- STAT CARDS (MODERN COMPONENT) --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
         {{-- Omset (terpengaruh periode) --}}
-        <div class="col-span-2 sm:col-span-1 rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f97316,#ea580c)">
-            <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
-                    {{-- lucide: trending-up --}}
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
-                </div>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
-            </div>
-            <p class="text-xs font-bold text-orange-100 uppercase tracking-wider">Omset {{ $periodeLabel }}</p>
-            <p class="text-sm sm:text-base font-black mt-1 leading-snug tracking-tight break-all">Rp {{ number_format($revenueToday, 0, ',', '.') }}</p>
-            <p class="text-xs font-semibold text-orange-100 mt-2">Dari pesanan selesai lunas</p>
-        </div>
+        <x-stat-card
+            class="col-span-2 sm:col-span-1"
+            title="Omset {{ $periodeLabel }}"
+            :value="'Rp ' . number_format($revenueToday, 0, ',', '.')"
+            sublabel="Dari pesanan selesai lunas"
+            color="orange"
+            :isTimeSensitive="true">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/>
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
         {{-- Pesanan Aktif (real-time, tidak terikat periode) --}}
-        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
-            <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center mb-2">
-                {{-- lucide: clock --}}
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-            </div>
-            <p class="text-xs font-bold text-amber-100 uppercase tracking-wider">Pesanan Aktif</p>
-            <p class="text-3xl font-black mt-1">{{ $activeOrdersCount }}</p>
-            <p class="text-xs font-semibold text-amber-100 mt-2">Perlu disiapkan sekarang</p>
-        </div>
+        <x-stat-card
+            title="Pesanan Aktif"
+            :value="$activeOrdersCount"
+            sublabel="Perlu disiapkan sekarang"
+            :badge="$activeOrdersCount > 0"
+            color="amber">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
         {{-- Pesanan Selesai (terpengaruh periode) --}}
-        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#059669,#10b981)">
-            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
-                    {{-- lucide: check-circle --}}
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                </div>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
-            </div>
-            <p class="text-xs font-bold text-emerald-100 uppercase tracking-wider">Pesanan Selesai</p>
-            <p class="text-3xl font-black mt-1">{{ $completedOrdersCount }}</p>
-            <p class="text-xs font-semibold text-emerald-100 mt-2">Sudah diambil siswa</p>
-        </div>
+        <x-stat-card
+            title="Pesanan Selesai"
+            :value="$completedOrdersCount"
+            sublabel="Sudah diambil siswa"
+            color="emerald"
+            :isTimeSensitive="true">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
-        {{-- Total Pesanan (terpengaruh periode) - biru --}}
-        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
-            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
-                    {{-- lucide: shopping-bag --}}
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/></svg>
-                </div>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
-            </div>
-            <p class="text-xs font-bold text-blue-100 uppercase tracking-wider">Total Pesanan</p>
-            <p class="text-3xl font-black mt-1">{{ $totalOrdersToday }}</p>
-            <p class="text-xs font-semibold text-blue-100 mt-2">Semua status {{ strtolower($periodeLabel) }}</p>
-        </div>
+        {{-- Total Pesanan (terpengaruh periode) --}}
+        <x-stat-card
+            title="Total Pesanan"
+            :value="$totalOrdersToday"
+            :sublabel="'Semua status ' . strtolower($periodeLabel)"
+            color="sky"
+            :isTimeSensitive="true">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/>
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
     </div>
 
-    {{-- PAYMENT REVENUE BREAKDOWN (Cash vs QRIS) --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
-            <div>
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Kas Tunai di Stand (Fisik)</span>
-                <span class="text-lg font-black text-slate-800 block mt-0.5">Rp {{ number_format($cashRevenue ?? 0, 0, ',', '.') }}</span>
-                <span class="text-[10px] text-emerald-600 font-bold">Uang tunai COD sudah dipegang</span>
-            </div>
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
-                💵
-            </div>
-        </div>
 
-        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
-            <div>
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Saldo QRIS di Rekening Admin</span>
-                <span class="text-lg font-black text-emerald-600 block mt-0.5">Rp {{ number_format($qrisRevenue ?? 0, 0, ',', '.') }}</span>
-                <span class="text-[10px] text-amber-600 font-bold">Menunggu transfer admin: Rp {{ number_format($qrisPendingPayout ?? 0, 0, ',', '.') }}</span>
-            </div>
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
-                📱
-            </div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
-            <div>
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">COD Menunggu Dibayar Siswa</span>
-                <span class="text-lg font-black text-amber-600 block mt-0.5">Rp {{ number_format($cashUnpaid ?? 0, 0, ',', '.') }}</span>
-                <span class="text-[10px] text-slate-400 font-medium">Tagih saat siswa mengambil pesanan</span>
-            </div>
-            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg">
-                ⏳
-            </div>
-        </div>
-    </div>
     <div>
         <!-- Status Filter Tabs -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1">

@@ -27,21 +27,39 @@ class SettlementController extends Controller
             })
             ->sum('total_harga');
 
-        $qrisRevenue = Order::where('status', 'selesai')
-            ->where('metode_pembayaran', 'qris')
+        // Total QRIS Masuk: Semua pembayaran QRIS yang sudah lunas dan tidak dibatalkan (Uang riil masuk ke rekening admin)
+        $qrisRevenue = Order::where('metode_pembayaran', 'qris')
+            ->where('status_pembayaran', 'lunas')
+            ->where('status', '!=', 'dibatalkan')
             ->sum('total_harga');
 
+        // Hak Saldo QRIS Stand yang Siap Dicairkan (Opsi A: Pesanan QRIS yang sudah lunas dan selesai diambil)
         $qrisPendingPayout = Order::where('status', 'selesai')
             ->where('metode_pembayaran', 'qris')
+            ->where('status_pembayaran', 'lunas')
+            ->where('settlement_status', 'pending')
+            ->sum('total_harga');
+
+        // Dana QRIS lunas yang masih dalam proses pengerjaan oleh stand (menunggu pesanan selesai)
+        $qrisInProgressPayout = Order::whereIn('status', ['pending', 'diproses', 'siap_diambil'])
+            ->where('metode_pembayaran', 'qris')
+            ->where('status_pembayaran', 'lunas')
             ->where('settlement_status', 'pending')
             ->sum('total_harga');
 
         $qrisSettledTotal = Settlement::whereIn('status', ['ditransfer', 'settled'])->sum('total_dana');
 
-        // 2. Stands with QRIS balances to disburse
+        // 2. Stands with QRIS balances to disburse (Opsi A: Saldo dicairkan jika pesanan selesai)
         $stands = Stand::withCount([
             'orders as qris_completed_orders_count' => function ($q) {
-                $q->where('status', 'selesai')->where('metode_pembayaran', 'qris');
+                $q->where('status', 'selesai')
+                    ->where('metode_pembayaran', 'qris')
+                    ->where('status_pembayaran', 'lunas');
+            },
+            'orders as qris_in_progress_orders_count' => function ($q) {
+                $q->whereIn('status', ['pending', 'diproses', 'siap_diambil'])
+                    ->where('metode_pembayaran', 'qris')
+                    ->where('status_pembayaran', 'lunas');
             },
         ])
             ->get()
@@ -49,6 +67,14 @@ class SettlementController extends Controller
                 $stand->saldo_pending = (int) Order::where('stand_id', $stand->id)
                     ->where('status', 'selesai')
                     ->where('metode_pembayaran', 'qris')
+                    ->where('status_pembayaran', 'lunas')
+                    ->where('settlement_status', 'pending')
+                    ->sum('total_harga');
+
+                $stand->saldo_in_progress = (int) Order::where('stand_id', $stand->id)
+                    ->whereIn('status', ['pending', 'diproses', 'siap_diambil'])
+                    ->where('metode_pembayaran', 'qris')
+                    ->where('status_pembayaran', 'lunas')
                     ->where('settlement_status', 'pending')
                     ->sum('total_harga');
 
@@ -70,6 +96,7 @@ class SettlementController extends Controller
             'cashRevenue',
             'qrisRevenue',
             'qrisPendingPayout',
+            'qrisInProgressPayout',
             'qrisSettledTotal',
             'stands',
             'settlements'
@@ -95,6 +122,7 @@ class SettlementController extends Controller
             $orders = Order::where('stand_id', $stand->id)
                 ->where('status', 'selesai')
                 ->where('metode_pembayaran', 'qris')
+                ->where('status_pembayaran', 'lunas')
                 ->where('settlement_status', 'pending')
                 ->lockForUpdate()
                 ->get();

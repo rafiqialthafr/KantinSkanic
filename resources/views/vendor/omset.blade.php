@@ -21,6 +21,11 @@
     Lihat Omset
 </a>
 
+<a href="{{ route('vendor.rekening.index') }}" class="sidebar-link {{ request()->routeIs('vendor.rekening.*') ? 'active' : '' }}">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" /></svg>
+    Rekening Pencairan
+</a>
+
 <div class="pt-3 pb-1 px-2">
     <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Status Pesanan</span>
 </div>
@@ -75,98 +80,107 @@
         </div>
     </div>
 
-    {{-- STAT CARDS --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-
+    {{-- STAT CARDS (MODERN COMPONENT) --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
         {{-- Total Omset (terpengaruh periode) --}}
-        <div class="col-span-2 sm:col-span-1 rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f97316,#ea580c)">
-            <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
-                    {{-- lucide: trending-up --}}
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
-                </div>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
-            </div>
-            <p class="text-xs font-bold text-orange-100 uppercase tracking-wider">Total Omset</p>
-            <p class="text-sm sm:text-base font-black mt-1 leading-snug tracking-tight break-all">Rp {{ number_format($totalOmset, 0, ',', '.') }}</p>
-            <p class="text-xs font-semibold text-orange-100 mt-2">Dari pesanan selesai</p>
-        </div>
+        <x-stat-card
+            class="col-span-2 sm:col-span-1"
+            title="Total Omset"
+            :value="'Rp ' . number_format($totalOmset, 0, ',', '.')"
+            sublabel="Dari pesanan selesai"
+            color="orange"
+            :isTimeSensitive="true">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/>
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
         {{-- Total Pesanan (terpengaruh periode) --}}
-        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
-                    {{-- lucide: shopping-bag --}}
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/></svg>
-                </div>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
-            </div>
-            <p class="text-xs font-bold text-amber-100 uppercase tracking-wider">Total Pesanan</p>
-            <p class="text-3xl font-black mt-1">{{ $totalOrders }}</p>
-            <p class="text-xs font-semibold text-amber-100 mt-2">Semua status</p>
-        </div>
+        <x-stat-card
+            title="Total Pesanan"
+            :value="$totalOrders"
+            sublabel="Semua status pesanan"
+            color="amber"
+            :isTimeSensitive="true">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/>
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
         {{-- Selesai (terpengaruh periode) --}}
-        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#059669,#10b981)">
-            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
-                    {{-- lucide: check-circle --}}
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                </div>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
-            </div>
-            <p class="text-xs font-bold text-emerald-100 uppercase tracking-wider">Selesai</p>
-            <p class="text-3xl font-black mt-1">{{ $selesaiOrders }}</p>
-            <p class="text-xs font-semibold text-emerald-100 mt-2">Berhasil terbayar</p>
-        </div>
+        <x-stat-card
+            title="Pesanan Selesai"
+            :value="$selesaiOrders"
+            sublabel="Berhasil terbayar"
+            color="emerald"
+            :isTimeSensitive="true">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
 
-        {{-- Dibatalkan (terpengaruh periode) - biru --}}
-        <div class="rounded-2xl p-5 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
-            <div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10"></div>
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
-                    {{-- lucide: x-circle --}}
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                </div>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[9px] sm:text-[10px] font-bold text-white/95 backdrop-blur-xs tracking-tight" title="Data diperbarui sesuai filter periode"><svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg><span>Periode</span></span>
-            </div>
-            <p class="text-xs font-bold text-blue-100 uppercase tracking-wider">Dibatalkan</p>
-            <p class="text-3xl font-black mt-1">{{ $batalOrders }}</p>
-            <p class="text-xs font-semibold text-blue-100 mt-2">Pesanan batal</p>
-        </div>
+        {{-- Dibatalkan (terpengaruh periode) --}}
+        <x-stat-card
+            title="Pesanan Dibatalkan"
+            :value="$batalOrders"
+            sublabel="Pesanan batal/ditolak"
+            color="rose"
+            :isTimeSensitive="true">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
     </div>
 
     {{-- PAYMENT REVENUE BREAKDOWN (Cash vs QRIS) --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
-            <div>
+        {{-- Pendapatan Tunai --}}
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-emerald-200 p-5 transition-all duration-200 flex items-center justify-between gap-4">
+            <div class="min-w-0">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pendapatan Tunai di Stand (Fisik)</span>
-                <span class="text-xl font-black text-slate-800 block mt-1">Rp {{ number_format($cashRevenue ?? 0, 0, ',', '.') }}</span>
-                <span class="text-xs text-emerald-600 font-semibold block mt-1">✓ Uang tunai COD langsung diterima stand</span>
+                <span class="text-xl sm:text-2xl font-black text-slate-900 block mt-1 tracking-tight">Rp {{ number_format($cashRevenue ?? 0, 0, ',', '.') }}</span>
+                <div class="flex items-center gap-1.5 mt-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span class="text-xs font-bold text-emerald-700">Uang tunai COD langsung diterima stand</span>
+                </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-2xl shadow-xs">
-                💵
+            <div class="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-2xs">
+                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v9.75c0 .414.336.75.75.75h.75m0-11.25H21a.75.75 0 0 1 .75.75v9.75a.75.75 0 0 1-.75.75h-.75m0-11.25V4.5m0 12v3.75m0 0a60.07 60.07 0 0 0-15.797 2.101M21 16.5H3" />
+                </svg>
             </div>
         </div>
 
-        <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
-            <div>
+        {{-- Pendapatan QRIS --}}
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-orange-200 p-5 transition-all duration-200 flex items-center justify-between gap-4">
+            <div class="min-w-0">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pendapatan QRIS Online (Rekening Admin)</span>
-                <span class="text-xl font-black text-emerald-600 block mt-1">Rp {{ number_format($qrisRevenue ?? 0, 0, ',', '.') }}</span>
-                <span class="text-xs text-amber-600 font-semibold block mt-1">⏳ Menunggu transfer admin: Rp {{ number_format($qrisPendingPayout ?? 0, 0, ',', '.') }}</span>
+                <span class="text-xl sm:text-2xl font-black text-slate-900 block mt-1 tracking-tight">Rp {{ number_format($qrisRevenue ?? 0, 0, ',', '.') }}</span>
+                <div class="flex items-center gap-1.5 mt-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                    <span class="text-xs font-bold text-amber-700">Menunggu transfer admin: Rp {{ number_format($qrisPendingPayout ?? 0, 0, ',', '.') }}</span>
+                </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-2xl shadow-xs">
-                📱
+            <div class="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-orange-50 border border-orange-100 text-orange-600 flex items-center justify-center shrink-0 shadow-2xs">
+                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM14.625 3.75c-.621 0-1.125.504-1.125 1.125v4.5c0 .621.504 1.125 1.125 1.125h4.5c.621 0 1.125-.504 1.125-1.125v-4.5c0-.621-.504-1.125-1.125-1.125h-4.5Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.625 14.625h2.25v2.25h-2.25v-2.25ZM19.125 14.625h.375a.75.75 0 0 1 .75.75v.375h-1.125v-1.125ZM14.625 19.125h1.125v1.125h-1.125v-1.125ZM18 18h2.25v2.25H18V18Z" />
+                </svg>
             </div>
         </div>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {{-- Top Selling Menus --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="font-black text-slate-900 text-sm">Menu Terlaris</h3>
@@ -200,7 +214,7 @@
         </div>
 
         {{-- Completed Orders History --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100">
                 <h3 class="font-black text-slate-900 text-sm">Riwayat Pesanan Selesai</h3>
                 <p class="text-xs text-slate-400 mt-0.5">{{ $orders->count() }} pesanan &mdash; {{ $periodeLabel }}</p>

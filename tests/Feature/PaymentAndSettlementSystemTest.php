@@ -211,4 +211,35 @@ class PaymentAndSettlementSystemTest extends TestCase
         $this->assertEquals(50000, $settlement->total_dana);
         $this->assertEquals($admin->id, $settlement->ditransfer_oleh);
     }
+
+    public function test_vendor_can_view_and_update_rekening(): void
+    {
+        $vendor = User::where('role', 'penjual')->whereNotNull('stand_id')->first();
+        $this->assertNotNull($vendor);
+        $stand = $vendor->stand;
+
+        $this->actingAs($vendor);
+
+        // 1. View rekening page
+        $viewResponse = $this->get(route('vendor.rekening.index'));
+        $viewResponse->assertStatus(200);
+        $viewResponse->assertSee($stand->nama_stand);
+        $viewResponse->assertSee('Rekening / E-Wallet Pencairan Stand');
+
+        // 2. Update rekening
+        $updateResponse = $this->post(route('vendor.rekening.update'), [
+            'bank_name' => 'BCA Digital (Blu)',
+            'nomor_rekening' => '00192837465',
+            'atas_nama' => 'Agus Syariah',
+            'no_wa' => '081234567899',
+            'deskripsi' => 'Menu andalan kami baru diperbarui.',
+        ]);
+
+        $updateResponse->assertSessionHas('success');
+        $stand->refresh();
+        $this->assertEquals('BCA Digital (Blu)', $stand->bank_name);
+        $this->assertEquals('00192837465', $stand->nomor_rekening);
+        $this->assertEquals('Agus Syariah', $stand->atas_nama);
+        $this->assertEquals('081234567899', $stand->no_wa);
+    }
 }

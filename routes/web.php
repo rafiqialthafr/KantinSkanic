@@ -14,6 +14,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\Vendor\MenuController as VendorMenuController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
+use App\Http\Controllers\Vendor\RekeningController as VendorRekeningController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -128,6 +129,10 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:penjual'])->
     Route::put('/menus/{menu}', [VendorMenuController::class, 'update'])->name('menus.update');
     Route::post('/menus/{menu}/toggle', [VendorMenuController::class, 'toggle'])->name('menus.toggle');
     Route::delete('/menus/{menu}', [VendorMenuController::class, 'destroy'])->name('menus.destroy');
+
+    // Rekening Pencairan Saldo QRIS
+    Route::get('/rekening', [VendorRekeningController::class, 'index'])->name('rekening.index');
+    Route::post('/rekening', [VendorRekeningController::class, 'update'])->name('rekening.update');
 });
 
 // ==========================================================
