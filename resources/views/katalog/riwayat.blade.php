@@ -76,10 +76,10 @@
      1. FULL-WIDTH PAGE HEADER (Matching Beranda Hero Colors)
 ======================================================== -->
 <section class="w-full relative overflow-hidden bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400 text-white py-12 sm:py-16 md:py-20 text-center shadow-md">
-    <!-- Giant Geometric Circles matching beranda hero -->
-    <div class="absolute -right-16 sm:-right-8 lg:right-10 top-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] rounded-full bg-white/[0.08] pointer-events-none"></div>
-    <div class="absolute -right-32 sm:-right-24 lg:-right-6 top-1/2 -translate-y-1/2 w-[480px] h-[480px] sm:w-[620px] sm:h-[620px] rounded-full border border-white/[0.08] pointer-events-none"></div>
-    <div class="absolute -left-16 -top-16 w-64 h-64 rounded-full bg-white/[0.06] pointer-events-none"></div>
+    <!-- Giant Geometric Circles matching beranda hero (hidden on mobile and tablet) -->
+    <div class="hidden md:block absolute -right-16 sm:-right-8 lg:right-10 top-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] rounded-full bg-white/[0.08] pointer-events-none"></div>
+    <div class="hidden md:block absolute -right-32 sm:-right-24 lg:-right-6 top-1/2 -translate-y-1/2 w-[480px] h-[480px] sm:w-[620px] sm:h-[620px] rounded-full border border-white/[0.08] pointer-events-none"></div>
+    <div class="hidden md:block absolute -left-16 -top-16 w-64 h-64 rounded-full bg-white/[0.06] pointer-events-none"></div>
 
     <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6">
         <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight">
@@ -315,13 +315,13 @@
                         </div>
                     </div>
 
-                    <!-- Tombol Aksi -->
-                    <div class="flex items-center justify-end gap-2 pt-2.5" id="order-actions-{{ $order->id }}">
+                    <!-- Tombol Aksi (Pas dengan card jika 1 tombol, setengah-setengah jika 2 tombol) -->
+                    <div class="flex items-center gap-2.5 pt-2.5 w-full" id="order-actions-{{ $order->id }}">
                         @if($isQris && ! $isLunas && $order->status !== 'dibatalkan')
                         <!-- Tombol Bayar -->
                         <button type="button" onclick="payWithSnap('{{ $batchCode }}', this)"
                                 id="btn-pay-{{ $order->id }}"
-                                class="flex-1 sm:flex-none px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-md shadow-orange-500/20 active:scale-95 transition-all flex items-center justify-center cursor-pointer gap-1.5">
+                                class="flex-1 w-full py-2.5 sm:py-3 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs sm:text-sm shadow-md shadow-orange-500/20 active:scale-[0.99] transition-all flex items-center justify-center cursor-pointer gap-2">
                             <span>Bayar Sekarang</span>
                         </button>
                         @endif
@@ -354,7 +354,7 @@
                         <button type="button"
                                 data-receipt="{{ json_encode($receiptPayload) }}"
                                 onclick="openDigitalReceiptModal(JSON.parse(this.dataset.receipt))"
-                                class="flex-1 sm:flex-none px-4 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-orange-50 text-slate-700 hover:text-orange-600 border border-slate-200/90 font-extrabold text-xs shadow-2xs active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                class="flex-1 w-full py-2.5 sm:py-3 px-4 rounded-xl bg-white hover:bg-orange-50 text-slate-700 hover:text-orange-600 border border-slate-200/90 font-extrabold text-xs sm:text-sm shadow-2xs active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
                             <svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                             </svg>
