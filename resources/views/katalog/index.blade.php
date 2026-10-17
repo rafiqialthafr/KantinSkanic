@@ -102,38 +102,48 @@
                 <!-- Category Pills Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'all'])) }}#katalog-section"
-                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-                        Semua Kategori
+                        class="shrink-0 inline-flex items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                            <rect width="7" height="7" x="3" y="3" rx="1.5" />
+                            <rect width="7" height="7" x="14" y="3" rx="1.5" />
+                            <rect width="7" height="7" x="14" y="14" rx="1.5" />
+                            <rect width="7" height="7" x="3" y="14" rx="1.5" />
+                        </svg>
+                        <span>Semua</span>
                     </a>
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'terlaris'])) }}#katalog-section"
-                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'terlaris' ? 'bg-red-600 text-white shadow-xs' : 'bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 border border-red-200' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
+                        class="shrink-0 inline-flex items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'terlaris' ? 'bg-red-600 text-white shadow-xs' : 'bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 border border-red-200' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
                             <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-                        </svg> Terlaris
+                        </svg>
+                        <span>Terlaris</span>
                     </a>
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'makanan'])) }}#katalog-section"
-                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'makanan' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
+                        class="shrink-0 inline-flex items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'makanan' ? 'bg-amber-600 text-white shadow-xs' : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
                             <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
                             <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
                             <path d="m2.1 21.8 6.4-6.3" />
                             <path d="m19 5-7 7" />
-                        </svg> Makanan
+                        </svg>
+                        <span>Makanan</span>
                     </a>
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'minuman'])) }}#katalog-section"
-                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'minuman' ? 'bg-sky-600 text-white shadow-xs' : 'bg-sky-50 text-sky-800 hover:bg-sky-100 border border-sky-200/60' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
+                        class="shrink-0 inline-flex items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'minuman' ? 'bg-sky-600 text-white shadow-xs' : 'bg-sky-50 text-sky-800 hover:bg-sky-100 border border-sky-200/60' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
                             <path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z" />
                             <path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0" />
-                        </svg> Minuman
+                        </svg>
+                        <span>Minuman</span>
                     </a>
                     <a href="{{ route('katalog.index', array_merge(request()->query(), ['kategori' => 'snack'])) }}#katalog-section"
-                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'snack' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block shrink-0 align-middle -mt-0.5">
+                        class="shrink-0 inline-flex items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-bold transition-all {{ $activeKategori === 'snack' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
                             <path d="M12 2a5 5 0 1 1 5 5H7a5 5 0 0 1 0-10 5 5 0 0 1 5 5" />
                             <path d="M12 7v5" />
                             <path d="M8 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3" />
-                        </svg> Snack
+                        </svg>
+                        <span>Snack</span>
                     </a>
                 </div>
 
@@ -145,6 +155,7 @@
                         <input type="text" id="menu-search-input" name="q" value="{{ $search }}"
                             oninput="filterMenuCardsRealtime(this.value)"
                             placeholder="Cari soto, nasi goreng, es teh..."
+                            aria-label="Cari menu makanan atau minuman"
                             class="w-full pl-9 pr-9 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
                         <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -484,32 +495,58 @@
 
                         <!-- Catatan Pesanan -->
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
+                            <label for="input-catatan" class="block text-xs font-bold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
                             <textarea id="input-catatan" rows="2" placeholder="Contoh: Pedas ya bu, kuah dipisah, es sedikit..."
                                 class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"></textarea>
                         </div>
 
-                        <!-- Pilihan Metode Pembayaran (Midtrans QRIS Sandbox vs COD) -->
+                        <!-- Pilihan Metode Pembayaran (Shopee Style dengan Centang) -->
                         <div class="pt-2">
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Metode Pembayaran</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <label for="method-qris" class="relative flex flex-col p-3 rounded-2xl border-2 border-orange-500 bg-orange-50/40 cursor-pointer transition-all" id="card-method-qris">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <input type="radio" name="payment_method_choice" id="method-qris" value="qris" checked onchange="selectDrawerPaymentMethod('qris')" class="text-orange-600 focus:ring-orange-500 cursor-pointer">
-                                        <span class="text-[9px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">MIDTRANS</span>
+                            <label class="block text-xs font-black text-slate-800 mb-2 uppercase tracking-wider">Metode Pembayaran</label>
+                            <div class="space-y-2">
+                                <!-- Opsi 1: QRIS -->
+                                <div onclick="selectDrawerPaymentMethod('qris')" id="card-method-qris"
+                                     class="flex items-center justify-between p-3.5 rounded-2xl border-2 border-orange-500 bg-orange-50/40 cursor-pointer transition-all active:scale-[0.99] select-none">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0 border border-orange-200/60">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.008v.008H6.75V6.75ZM6.75 16.5h.008v.008H6.75V16.5ZM16.5 6.75h.008v.008H16.5V6.75ZM13.5 13.5h.008v.008H13.5V13.5ZM13.5 19.5h.008v.008H13.5V19.5ZM19.5 13.5h.008v.008H19.5V13.5ZM16.5 16.5h.008v.008H16.5V16.5ZM19.5 19.5h.008v.008H19.5V19.5Z" />
+                                            </svg>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <span class="text-xs sm:text-sm font-black text-slate-900 block leading-tight">QRIS</span>
+                                            <span class="text-[11px] text-slate-500 font-medium block mt-0.5 truncate">Semua E-Wallet &amp; Mobile Banking</span>
+                                        </div>
                                     </div>
-                                    <span class="text-xs font-extrabold text-slate-900">QRIS Online</span>
-                                    <span class="text-[10px] text-slate-500 mt-0.5 leading-tight">Bayar 1x via Snap QRIS</span>
-                                </label>
 
-                                <label for="method-cod" class="relative flex flex-col p-3 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition-all" id="card-method-cod">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <input type="radio" name="payment_method_choice" id="method-cod" value="cod" onchange="selectDrawerPaymentMethod('cod')" class="text-orange-600 focus:ring-orange-500 cursor-pointer">
-                                        <span class="text-[9px] font-black text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">COD</span>
+                                    <!-- Centang Bulat ala Shopee (Selected) -->
+                                    <div id="check-method-qris" class="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                        </svg>
                                     </div>
-                                    <span class="text-xs font-extrabold text-slate-900">Bayar di Tempat</span>
-                                    <span class="text-[10px] text-slate-500 mt-0.5 leading-tight">Bayar tunai di stand</span>
-                                </label>
+                                </div>
+
+                                <!-- Opsi 2: COD -->
+                                <div onclick="selectDrawerPaymentMethod('cod')" id="card-method-cod"
+                                     class="flex items-center justify-between p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition-all active:scale-[0.99] select-none">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200/60">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v10.5m0-10.5h19.5m0 0v10.5m0-10.5c.414 0 .75.336.75.75v.75m-21 0h21M6.75 15h10.5a2.25 2.25 0 0 0 2.25-2.25V9a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 9v3.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                            </svg>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <span class="text-xs sm:text-sm font-black text-slate-900 block leading-tight">Bayar di Tempat (COD)</span>
+                                            <span class="text-[11px] text-slate-500 font-medium block mt-0.5 truncate">Bayar tunai langsung saat ambil makanan</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Centang Bulat ala Shopee (Unselected) -->
+                                    <div id="check-method-cod" class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center shrink-0 transition-all">
+                                    </div>
+                                </div>
                             </div>
                             <input type="hidden" id="selected-payment-method" value="qris">
                         </div>
@@ -762,32 +799,56 @@
     function selectDrawerPaymentMethod(method) {
         const qrisCard = document.getElementById('card-method-qris');
         const codCard = document.getElementById('card-method-cod');
+        const qrisCheck = document.getElementById('check-method-qris');
+        const codCheck = document.getElementById('check-method-cod');
         const hiddenInput = document.getElementById('selected-payment-method');
         const btnText = document.getElementById('btn-submit-text');
         const totalNote = document.getElementById('total-payment-note');
+
+        const checkSvg = `
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+        `;
 
         if (hiddenInput) hiddenInput.value = method;
 
         if (method === 'qris') {
             if (qrisCard) {
-                qrisCard.classList.remove('border-slate-200', 'bg-white');
-                qrisCard.classList.add('border-orange-500', 'bg-orange-50/40');
+                qrisCard.className = 'flex items-center justify-between p-3.5 rounded-2xl border-2 border-orange-500 bg-orange-50/40 cursor-pointer transition-all active:scale-[0.99] select-none';
             }
+            if (qrisCheck) {
+                qrisCheck.className = 'w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs transition-all';
+                qrisCheck.innerHTML = checkSvg;
+            }
+
             if (codCard) {
-                codCard.classList.remove('border-orange-500', 'bg-orange-50/40');
-                codCard.classList.add('border-slate-200', 'bg-white');
+                codCard.className = 'flex items-center justify-between p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition-all active:scale-[0.99] select-none';
             }
+            if (codCheck) {
+                codCheck.className = 'w-6 h-6 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center shrink-0 transition-all';
+                codCheck.innerHTML = '';
+            }
+
             if (btnText) btnText.innerText = 'Bayar Sekarang via QRIS';
             if (totalNote) totalNote.innerText = 'Bayar 1x lunas via QRIS';
         } else {
             if (codCard) {
-                codCard.classList.remove('border-slate-200', 'bg-white');
-                codCard.classList.add('border-orange-500', 'bg-orange-50/40');
+                codCard.className = 'flex items-center justify-between p-3.5 rounded-2xl border-2 border-orange-500 bg-orange-50/40 cursor-pointer transition-all active:scale-[0.99] select-none';
             }
+            if (codCheck) {
+                codCheck.className = 'w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs transition-all';
+                codCheck.innerHTML = checkSvg;
+            }
+
             if (qrisCard) {
-                qrisCard.classList.remove('border-orange-500', 'bg-orange-50/40');
-                qrisCard.classList.add('border-slate-200', 'bg-white');
+                qrisCard.className = 'flex items-center justify-between p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition-all active:scale-[0.99] select-none';
             }
+            if (qrisCheck) {
+                qrisCheck.className = 'w-6 h-6 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center shrink-0 transition-all';
+                qrisCheck.innerHTML = '';
+            }
+
             if (btnText) btnText.innerText = 'Konfirmasi Pesanan (COD)';
             if (totalNote) totalNote.innerText = 'Bayar tunai di masing-masing stand';
         }

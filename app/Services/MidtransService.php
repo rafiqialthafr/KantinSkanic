@@ -55,6 +55,11 @@ class MidtransService
                 'phone' => $customerPhone,
             ],
             'item_details' => $itemDetails,
+            'expiry' => [
+                'start_time' => now('Asia/Jakarta')->format('Y-m-d H:i:s O'),
+                'unit' => 'hour',
+                'duration' => (int) config('midtrans.expiry_hours', 24),
+            ],
         ];
 
         try {

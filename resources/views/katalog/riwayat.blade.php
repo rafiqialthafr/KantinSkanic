@@ -86,7 +86,7 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <!-- Shopee Navigation Tabs Bar -->
-        <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 mb-4 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 mb-5 overflow-hidden">
             <div class="flex items-center overflow-x-auto no-scrollbar scroll-smooth">
                 @php
                     $tabs = [
@@ -102,7 +102,7 @@
                 @php
                     $isActive = ($statusFilter === $key) || ($key === 'all' && empty($statusFilter));
                 @endphp
-                <a href="{{ route('order.history', ['status' => $key, 'q' => $searchQuery]) }}"
+                <a href="{{ route('order.history', ['status' => $key]) }}"
                    class="flex-1 min-w-[110px] sm:min-w-[130px] py-3.5 px-3 text-center text-xs sm:text-sm transition-all whitespace-nowrap border-b-2
                           {{ $isActive
                              ? 'text-orange-600 font-black border-orange-500 bg-orange-50/20'
@@ -117,34 +117,6 @@
                 </a>
                 @endforeach
             </div>
-        </div>
-
-        <!-- Shopee Search Bar Card -->
-        <div class="bg-white rounded-2xl p-2.5 sm:p-3 shadow-xs border border-slate-200/80 mb-5">
-            <form method="GET" action="{{ route('order.history') }}" class="flex items-center gap-2">
-                <input type="hidden" name="status" value="{{ $statusFilter }}">
-
-                <div class="relative flex-1">
-                    <div class="absolute left-3.5 top-3 text-slate-400">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
-                    </div>
-                    <input type="text" name="q" value="{{ $searchQuery }}"
-                           placeholder="Kamu dapat mencari berdasarkan No. Pesanan (SKNC-XXXX), Nama Stand, atau Menu..."
-                           class="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-slate-50/80 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium">
-                </div>
-
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs sm:text-sm shadow-xs active:scale-95 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer">
-                    <span>Cari</span>
-                </button>
-
-                @if(!empty($searchQuery))
-                <a href="{{ route('order.history', ['status' => $statusFilter]) }}" class="px-3 py-2 text-xs text-slate-400 hover:text-slate-600 font-bold shrink-0">
-                    Reset
-                </a>
-                @endif
-            </form>
         </div>
 
         <!-- Shopee Orders List Cards (SubOrder per Stand) -->
@@ -340,29 +312,33 @@
                         @endif
 
                         <!-- Tombol 'Lihat Struk Pengambilan' yang membuka popup digital bersih -->
+                        @php
+                            $receiptPayload = [
+                                'ticket_code' => $ticketCode,
+                                'batch_code' => $batchCode,
+                                'stand_name' => $order->stand->nama_stand ?? 'Stand Kantin',
+                                'stand_num' => $order->stand->nomor_stand ?? '-',
+                                'nama_pemesan' => $order->nama_pemesan,
+                                'kelas' => $order->kelas,
+                                'created_at' => $order->created_at->format('d M Y, H:i') . ' WIB',
+                                'is_qris' => $isQris,
+                                'is_lunas' => $isLunas,
+                                'status' => $order->status,
+                                'total_harga' => $order->total_harga,
+                                'items' => $order->items->map(fn($it) => [
+                                    'name' => $it->menu->nama_menu ?? 'Menu',
+                                    'qty' => $it->jumlah,
+                                    'price' => $it->harga_satuan,
+                                    'subtotal' => $it->subtotal,
+                                    'notes' => $it->notes,
+                                ]),
+                                'catatan' => $order->catatan,
+                                'detail_url' => route('order.status', $order->kode_tr)
+                            ];
+                        @endphp
                         <button type="button"
-                                onclick="openDigitalReceiptModal({{ json_encode([
-                                    'ticket_code' => $ticketCode,
-                                    'batch_code' => $batchCode,
-                                    'stand_name' => $order->stand->nama_stand ?? 'Stand Kantin',
-                                    'stand_num' => $order->stand->nomor_stand ?? '-',
-                                    'nama_pemesan' => $order->nama_pemesan,
-                                    'kelas' => $order->kelas,
-                                    'created_at' => $order->created_at->format('d M Y, H:i') . ' WIB',
-                                    'is_qris' => $isQris,
-                                    'is_lunas' => $isLunas,
-                                    'status' => $order->status,
-                                    'total_harga' => $order->total_harga,
-                                    'items' => $order->items->map(fn($it) => [
-                                        'name' => $it->menu->nama_menu ?? 'Menu',
-                                        'qty' => $it->jumlah,
-                                        'price' => $it->harga_satuan,
-                                        'subtotal' => $it->subtotal,
-                                        'notes' => $it->notes,
-                                    ]),
-                                    'catatan' => $order->catatan,
-                                    'detail_url' => route('order.status', $order->kode_tr)
-                                ]) }})"
+                                data-receipt="{{ json_encode($receiptPayload) }}"
+                                onclick="openDigitalReceiptModal(JSON.parse(this.dataset.receipt))"
                                 class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs shadow-md shadow-orange-500/20 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
@@ -1074,11 +1050,11 @@
     window.syncOrderStatus = syncOrderStatus;
     window.pollActiveOrderStatuses = pollActiveOrderStatuses;
 
-    @guest
     // Bersihkan storage riwayat lokal jika user tidak sedang login
-    try {
-        localStorage.removeItem('kantinskanic_order_history');
-    } catch (e) {}
-    @endguest
+    if ({{ auth()->guest() ? 'true' : 'false' }}) {
+        try {
+            localStorage.removeItem('kantinskanic_order_history');
+        } catch (e) {}
+    }
 </script>
 @endsection

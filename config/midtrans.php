@@ -23,4 +23,10 @@ return [
     'snap_js_url' => env('MIDTRANS_IS_PRODUCTION', false)
         ? 'https://app.midtrans.com/snap/snap.js'
         : 'https://app.sandbox.midtrans.com/snap/snap.js',
+
+    /*
+    | Batas waktu pembayaran (dalam jam) sebelum transaksi QRIS kedaluwarsa.
+    | Default Midtrans untuk QRIS adalah 15 menit jika tidak diatur.
+    */
+    'expiry_hours' => (int) env('MIDTRANS_EXPIRY_HOURS', 24),
 ];

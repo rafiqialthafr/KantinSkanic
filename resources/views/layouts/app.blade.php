@@ -232,45 +232,97 @@
                     </button>
 
                     @auth
-                    <!-- Authenticated User Menu -->
-                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                        @if(Auth::user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 transition-colors border border-orange-200" title="Panel Admin">
-                            <svg class="w-4 h-4 text-orange-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                            </svg>
-                            <span class="hidden sm:inline">Panel Admin</span>
-                        </a>
-                        @elseif(Auth::user()->isPenjual())
-                        <a href="{{ route('vendor.dashboard') }}" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 transition-colors border border-orange-200" title="Dashboard Stand">
-                            <svg class="w-4 h-4 text-orange-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016 2.993 2.993 0 0 0 2.25-1.016 3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
-                            </svg>
-                            <span class="hidden sm:inline">Dashboard Stand</span>
-                        </a>
-                        @else
-                        <span class="hidden sm:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors">
-                            {{-- Avatar circle dengan inisial --}}
-                            <span class="relative shrink-0">
-                                <span style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#f97316,#f59e0b);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;letter-spacing:-0.5px;">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                </span>
-                                {{-- Status dot online --}}
-                                <span style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:#22c55e;border-radius:50%;border:1.5px solid #fff;"></span>
-                            </span>
-                            <span>{{ explode(' ', Auth::user()->name)[0] }}</span>
-                        </span>
-                        @endif
+                    <!-- Authenticated User Menu: Avatar Only with Dropdown -->
+                    <div class="relative shrink-0 flex items-center" id="user-profile-menu-container">
+                        <!-- Avatar Button (Bulat sempurna presisi 1:1 tanpa distorsi & tanpa glow) -->
+                        <button type="button"
+                            id="user-profile-btn"
+                            onclick="toggleUserProfileDropdown(event)"
+                            class="shrink-0 aspect-square w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-black text-xs sm:text-lg flex items-center justify-center p-0 leading-none hover:opacity-95 active:scale-95 transition-all cursor-pointer focus:outline-hidden"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                            title="{{ Auth::user()->name }}">
+                            <span class="leading-none select-none">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                        </button>
 
-                        <form action="{{ route('logout') }}" method="POST" class="hidden sm:inline" onsubmit="clearAuthStorageOnLogout()">
-                            @csrf
-                            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 sm:px-3 sm:py-2 text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors border border-rose-100 cursor-pointer" title="Keluar">
-                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                                </svg>
-                                <span>Keluar</span>
-                            </button>
-                        </form>
+                        <!-- Dropdown Popup Card (Kembali ke layout lengkap: Nama, Kelas, Email, Logout — tanpa menu Riwayat) -->
+                        <div id="user-profile-dropdown"
+                            class="hidden absolute right-0 top-full mt-2 w-64 sm:w-72 bg-white rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-200/90 p-3.5 z-50 transition-all origin-top-right">
+                            
+                            <!-- Header: Profil Avatar, Nama, dan Kelas / Role -->
+                            <div class="flex items-center gap-3 p-1">
+                                <div class="shrink-0 aspect-square w-11 h-11 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-black text-base flex items-center justify-center">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-extrabold text-sm text-slate-800 leading-tight truncate">
+                                        {{ Auth::user()->name }}
+                                    </div>
+                                    @if(Auth::user()->isSiswa() && Auth::user()->kelas)
+                                    <div class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 text-[11px] font-bold border border-orange-200/60">
+                                        <svg class="w-3 h-3 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                                        </svg>
+                                        <span>Kelas {{ Auth::user()->kelas }}</span>
+                                    </div>
+                                    @elseif(Auth::user()->isAdmin())
+                                    <div class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 text-[11px] font-bold border border-purple-200/60">
+                                        <span>Administrator</span>
+                                    </div>
+                                    @elseif(Auth::user()->isPenjual())
+                                    <div class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-[11px] font-bold border border-amber-200/60">
+                                        <span>{{ Auth::user()->stand->nama_stand ?? 'Penjual Stand' }}</span>
+                                    </div>
+                                    @else
+                                    <div class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-bold">
+                                        <span>Siswa</span>
+                                    </div>
+                                    @endif
+                                    <span class="text-[11px] text-slate-400 mt-0.5 block truncate">
+                                        {{ Auth::user()->email }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            @if(Auth::user()->isAdmin())
+                            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-orange-700 hover:bg-orange-50 transition-colors">
+                                    <div class="w-6 h-6 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                                        </svg>
+                                    </div>
+                                    <span>Panel Admin</span>
+                                </a>
+                            </div>
+                            @elseif(Auth::user()->isPenjual())
+                            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                                <a href="{{ route('vendor.dashboard') }}" class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-orange-700 hover:bg-orange-50 transition-colors">
+                                    <div class="w-6 h-6 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016 2.993 2.993 0 0 0 2.25-1.016 3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+                                        </svg>
+                                    </div>
+                                    <span>Dashboard Stand</span>
+                                </a>
+                            </div>
+                            @endif
+
+                            <!-- Tombol Logout -->
+                            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                                <form action="{{ route('logout') }}" method="POST" onsubmit="clearAuthStorageOnLogout()">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer group">
+                                        <div class="w-6 h-6 rounded-lg bg-rose-50 group-hover:bg-rose-100 text-rose-600 flex items-center justify-center transition-colors shrink-0">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                                            </svg>
+                                        </div>
+                                        <span>Keluar Akun</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                     @else
                     <!-- Tombol Masuk / Login (Corporate & Modern Clean Pill) -->
@@ -314,6 +366,8 @@
                                 Super Administrator
                                 @elseif(Auth::user()->isPenjual())
                                 Stand Penjual
+                                @elseif(Auth::user()->kelas)
+                                Kelas {{ Auth::user()->kelas }}
                                 @else
                                 Siswa
                                 @endif
@@ -471,7 +525,7 @@
                 </div>
 
                 <!-- Tagline -->
-                <p class="text-slate-500 font-medium">
+                <p class="hidden md:block text-slate-500 font-medium">
                     Pesan makanan favoritmu di Kantin Skanic. Cepat, praktis, & efisien.
                 </p>
 
@@ -499,6 +553,47 @@
                 if (btn) btn.classList.add('is-open');
             }
         }
+
+        function toggleUserProfileDropdown(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const dropdown = document.getElementById('user-profile-dropdown');
+            const btn = document.getElementById('user-profile-btn');
+            if (!dropdown) return;
+
+            const isHidden = dropdown.classList.contains('hidden');
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+                if (btn) btn.setAttribute('aria-expanded', 'true');
+            } else {
+                dropdown.classList.add('hidden');
+                if (btn) btn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        // Tutup dropdown profile saat klik di luar container
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('user-profile-menu-container');
+            const dropdown = document.getElementById('user-profile-dropdown');
+            const btn = document.getElementById('user-profile-btn');
+            if (container && dropdown && !container.contains(e.target)) {
+                dropdown.classList.add('hidden');
+                if (btn) btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Tutup dropdown profile saat tombol Escape ditekan
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const dropdown = document.getElementById('user-profile-dropdown');
+                const btn = document.getElementById('user-profile-btn');
+                if (dropdown && !dropdown.classList.contains('hidden')) {
+                    dropdown.classList.add('hidden');
+                    if (btn) btn.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
 
         function clearAuthStorageOnLogout() {
             try {

@@ -102,6 +102,14 @@ class MidtransOrderAndWebhookTest extends TestCase
         // Assert stock decremented
         $this->assertEquals(18, $menu1->fresh()->stok);
         $this->assertEquals(29, $menu2->fresh()->stok);
+
+        // Assert Snap request carries 24-hour payment expiry
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), '/snap/v1/transactions')
+                && $request['expiry']['unit'] === 'hour'
+                && $request['expiry']['duration'] === 24
+                && ! empty($request['expiry']['start_time']);
+        });
     }
 
     public function test_checkout_cod_creates_parent_order_with_pending_cash_and_suborders_pending(): void
