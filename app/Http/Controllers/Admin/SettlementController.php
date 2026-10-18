@@ -81,6 +81,10 @@ class SettlementController extends Controller
                     ->where('status_pembayaran', 'lunas');
                 $periodFilter($q);
             },
+            'settlements as settlements_in_period_count' => function ($q) use ($periodFilter) {
+                $q->whereIn('status', ['ditransfer', 'settled']);
+                $periodFilter($q);
+            },
         ])
             ->get()
             ->map(function ($stand) use ($periodFilter) {
@@ -170,7 +174,7 @@ class SettlementController extends Controller
                 'kode_settlement' => $kodeSettlement,
                 'total_dana' => $totalDana,
                 'status' => 'ditransfer',
-                'catatan' => $validated['catatan'] ?? 'Pencairan saldo QRIS hasil pre-order ke rekening stand.',
+                'catatan' => ! empty($validated['catatan']) ? $validated['catatan'] : null,
                 'bukti_transfer' => $buktiPath,
                 'ditransfer_at' => now(),
                 'ditransfer_oleh' => auth()->id(),

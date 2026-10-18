@@ -161,12 +161,26 @@
                                 </svg>
                                 <span>Cairkan Saldo</span>
                             </button>
-                            @else
-                            <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-400 font-bold text-[11px]">
-                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            @elseif(($stand->saldo_in_progress ?? 0) > 0)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 font-bold text-[11px] border border-amber-200/70" title="Ada pesanan QRIS yang sedang diproses stand">
+                                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <span>Menunggu Selesai</span>
+                            </span>
+                            @elseif($stand->qris_completed_orders_count > 0 || ($stand->settlements_in_period_count ?? 0) > 0)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-500 font-bold text-[11px]" title="Seluruh pesanan selesai pada periode ini telah ditransfer">
+                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                 </svg>
                                 <span>Lunas Ditransfer</span>
+                            </span>
+                            @else
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-400 font-semibold text-[11px]" title="Tidak ada pesanan atau saldo untuk dicairkan">
+                                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <span>Tidak Ada Saldo</span>
                             </span>
                             @endif
                         </td>
@@ -187,7 +201,7 @@
     <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
         <div class="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
             <div>
-                <h3 class="text-base font-black text-slate-900">Riwayat Transfer Payout (Audit Trail)</h3>
+                <h3 class="text-base font-black text-slate-900">Riwayat Transfer Payout</h3>
                 <p class="text-xs text-slate-500 mt-0.5">Catatan seluruh bukti transfer dan pencairan saldo QRIS admin ke stand kantin.</p>
             </div>
         </div>
