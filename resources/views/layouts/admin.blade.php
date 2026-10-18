@@ -74,6 +74,8 @@
             <div class="space-y-1">
                 @hasSection('sidebar-nav')
                     @yield('sidebar-nav')
+                @elseif(Auth::check() && Auth::user()->isPenjual())
+                    @include('vendor.partials.sidebar_nav')
                 @elseif(Auth::check() && Auth::user()->isAdmin())
                     @include('admin.partials.sidebar_nav')
                 @endif

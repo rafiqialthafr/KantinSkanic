@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Stand;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,7 +28,7 @@ class DashboardController extends Controller
     /**
      * Seller dashboard view.
      */
-    protected function penjualDashboard(Request $request, $user)
+    protected function penjualDashboard(Request $request, User $user)
     {
         $stand = $user->stand;
 

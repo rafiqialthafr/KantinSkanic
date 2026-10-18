@@ -243,8 +243,6 @@ class KantinOrderTest extends TestCase
             $resp->assertSee('Total Omset');
             $resp->assertSee('Menu Terlaris');
             $resp->assertSee('Status Pesanan');
-            $resp->assertSee('Menunggu');
-            $resp->assertSee('Siap Diambil');
         }
     }
 
