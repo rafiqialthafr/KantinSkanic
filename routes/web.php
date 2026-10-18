@@ -99,6 +99,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     // Laporan & Omset
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export/excel', [AdminReportController::class, 'exportExcel'])->name('reports.export.excel');
+    Route::get('/reports/export/pdf', [AdminReportController::class, 'exportPdf'])->name('reports.export.pdf');
 
     // Settlement & Penarikan Saldo QRIS Stand Kantin
     Route::get('/settlements', [AdminSettlementController::class, 'index'])->name('settlements.index');

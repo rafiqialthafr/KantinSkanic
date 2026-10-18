@@ -3,7 +3,7 @@
 @section('title', 'Laporan & Omset - ' . $stand->nama_stand)
 @section('sidebar-role', 'Stand Penjual')
 @section('page-title', $stand->nama_stand)
-@section('page-subtitle', 'Laporan Pesanan & Omset')
+@section('page-subtitle', 'Laporan & Omset')
 
 @section('sidebar-nav')
 @include('vendor.partials.sidebar_nav')
