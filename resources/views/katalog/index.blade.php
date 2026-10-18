@@ -154,19 +154,21 @@
                     <div class="relative">
                         <input type="text" id="menu-search-input" name="q" value="{{ $search }}"
                             oninput="filterMenuCardsRealtime(this.value)"
-                            placeholder="Cari soto, nasi goreng, es teh..."
+                            placeholder="Cari batagor, bakso, pop ice
+                            ..."
                             aria-label="Cari menu makanan atau minuman"
+                            autocomplete="off"
                             class="w-full pl-9 pr-9 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
                         <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
-                        @if($search)
-                        <a href="{{ route('katalog.index', array_merge(request()->query(), ['q' => ''])) }}#katalog-section" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 p-0.5">
+                        <button type="button" id="menu-search-clear-btn" onclick="clearMenuSearch()"
+                            class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer {{ $search ? '' : 'hidden' }}"
+                            aria-label="Hapus kata kunci pencarian">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                             </svg>
-                        </a>
-                        @endif
+                        </button>
                     </div>
                 </form>
             </div>
@@ -241,7 +243,9 @@
                 data-harga-raw="{{ $menu->harga }}"
                 data-stand-raw="{{ e($menu->stand->nama_stand) }}"
                 data-nama="{{ strtolower($menu->nama_menu) }}"
-                data-stand="{{ strtolower($menu->stand->nama_stand) }}">
+                data-stand="{{ strtolower($menu->stand->nama_stand) }}"
+                data-pemilik="{{ strtolower($menu->stand->pemilik ?? '') }}"
+                data-kategori="{{ strtolower($menu->kategori ?? '') }}">
 
                 <div>
                     <!-- Ratio Foto 4:3 -->
@@ -353,6 +357,20 @@
 
             </div>
             @endforeach
+        </div>
+
+        <!-- Real-Time Search Empty State -->
+        <div id="search-empty-notice" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 p-8 shadow-xs">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-400">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+            </div>
+            <h3 class="text-base font-bold text-slate-800">Menu Tidak Ditemukan</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Tidak ada menu yang sesuai dengan kata kunci "<span id="search-empty-keyword" class="font-semibold text-slate-700"></span>".</p>
+            <button type="button" onclick="clearMenuSearch()" class="inline-block mt-4 px-4 py-2 text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors cursor-pointer">
+                Hapus Pencarian
+            </button>
         </div>
         @endif
 
@@ -1029,19 +1047,170 @@
         }
     }
 
-    // Real-time menu search filter
+    // ==========================================
+    // Superpower Real-Time Menu Search & Ranking
+    // ==========================================
+    let originalMenuCards = [];
+
+    function initMenuCardsOrder() {
+        const grid = document.getElementById('menus-grid-container');
+        if (!grid) return;
+        const cards = Array.from(grid.querySelectorAll('.menu-card-item'));
+        cards.forEach((card, idx) => {
+            if (!card.dataset.origIndex) {
+                card.dataset.origIndex = idx;
+            }
+        });
+        originalMenuCards = cards;
+    }
+
+    function calculateCardRelevance(nama, stand, pemilik, kategori, query) {
+        nama = (nama || '').trim();
+        stand = (stand || '').trim();
+        pemilik = (pemilik || '').trim();
+        kategori = (kategori || '').trim();
+
+        if (nama === query) {
+            return 2000;
+        }
+
+        const tokens = query.split(/\s+/).filter(Boolean);
+        if (tokens.length === 0) return 0;
+
+        let totalScore = 0;
+
+        for (const token of tokens) {
+            let tokenScore = 0;
+
+            // 1. Menu name starts with token (Highest priority!)
+            if (nama.startsWith(token)) {
+                tokenScore += 800;
+            }
+
+            // 2. Any word in menu name starts with token
+            const words = nama.split(/[\s,\-_]+/).filter(Boolean);
+            for (let idx = 0; idx < words.length; idx++) {
+                const word = words[idx];
+                if (word === token) {
+                    tokenScore += 650;
+                    break;
+                } else if (word.startsWith(token)) {
+                    tokenScore += Math.max(500 - (idx * 15), 350);
+                    break;
+                }
+            }
+
+            // 3. Substring match inside words
+            if (tokenScore === 0 && nama.includes(token)) {
+                const pos = nama.indexOf(token);
+                tokenScore += Math.max(250 - (pos * 5), 80);
+            }
+
+            // 4. Stand / Pemilik match
+            if (stand === token || pemilik === token) {
+                tokenScore += 200;
+            } else if (stand.startsWith(token) || pemilik.startsWith(token)) {
+                tokenScore += 150;
+            } else if (stand.includes(token) || pemilik.includes(token)) {
+                tokenScore += 60;
+            }
+
+            // 5. Category match
+            if (kategori === token || kategori.startsWith(token)) {
+                tokenScore += 50;
+            }
+
+            if (tokenScore === 0) {
+                return 0; // If any token fails to match, zero out
+            }
+
+            totalScore += tokenScore;
+        }
+
+        return totalScore;
+    }
+
     function filterMenuCardsRealtime(keyword) {
-        const q = keyword.trim().toLowerCase();
-        const cards = document.querySelectorAll('.menu-card-item');
-        cards.forEach(card => {
+        const grid = document.getElementById('menus-grid-container');
+        if (!grid) return;
+
+        if (originalMenuCards.length === 0) {
+            initMenuCardsOrder();
+        }
+
+        const q = (keyword || '').trim().toLowerCase();
+        const clearBtn = document.getElementById('menu-search-clear-btn');
+        const emptyNotice = document.getElementById('search-empty-notice');
+        const emptyKeyword = document.getElementById('search-empty-keyword');
+
+        if (clearBtn) {
+            if (q) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        if (!q) {
+            // Restore original order and show all cards
+            originalMenuCards.forEach(card => {
+                card.classList.remove('hidden');
+                grid.appendChild(card);
+            });
+            if (emptyNotice) emptyNotice.classList.add('hidden');
+            return;
+        }
+
+        const scoredCards = [];
+        originalMenuCards.forEach(card => {
             const nama = card.getAttribute('data-nama') || '';
             const stand = card.getAttribute('data-stand') || '';
-            if (!q || nama.includes(q) || stand.includes(q)) {
+            const pemilik = card.getAttribute('data-pemilik') || '';
+            const kategori = card.getAttribute('data-kategori') || '';
+
+            const score = calculateCardRelevance(nama, stand, pemilik, kategori, q);
+            if (score > 0) {
                 card.classList.remove('hidden');
+                scoredCards.push({
+                    card,
+                    score,
+                    origIndex: parseInt(card.dataset.origIndex || '0', 10)
+                });
             } else {
                 card.classList.add('hidden');
             }
         });
+
+        if (scoredCards.length === 0) {
+            if (emptyNotice) {
+                if (emptyKeyword) emptyKeyword.textContent = keyword;
+                emptyNotice.classList.remove('hidden');
+            }
+        } else {
+            if (emptyNotice) emptyNotice.classList.add('hidden');
+
+            // Sort descending by relevance score, then original index
+            scoredCards.sort((a, b) => {
+                if (b.score !== a.score) {
+                    return b.score - a.score;
+                }
+                return a.origIndex - b.origIndex;
+            });
+
+            // Re-order DOM elements inside the grid container seamlessly
+            scoredCards.forEach(item => {
+                grid.appendChild(item.card);
+            });
+        }
+    }
+
+    function clearMenuSearch() {
+        const input = document.getElementById('menu-search-input');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+        filterMenuCardsRealtime('');
     }
 
     // ==========================================
@@ -1239,6 +1408,13 @@
     document.addEventListener('DOMContentLoaded', () => {
         cartStore.updateUI();
         initRealtimeStockSync();
+        initMenuCardsOrder();
+
+        const searchInput = document.getElementById('menu-search-input');
+        if (searchInput && searchInput.value.trim()) {
+            filterMenuCardsRealtime(searchInput.value);
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('cart') === 'open' || urlParams.get('open_cart') === '1' || window.location.hash === '#cart') {
             openCartModal();

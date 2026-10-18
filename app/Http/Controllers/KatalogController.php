@@ -67,16 +67,25 @@ class KatalogController extends Controller
 
         // Search by keyword
         if ($request->filled('q')) {
-            $search = $request->q;
+            $search = trim($request->q);
             $query->where(function ($q) use ($search) {
                 $q->where('nama_menu', 'like', "%{$search}%")
+                    ->orWhere('kategori', 'like', "%{$search}%")
                     ->orWhereHas('stand', function ($sq) use ($search) {
-                        $sq->where('nama_stand', 'like', "%{$search}%");
+                        $sq->where('nama_stand', 'like', "%{$search}%")
+                            ->orWhere('pemilik', 'like', "%{$search}%");
                     });
             });
         }
 
         $menus = $query->get();
+
+        if ($request->filled('q')) {
+            $search = strtolower(trim($request->q));
+            $menus = $menus->sortByDesc(function ($menu) use ($search) {
+                return $this->calculateSearchRelevance($menu, $search);
+            })->values();
+        }
 
         return view('katalog.index', [
             'stands' => $stands,
@@ -403,5 +412,73 @@ class KatalogController extends Controller
                 'url' => route('order.status', $order->kode_tr),
             ];
         })->values()->all();
+    }
+
+    /**
+     * Calculate search relevance score for a menu item.
+     * Higher score indicates higher relevance in search results.
+     */
+    protected function calculateSearchRelevance(Menu $menu, string $search): int
+    {
+        $name = strtolower(trim($menu->nama_menu));
+        $stand = strtolower(trim($menu->stand?->nama_stand ?? ''));
+        $pemilik = strtolower(trim($menu->stand?->pemilik ?? ''));
+        $kategori = strtolower(trim($menu->kategori ?? ''));
+
+        if ($name === $search) {
+            return 2000;
+        }
+
+        $tokens = preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY) ?: [$search];
+        $totalScore = 0;
+
+        foreach ($tokens as $token) {
+            $tokenScore = 0;
+
+            // 1. Menu name starts with token (Highest priority!)
+            if (str_starts_with($name, $token)) {
+                $tokenScore += 800;
+            }
+
+            // 2. Any word in menu name starts with token
+            $words = preg_split('/[\s,\-_]+/', $name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+            foreach ($words as $idx => $word) {
+                if ($word === $token) {
+                    $tokenScore += 650;
+                    break;
+                } elseif (str_starts_with($word, $token)) {
+                    $tokenScore += max(500 - ($idx * 15), 350);
+                    break;
+                }
+            }
+
+            // 3. Substring match inside words
+            if ($tokenScore === 0 && str_contains($name, $token)) {
+                $pos = strpos($name, $token);
+                $tokenScore += max(250 - ($pos * 5), 80);
+            }
+
+            // 4. Stand / Pemilik match
+            if ($stand === $token || $pemilik === $token) {
+                $tokenScore += 200;
+            } elseif (str_starts_with($stand, $token) || str_starts_with($pemilik, $token)) {
+                $tokenScore += 150;
+            } elseif (str_contains($stand, $token) || str_contains($pemilik, $token)) {
+                $tokenScore += 60;
+            }
+
+            // 5. Category match
+            if ($kategori === $token || str_starts_with($kategori, $token)) {
+                $tokenScore += 50;
+            }
+
+            if ($tokenScore === 0) {
+                return 0; // If any token fails to match, zero out
+            }
+
+            $totalScore += $tokenScore;
+        }
+
+        return $totalScore;
     }
 }
