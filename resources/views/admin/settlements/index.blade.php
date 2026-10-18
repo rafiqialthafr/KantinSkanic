@@ -71,7 +71,120 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        {{-- MOBILE CARD VIEW (Khusus layar < md agar rapi & nyaman diakses smartphone) --}}
+        <div class="block md:hidden divide-y divide-slate-100 p-3 sm:p-4 space-y-3">
+            @forelse($stands as $stand)
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 border border-slate-200/80 space-y-3">
+                {{-- Header Stand --}}
+                <div class="flex items-start justify-between gap-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm text-white shadow-xs shrink-0" style="background:linear-gradient(135deg,#f97316,#f59e0b)">
+                            {{ strtoupper(substr($stand->nama_stand, 0, 1)) }}
+                        </div>
+                        <div class="min-w-0">
+                            <span class="font-extrabold text-slate-900 text-sm leading-snug truncate block">{{ $stand->nama_stand }}</span>
+                            <span class="text-[11px] text-slate-400 block truncate">{{ $stand->pemilik }} &bull; {{ $stand->no_wa ?? '-' }}</span>
+                        </div>
+                    </div>
+                    @if($stand->nomor_stand)
+                    <span class="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-md shrink-0">
+                        {{ $stand->nomor_stand }}
+                    </span>
+                    @endif
+                </div>
+
+                {{-- Rekening / Bank Info --}}
+                <div class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-xs space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rekening Tujuan</span>
+                        @if($stand->nomor_rekening)
+                        <span class="font-black text-slate-800 text-xs">{{ $stand->bank_name ?? 'Bank' }}</span>
+                        @endif
+                    </div>
+                    @if($stand->nomor_rekening)
+                    <div class="flex items-baseline justify-between pt-0.5">
+                        <span class="font-mono font-bold text-slate-700 text-xs select-all">{{ $stand->nomor_rekening }}</span>
+                        <span class="text-[11px] text-slate-500 font-medium">a.n {{ $stand->atas_nama ?? $stand->pemilik }}</span>
+                    </div>
+                    @else
+                    <div class="flex items-center gap-1.5 text-amber-600 font-bold text-[11px] pt-0.5">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                        </svg>
+                        <span>Belum Diatur oleh Vendor</span>
+                    </div>
+                    @endif
+                </div>
+
+                {{-- Ringkasan Pesanan & Saldo --}}
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="p-2.5 rounded-xl bg-white border border-slate-200/80">
+                        <span class="text-[10px] font-bold text-slate-400 block">Pesanan QRIS</span>
+                        <span class="font-bold text-slate-800 text-xs block mt-0.5">{{ $stand->qris_completed_orders_count }} selesai</span>
+                        @if(($stand->qris_in_progress_orders_count ?? 0) > 0)
+                        <span class="text-[10px] text-amber-600 font-bold block mt-0.5">{{ $stand->qris_in_progress_orders_count }} diproses</span>
+                        @endif
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-white border border-slate-200/80">
+                        <span class="text-[10px] font-bold text-slate-400 block">Saldo QRIS</span>
+                        @if($stand->saldo_pending > 0)
+                        <span class="font-black text-emerald-600 text-xs block mt-0.5">Rp {{ number_format($stand->saldo_pending, 0, ',', '.') }}</span>
+                        <span class="text-[9px] text-emerald-600 font-bold block">Siap Dicairkan</span>
+                        @else
+                        <span class="font-bold text-slate-400 text-xs block mt-0.5">Rp 0</span>
+                        @if(($stand->saldo_in_progress ?? 0) > 0)
+                        <span class="text-[9px] text-amber-600 font-bold block">Rp {{ number_format($stand->saldo_in_progress, 0, ',', '.') }} diproses</span>
+                        @else
+                        <span class="text-[9px] text-slate-400 block">Nihil</span>
+                        @endif
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Action / Status Badge (min 44px touch target) --}}
+                <div class="pt-0.5">
+                    @if($stand->saldo_pending > 0)
+                    <button type="button"
+                            onclick="openPayoutModal({{ $stand->id }}, '{{ addslashes($stand->nama_stand) }}', {{ $stand->saldo_pending }}, '{{ addslashes($stand->bank_name ?? 'Bank') }}', '{{ addslashes($stand->nomor_rekening ?? '-') }}', '{{ addslashes($stand->atas_nama ?? $stand->pemilik) }}')"
+                            class="w-full min-h-[44px] py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        <span>Cairkan Saldo (Rp {{ number_format($stand->saldo_pending, 0, ',', '.') }})</span>
+                    </button>
+                    @elseif(($stand->saldo_in_progress ?? 0) > 0)
+                    <div class="w-full min-h-[40px] py-2 px-3 rounded-xl bg-amber-50 border border-amber-200/70 text-amber-700 font-bold text-xs flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span>Menunggu Selesai ({{ $stand->qris_in_progress_orders_count }} Pesanan)</span>
+                    </div>
+                    @elseif($stand->qris_completed_orders_count > 0 || ($stand->settlements_in_period_count ?? 0) > 0)
+                    <div class="w-full min-h-[40px] py-2 px-3 rounded-xl bg-slate-100 text-slate-500 font-bold text-xs flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        <span>Lunas Ditransfer</span>
+                    </div>
+                    @else
+                    <div class="w-full min-h-[40px] py-2 px-3 rounded-xl bg-slate-100 text-slate-400 font-semibold text-xs flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span>Tidak Ada Saldo</span>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @empty
+            <div class="py-8 text-center text-slate-400 text-xs">
+                Belum ada data stand terdaftar.
+            </div>
+            @endforelse
+        </div>
+
+        {{-- DESKTOP / TABLET VIEW (TABLE) --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50/80 border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-extrabold">
                     <tr>
@@ -206,7 +319,64 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        {{-- MOBILE CARD VIEW FOR RIWAYAT TRANSFER --}}
+        <div class="block md:hidden divide-y divide-slate-100 p-3 sm:p-4 space-y-3">
+            @forelse($settlements as $settle)
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 border border-slate-200/80 space-y-2.5">
+                {{-- Top: Code & Date --}}
+                <div class="flex items-center justify-between gap-2">
+                    <span class="font-mono font-bold text-slate-800 text-xs bg-slate-100 px-2 py-0.5 rounded-md">#{{ $settle->kode_settlement }}</span>
+                    <span class="text-[10px] text-slate-400 font-medium">
+                        {{ $settle->ditransfer_at ? $settle->ditransfer_at->format('d M Y, H:i') : $settle->created_at->format('d M Y, H:i') }} WIB
+                    </span>
+                </div>
+
+                {{-- Middle: Stand & Amount --}}
+                <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Stand Penerima</span>
+                        <span class="font-extrabold text-slate-900 text-sm block mt-0.5">{{ $settle->stand->nama_stand ?? 'Stand' }}</span>
+                        <span class="text-[10px] text-slate-400 block">Oleh: {{ $settle->admin->name ?? 'Super Admin' }}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Transfer</span>
+                        <span class="font-black text-emerald-600 text-base block mt-0.5">Rp {{ number_format($settle->total_dana, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+
+                @if($settle->catatan)
+                <div class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-[11px] text-slate-600 italic">
+                    {{ $settle->catatan }}
+                </div>
+                @endif
+
+                {{-- Action: Bukti Transfer button --}}
+                <div class="pt-0.5">
+                    @if($settle->bukti_transfer)
+                    <button type="button"
+                            onclick="openImagePreview('{{ asset('storage/' . $settle->bukti_transfer) }}', 'Bukti Transfer #{{ $settle->kode_settlement }} - {{ addslashes($settle->stand->nama_stand ?? 'Stand') }}')"
+                            class="w-full min-h-[40px] inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-orange-50 hover:bg-orange-100 active:scale-95 text-orange-700 font-bold text-xs border border-orange-200 transition-all cursor-pointer">
+                        <svg class="w-4 h-4 text-orange-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                        </svg>
+                        <span>Lihat Bukti Foto Transfer</span>
+                    </button>
+                    @else
+                    <div class="text-center py-1 text-[11px] text-slate-400 italic">
+                        Tidak ada bukti foto
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @empty
+            <div class="py-8 text-center text-slate-400 text-xs">
+                Belum ada riwayat transfer settlement yang dicatat.
+            </div>
+            @endforelse
+        </div>
+
+        {{-- DESKTOP / TABLET VIEW (TABLE) --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-slate-50/80 border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-extrabold">
                     <tr>
@@ -277,11 +447,11 @@
 {{-- MODAL TRANSFER PAYOUT --}}
 <div id="payout-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onclick="closePayoutModal()"></div>
-    <div class="min-h-full flex items-center justify-center p-4">
-        <div class="relative bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+    <div class="min-h-full flex items-center justify-center p-3 sm:p-4">
+        <div class="relative bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="text-base font-black text-slate-900">Konfirmasi Transfer Saldo QRIS</h3>
-                <button type="button" onclick="closePayoutModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold text-lg">&times;</button>
+                <h3 class="text-sm sm:text-base font-black text-slate-900">Konfirmasi Transfer Saldo QRIS</h3>
+                <button type="button" onclick="closePayoutModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold text-lg cursor-pointer">&times;</button>
             </div>
 
             <form action="{{ route('admin.settlements.payout') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -336,10 +506,10 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                    <button type="button" onclick="closePayoutModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+                    <button type="button" onclick="closePayoutModal()" class="min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer">
                         Batal
                     </button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs active:scale-95 transition-all">
+                    <button type="submit" class="min-h-[44px] px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all cursor-pointer">
                         Konfirmasi
                     </button>
                 </div>
