@@ -12,42 +12,62 @@
 @section('content')
 <div class="p-3.5 sm:p-6 space-y-4 sm:space-y-6">
 
-    {{-- STAT CARDS (REUSABLE COMPONENT: MOBILE 2 COLS / TABLET-DESKTOP 3 COLS) --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+    {{-- STAT CARDS (4 CARDS: TOTAL OMSET, OMSET QRIS, OMSET COD, PESANAN SELESAI) --}}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {{-- Total Omset Sukses --}}
         <x-stat-card
             title="Total Omset Sukses"
             :value="'Rp ' . number_format($overallTotalRevenue, 0, ',', '.')"
-            :sublabel="'Omset ' . $periodeLabel"
+            :sublabel="'Omset selesai ' . $periodeLabel"
             :isTimeSensitive="true"
             color="emerald">
             <x-slot:icon>
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
+
+        {{-- Omset QRIS (Non-Tunai) --}}
+        <x-stat-card
+            title="Omset QRIS"
+            :value="'Rp ' . number_format($overallQrisRevenue, 0, ',', '.')"
+            :sublabel="'Non-tunai ' . $periodeLabel"
+            :isTimeSensitive="true"
+            color="orange">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM14.625 3.75c-.621 0-1.125.504-1.125 1.125v4.5c0 .621.504 1.125 1.125 1.125h4.5c.621 0 1.125-.504 1.125-1.125v-4.5c0-.621-.504-1.125-1.125-1.125h-4.5Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.625 14.625h2.25v2.25h-2.25v-2.25ZM19.125 14.625h.375a.75.75 0 0 1 .75.75v.375h-1.125v-1.125ZM14.625 19.125h1.125v1.125h-1.125v-1.125ZM18 18h2.25v2.25H18V18Z" />
+                </svg>
+            </x-slot:icon>
+        </x-stat-card>
+
+        {{-- Omset Tunai (COD) --}}
+        <x-stat-card
+            title="Omset Tunai (COD)"
+            :value="'Rp ' . number_format($overallCashRevenue, 0, ',', '.')"
+            :sublabel="'Fisik stand ' . $periodeLabel"
+            :isTimeSensitive="true"
+            color="amber">
+            <x-slot:icon>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v9.75c0 .414.336.75.75.75h.75m0-11.25H21a.75.75 0 0 1 .75.75v9.75a.75.75 0 0 1-.75.75h-.75m0-11.25V4.5m0 12v3.75m0 0a60.07 60.07 0 0 0-15.797 2.101M21 16.5H3" />
+                </svg>
             </x-slot:icon>
         </x-stat-card>
 
         {{-- Pesanan Terselesaikan --}}
         <x-stat-card
-            title="Pesanan Terselesaikan"
+            title="Pesanan Selesai"
             :value="number_format($overallCompletedOrders, 0, ',', '.')"
             :sublabel="'Dari ' . $overallTotalOrders . ' pesanan (' . $periodeLabel . ')'"
             :isTimeSensitive="true"
-            color="orange">
-            <x-slot:icon>
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-            </x-slot:icon>
-        </x-stat-card>
-
-        {{-- Rata-Rata per Transaksi --}}
-        @php $avgOrder = $overallCompletedOrders > 0 ? $overallTotalRevenue / $overallCompletedOrders : 0; @endphp
-        <x-stat-card
-            title="Rata-Rata / Transaksi"
-            :value="'Rp ' . number_format($avgOrder, 0, ',', '.')"
-            :sublabel="'Rata-rata ' . $periodeLabel"
-            :isTimeSensitive="true"
             color="sky">
             <x-slot:icon>
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v10.5m0-10.5h19.5m0 0v10.5m0-10.5a.75.75 0 0 1-.75-.75V4.5M21.75 6H21m.75 10.5H21m.75 0a.75.75 0 0 1-.75.75v.75m0-1.5H3m18 0v1.5m0 0a60.07 60.07 0 0 1-15.797 2.101c-.727.198-1.453-.342-1.453-1.096V18.75" /></svg>
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
             </x-slot:icon>
         </x-stat-card>
     </div>

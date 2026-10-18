@@ -68,6 +68,24 @@ class AdminPeriodFilterTest extends TestCase
             $response->assertStatus(200);
             $response->assertSee('Laporan & Omset');
             $response->assertSee('Total Omset Sukses');
+            $response->assertSee('Omset QRIS');
+            $response->assertSee('Omset Tunai (COD)');
+            $response->assertDontSee('Rata-Rata / Transaksi');
+        }
+    }
+
+    public function test_admin_can_access_settlements_index_with_all_periods(): void
+    {
+        $this->actingAs($this->admin);
+
+        foreach (['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'] as $periode) {
+            $response = $this->get(route('admin.settlements.index', ['periode' => $periode]));
+            $response->assertStatus(200);
+            $response->assertSee('Settlement QRIS Stand');
+            $response->assertSee('Menunggu Ditransfer');
+            $response->assertSee('Total QRIS Masuk');
+            $response->assertSee('Sudah Ditransfer');
+            $response->assertDontSee('Total Tunai (COD)');
         }
     }
 

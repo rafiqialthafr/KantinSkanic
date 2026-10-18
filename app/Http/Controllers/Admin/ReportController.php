@@ -56,11 +56,26 @@ class ReportController extends Controller
         $overallCompletedOrders = (clone $overallQuery)->where('status', 'selesai')->count();
         $overallTotalRevenue = (clone $overallQuery)->where('status', 'selesai')->sum('total_harga');
 
+        // Omset QRIS (Pesanan selesai non-tunai)
+        $overallQrisRevenue = (clone $overallQuery)->where('status', 'selesai')
+            ->where('metode_pembayaran', 'qris')
+            ->sum('total_harga');
+
+        // Omset COD / Tunai Fisik Stand (Pesanan selesai tunai)
+        $overallCashRevenue = (clone $overallQuery)->where('status', 'selesai')
+            ->where(function ($q) {
+                $q->where('metode_pembayaran', 'tunai')
+                    ->orWhereNull('metode_pembayaran');
+            })
+            ->sum('total_harga');
+
         return view('admin.reports.index', compact(
             'stands',
             'overallTotalOrders',
             'overallCompletedOrders',
             'overallTotalRevenue',
+            'overallQrisRevenue',
+            'overallCashRevenue',
             'periode',
             'periodeLabel'
         ));

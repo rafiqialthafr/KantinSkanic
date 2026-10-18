@@ -3,7 +3,7 @@
 @section('title', 'Settlement QRIS Stand - Admin Kantin')
 @section('sidebar-role', 'Super Administrator')
 @section('page-title', 'Settlement QRIS Stand')
-@section('page-subtitle', 'Rekapitulasi pembayaran & transfer pencairan saldo QRIS ke rekening stand')
+@section('page-subtitle', \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('dddd') . ', ' . \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('d F Y'))
 
 @section('sidebar-nav')
 @include('admin.partials.sidebar_nav')
@@ -12,13 +12,14 @@
 @section('content')
 <div class="p-3.5 sm:p-6 space-y-4 sm:space-y-6">
 
-    {{-- STAT CARDS (REUSABLE COMPONENT: SEIRAMA DENGAN HALAMAN ADMIN LAIN) --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+    {{-- STAT CARDS (3 CARDS: MENUNGGU DITRANSFER, TOTAL QRIS MASUK, SUDAH DITRANSFER) --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {{-- Total Saldo QRIS Menunggu Transfer --}}
         <x-stat-card
             title="Menunggu Ditransfer"
             :value="'Rp ' . number_format($qrisPendingPayout, 0, ',', '.')"
-            sublabel="Hak saldo stand (Pesanan Selesai)"
+            :sublabel="'Hak saldo stand (' . $periodeLabel . ')'"
+            :isTimeSensitive="true"
             color="emerald">
             <x-slot:icon>
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -31,7 +32,8 @@
         <x-stat-card
             title="Total QRIS Masuk"
             :value="'Rp ' . number_format($qrisRevenue, 0, ',', '.')"
-            sublabel="Dana lunas rekening admin"
+            :sublabel="'Dana lunas admin (' . $periodeLabel . ')'"
+            :isTimeSensitive="true"
             color="orange">
             <x-slot:icon>
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -41,24 +43,12 @@
             </x-slot:icon>
         </x-stat-card>
 
-        {{-- Total Pembayaran Tunai (Fisik di Stand) --}}
-        <x-stat-card
-            title="Total Tunai (COD)"
-            :value="'Rp ' . number_format($cashRevenue, 0, ',', '.')"
-            sublabel="Uang fisik langsung ke stand"
-            color="amber">
-            <x-slot:icon>
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0v9.75c0 .414.336.75.75.75h.75m0-11.25H21a.75.75 0 0 1 .75.75v9.75a.75.75 0 0 1-.75.75h-.75m0-11.25V4.5m0 12v3.75m0 0a60.07 60.07 0 0 0-15.797 2.101M21 16.5H3" />
-                </svg>
-            </x-slot:icon>
-        </x-stat-card>
-
         {{-- Total QRIS Sudah Dicairkan --}}
         <x-stat-card
             title="Sudah Ditransfer"
             :value="'Rp ' . number_format($qrisSettledTotal, 0, ',', '.')"
-            sublabel="Total riwayat payout berhasil"
+            :sublabel="'Total riwayat payout (' . $periodeLabel . ')'"
+            :isTimeSensitive="true"
             color="sky">
             <x-slot:icon>
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -209,8 +199,9 @@
                         <th class="py-3 px-4 sm:px-6">Kode Settlement</th>
                         <th class="py-3 px-4">Tanggal & Jam</th>
                         <th class="py-3 px-4">Stand Penerima</th>
-                        <th class="py-3 px-4 text-right">Total Dana Ditransfer</th>
+                        <th class="py-3 px-4 text-right">Nominal Ditransfer</th>
                         <th class="py-3 px-4">Ditransfer Oleh</th>
+                        <th class="py-3 px-4 text-center">Bukti Transfer</th>
                         <th class="py-3 px-4 sm:px-6">Catatan / Ref</th>
                     </tr>
                 </thead>
@@ -232,13 +223,27 @@
                         <td class="py-4 px-4 text-slate-600 font-medium">
                             {{ $settle->admin->name ?? 'Super Admin' }}
                         </td>
+                        <td class="py-4 px-4 text-center">
+                            @if($settle->bukti_transfer)
+                            <button type="button"
+                                    onclick="openImagePreview('{{ asset('storage/' . $settle->bukti_transfer) }}', 'Bukti Transfer #{{ $settle->kode_settlement }} - {{ addslashes($settle->stand->nama_stand ?? 'Stand') }}')"
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-700 font-bold text-[11px] border border-orange-200 transition-all cursor-pointer">
+                                <svg class="w-3.5 h-3.5 text-orange-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                </svg>
+                                <span>Lihat</span>
+                            </button>
+                            @else
+                            <span class="text-slate-400 text-[10px] italic">Tidak ada foto</span>
+                            @endif
+                        </td>
                         <td class="py-4 px-4 sm:px-6 text-slate-500 italic">
                             {{ $settle->catatan ?? '-' }}
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="py-10 text-center text-slate-400">
+                        <td colspan="7" class="py-10 text-center text-slate-400">
                             Belum ada riwayat transfer settlement yang dicatat.
                         </td>
                     </tr>
@@ -265,7 +270,7 @@
                 <button type="button" onclick="closePayoutModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center font-bold text-lg">&times;</button>
             </div>
 
-            <form action="{{ route('admin.settlements.payout') }}" method="POST" class="space-y-4">
+            <form action="{{ route('admin.settlements.payout') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <input type="hidden" name="stand_id" id="modal-stand-id">
 
@@ -278,9 +283,41 @@
                     </div>
                 </div>
 
+                {{-- Upload Bukti Foto / Screenshot Transfer --}}
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Catatan / Bukti Referensi Transfer (Opsional)</label>
-                    <input type="text" name="catatan" placeholder="Contoh: Transfer via BCA / DANA No Ref #9872"
+                    <label class="block text-xs font-bold text-slate-700 mb-1">
+                        Foto / Screenshot Bukti Transfer <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        <label for="modal-bukti-transfer" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 hover:border-orange-500 rounded-2xl cursor-pointer bg-slate-50 hover:bg-orange-50/40 transition-all group">
+                            <div class="flex flex-col items-center justify-center space-y-1 text-center" id="upload-placeholder">
+                                <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-700 group-hover:text-orange-600">Unggah Bukti Transfer</span>
+                                <span class="text-[10px] text-slate-400">JPG, PNG, atau WEBP (Maksimal 5 MB)</span>
+                            </div>
+
+                            {{-- Live Image Preview --}}
+                            <div id="upload-preview" class="hidden flex items-center gap-3 w-full">
+                                <img id="preview-img" src="" alt="Bukti Transfer" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0 shadow-2xs">
+                                <div class="min-w-0 flex-1 text-left">
+                                    <span id="preview-filename" class="text-xs font-bold text-slate-800 block truncate">foto_bukti.png</span>
+                                    <span id="preview-filesize" class="text-[10px] text-slate-400 block mt-0.5">240 KB</span>
+                                    <span class="text-[10px] text-orange-600 font-semibold mt-1 inline-block">Klik untuk mengganti foto</span>
+                                </div>
+                            </div>
+
+                            <input type="file" name="bukti_transfer" id="modal-bukti-transfer" accept="image/*" required class="hidden" onchange="previewBukti(this)">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
+                    <input type="text" name="catatan" placeholder="Contoh: No Ref #9872 atau Transfer dari Rekening BCA"
                            class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
 
@@ -289,7 +326,7 @@
                         Batal
                     </button>
                     <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs active:scale-95 transition-all">
-                        Konfirmasi Sudah Ditransfer &check;
+                        Konfirmasi
                     </button>
                 </div>
             </form>
@@ -297,7 +334,53 @@
     </div>
 </div>
 
+{{-- LIGHTBOX IMAGE PREVIEW MODAL --}}
+<div id="image-preview-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity" onclick="closeImagePreview()"></div>
+    <div class="min-h-full flex items-center justify-center p-3 sm:p-6">
+        <div class="relative bg-white rounded-3xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl space-y-3 z-10">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="min-w-0 pr-3">
+                    <h3 class="text-sm sm:text-base font-black text-slate-900 truncate" id="lightbox-title">Bukti Transfer</h3>
+                    <p class="text-[11px] text-slate-400">Bukti transfer pencairan saldo QRIS</p>
+                </div>
+                <button type="button" onclick="closeImagePreview()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center font-bold text-lg cursor-pointer shrink-0">&times;</button>
+            </div>
+
+            <div class="rounded-2xl bg-slate-100 overflow-hidden flex items-center justify-center max-h-[70vh] p-2">
+                <img id="lightbox-img" src="" alt="Bukti Transfer" class="max-h-[65vh] w-auto object-contain rounded-xl shadow-xs">
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+                <a id="lightbox-link" href="#" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-700">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                    <span>Buka Foto Asli Tab Baru</span>
+                </a>
+                <button type="button" onclick="closeImagePreview()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function previewBukti(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-img').src = e.target.result;
+                document.getElementById('preview-filename').innerText = file.name;
+                document.getElementById('preview-filesize').innerText = (file.size / 1024).toFixed(1) + ' KB';
+                document.getElementById('upload-placeholder').classList.add('hidden');
+                document.getElementById('upload-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 
     function openPayoutModal(standId, standName, amount, bankName, accountNo, ownerName) {
         document.getElementById('modal-stand-id').value = standId;
@@ -306,11 +389,31 @@
         document.getElementById('modal-bank-info').innerText = 'Tujuan: ' + bankName + ' - ' + accountNo;
         document.getElementById('modal-owner-info').innerText = 'a.n ' + ownerName;
 
+        const fileInput = document.getElementById('modal-bukti-transfer');
+        if (fileInput) fileInput.value = '';
+        document.getElementById('upload-placeholder')?.classList.remove('hidden');
+        document.getElementById('upload-preview')?.classList.add('hidden');
+
         document.getElementById('payout-modal').classList.remove('hidden');
     }
 
     function closePayoutModal() {
         document.getElementById('payout-modal').classList.add('hidden');
+        const fileInput = document.getElementById('modal-bukti-transfer');
+        if (fileInput) fileInput.value = '';
+        document.getElementById('upload-placeholder')?.classList.remove('hidden');
+        document.getElementById('upload-preview')?.classList.add('hidden');
+    }
+
+    function openImagePreview(url, title) {
+        document.getElementById('lightbox-img').src = url;
+        document.getElementById('lightbox-link').href = url;
+        document.getElementById('lightbox-title').innerText = title;
+        document.getElementById('image-preview-modal').classList.remove('hidden');
+    }
+
+    function closeImagePreview() {
+        document.getElementById('image-preview-modal').classList.add('hidden');
     }
 </script>
 @endsection

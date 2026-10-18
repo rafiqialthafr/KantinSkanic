@@ -7,6 +7,8 @@ use App\Models\Stand;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PaymentAndSettlementSystemTest extends TestCase
@@ -195,10 +197,14 @@ class PaymentAndSettlementSystemTest extends TestCase
         $response->assertSee('5420192831');
         $response->assertSee('Rp 50.000');
 
+        Storage::fake('public');
+        $buktiFile = UploadedFile::fake()->image('bukti_transfer.png');
+
         // Execute payout
         $payoutResponse = $this->post(route('admin.settlements.payout'), [
             'stand_id' => $stand->id,
             'catatan' => 'Transfer via BCA ref #882193',
+            'bukti_transfer' => $buktiFile,
         ]);
 
         $payoutResponse->assertSessionHas('success');
@@ -210,6 +216,8 @@ class PaymentAndSettlementSystemTest extends TestCase
         $settlement = $order->settlement;
         $this->assertEquals(50000, $settlement->total_dana);
         $this->assertEquals($admin->id, $settlement->ditransfer_oleh);
+        $this->assertNotNull($settlement->bukti_transfer);
+        Storage::disk('public')->assertExists($settlement->bukti_transfer);
     }
 
     public function test_vendor_can_view_and_update_rekening(): void

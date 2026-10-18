@@ -16,67 +16,89 @@ class SettlementController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Transaction Recap (All canteen transactions)
-        $totalOrdersCount = Order::count();
-        $totalRevenue = Order::where('status', 'selesai')->sum('total_harga');
+        $periode = $request->query('periode', 'hari_ini');
+        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
+            $periode = 'hari_ini';
+        }
 
-        $cashRevenue = Order::where('status', 'selesai')
-            ->where(function ($q) {
-                $q->where('metode_pembayaran', 'tunai')
-                    ->orWhereNull('metode_pembayaran');
-            })
-            ->sum('total_harga');
+        $periodeLabel = match ($periode) {
+            'hari_ini' => 'Hari Ini',
+            'minggu_ini' => 'Minggu Ini',
+            'bulan_ini' => 'Bulan Ini',
+            'semua' => 'Keseluruhan',
+        };
 
-        // Total QRIS Masuk: Semua pembayaran QRIS yang sudah lunas dan tidak dibatalkan (Uang riil masuk ke rekening admin)
-        $qrisRevenue = Order::where('metode_pembayaran', 'qris')
+        $periodFilter = function ($q) use ($periode) {
+            match ($periode) {
+                'hari_ini' => $q->whereDate('created_at', today()),
+                'minggu_ini' => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'bulan_ini' => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+                'semua' => null,
+                default => $q->whereDate('created_at', today()),
+            };
+        };
+
+        // 1. Transaction Recap (Khusus QRIS sesuai periode)
+        // Total QRIS Masuk: Semua pembayaran QRIS yang sudah lunas dan tidak dibatalkan
+        $qrisRevenueQuery = Order::where('metode_pembayaran', 'qris')
             ->where('status_pembayaran', 'lunas')
-            ->where('status', '!=', 'dibatalkan')
-            ->sum('total_harga');
+            ->where('status', '!=', 'dibatalkan');
+        $periodFilter($qrisRevenueQuery);
+        $qrisRevenue = $qrisRevenueQuery->sum('total_harga');
 
-        // Hak Saldo QRIS Stand yang Siap Dicairkan (Opsi A: Pesanan QRIS yang sudah lunas dan selesai diambil)
-        $qrisPendingPayout = Order::where('status', 'selesai')
+        // Hak Saldo QRIS Stand yang Siap Dicairkan (Pesanan QRIS lunas & selesai diambil)
+        $qrisPendingPayoutQuery = Order::where('status', 'selesai')
             ->where('metode_pembayaran', 'qris')
             ->where('status_pembayaran', 'lunas')
-            ->where('settlement_status', 'pending')
-            ->sum('total_harga');
+            ->where('settlement_status', 'pending');
+        $periodFilter($qrisPendingPayoutQuery);
+        $qrisPendingPayout = $qrisPendingPayoutQuery->sum('total_harga');
 
-        // Dana QRIS lunas yang masih dalam proses pengerjaan oleh stand (menunggu pesanan selesai)
-        $qrisInProgressPayout = Order::whereIn('status', ['pending', 'diproses', 'siap_diambil'])
+        // Dana QRIS lunas yang masih dalam proses pengerjaan oleh stand
+        $qrisInProgressQuery = Order::whereIn('status', ['pending', 'diproses', 'siap_diambil'])
             ->where('metode_pembayaran', 'qris')
             ->where('status_pembayaran', 'lunas')
-            ->where('settlement_status', 'pending')
-            ->sum('total_harga');
+            ->where('settlement_status', 'pending');
+        $periodFilter($qrisInProgressQuery);
+        $qrisInProgressPayout = $qrisInProgressQuery->sum('total_harga');
 
-        $qrisSettledTotal = Settlement::whereIn('status', ['ditransfer', 'settled'])->sum('total_dana');
+        // Total dana QRIS yang sudah berhasil ditransfer
+        $settledQuery = Settlement::whereIn('status', ['ditransfer', 'settled']);
+        $periodFilter($settledQuery);
+        $qrisSettledTotal = $settledQuery->sum('total_dana');
 
-        // 2. Stands with QRIS balances to disburse (Opsi A: Saldo dicairkan jika pesanan selesai)
+        // 2. Stands with QRIS balances to disburse (disesuaikan dengan filter periode)
         $stands = Stand::withCount([
-            'orders as qris_completed_orders_count' => function ($q) {
+            'orders as qris_completed_orders_count' => function ($q) use ($periodFilter) {
                 $q->where('status', 'selesai')
                     ->where('metode_pembayaran', 'qris')
                     ->where('status_pembayaran', 'lunas');
+                $periodFilter($q);
             },
-            'orders as qris_in_progress_orders_count' => function ($q) {
+            'orders as qris_in_progress_orders_count' => function ($q) use ($periodFilter) {
                 $q->whereIn('status', ['pending', 'diproses', 'siap_diambil'])
                     ->where('metode_pembayaran', 'qris')
                     ->where('status_pembayaran', 'lunas');
+                $periodFilter($q);
             },
         ])
             ->get()
-            ->map(function ($stand) {
-                $stand->saldo_pending = (int) Order::where('stand_id', $stand->id)
+            ->map(function ($stand) use ($periodFilter) {
+                $pendingQuery = Order::where('stand_id', $stand->id)
                     ->where('status', 'selesai')
                     ->where('metode_pembayaran', 'qris')
                     ->where('status_pembayaran', 'lunas')
-                    ->where('settlement_status', 'pending')
-                    ->sum('total_harga');
+                    ->where('settlement_status', 'pending');
+                $periodFilter($pendingQuery);
+                $stand->saldo_pending = (int) $pendingQuery->sum('total_harga');
 
-                $stand->saldo_in_progress = (int) Order::where('stand_id', $stand->id)
+                $inProgressQuery = Order::where('stand_id', $stand->id)
                     ->whereIn('status', ['pending', 'diproses', 'siap_diambil'])
                     ->where('metode_pembayaran', 'qris')
                     ->where('status_pembayaran', 'lunas')
-                    ->where('settlement_status', 'pending')
-                    ->sum('total_harga');
+                    ->where('settlement_status', 'pending');
+                $periodFilter($inProgressQuery);
+                $stand->saldo_in_progress = (int) $inProgressQuery->sum('total_harga');
 
                 $stand->last_settlement = Settlement::where('stand_id', $stand->id)
                     ->latest()
@@ -85,21 +107,20 @@ class SettlementController extends Controller
                 return $stand;
             });
 
-        // 3. Settlement history logs
-        $settlements = Settlement::with(['stand', 'admin', 'orders'])
-            ->latest()
-            ->paginate(15);
+        // 3. Settlement history logs (disesuaikan dengan filter periode)
+        $settlementsQuery = Settlement::with(['stand', 'admin', 'orders'])->latest();
+        $periodFilter($settlementsQuery);
+        $settlements = $settlementsQuery->paginate(15)->withQueryString();
 
         return view('admin.settlements.index', compact(
-            'totalOrdersCount',
-            'totalRevenue',
-            'cashRevenue',
             'qrisRevenue',
             'qrisPendingPayout',
             'qrisInProgressPayout',
             'qrisSettledTotal',
             'stands',
-            'settlements'
+            'settlements',
+            'periode',
+            'periodeLabel'
         ));
     }
 
@@ -111,14 +132,23 @@ class SettlementController extends Controller
         $validated = $request->validate([
             'stand_id' => ['required', 'exists:stands,id'],
             'catatan' => ['nullable', 'string', 'max:255'],
-            'bukti_transfer' => ['nullable', 'string', 'max:255'],
+            'bukti_transfer' => ['required', 'image', 'mimes:jpeg,png,jpg,webp,jfif', 'max:5120'],
         ], [
             'stand_id.required' => 'Pilih stand yang akan dicairkan saldonya.',
+            'bukti_transfer.required' => 'Bukti foto atau screenshot transfer wajib diunggah.',
+            'bukti_transfer.image' => 'Bukti transfer harus berupa file gambar.',
+            'bukti_transfer.mimes' => 'Format bukti transfer harus JPG, PNG, atau WEBP.',
+            'bukti_transfer.max' => 'Ukuran file bukti transfer maksimal 5 MB.',
         ]);
 
         $stand = Stand::findOrFail($validated['stand_id']);
 
-        return DB::transaction(function () use ($stand, $validated) {
+        $buktiPath = null;
+        if ($request->hasFile('bukti_transfer')) {
+            $buktiPath = $request->file('bukti_transfer')->store('settlements', 'public');
+        }
+
+        return DB::transaction(function () use ($stand, $validated, $buktiPath) {
             $orders = Order::where('stand_id', $stand->id)
                 ->where('status', 'selesai')
                 ->where('metode_pembayaran', 'qris')
@@ -141,7 +171,7 @@ class SettlementController extends Controller
                 'total_dana' => $totalDana,
                 'status' => 'ditransfer',
                 'catatan' => $validated['catatan'] ?? 'Pencairan saldo QRIS hasil pre-order ke rekening stand.',
-                'bukti_transfer' => $validated['bukti_transfer'] ?? null,
+                'bukti_transfer' => $buktiPath,
                 'ditransfer_at' => now(),
                 'ditransfer_oleh' => auth()->id(),
             ]);
@@ -151,7 +181,7 @@ class SettlementController extends Controller
                 'settlement_id' => $settlement->id,
             ]);
 
-            return back()->with('success', 'Berhasil mencairkan saldo QRIS Rp '.number_format($totalDana, 0, ',', '.')." ke {$stand->nama_stand} ({$stand->bank_name} {$stand->nomor_rekening} a.n {$stand->atas_nama}) dengan kode #{$kodeSettlement}.");
+            return back()->with('success', 'Berhasil mencairkan saldo QRIS Rp '.number_format($totalDana, 0, ',', '.')." ke {$stand->nama_stand} ({$stand->bank_name} {$stand->nomor_rekening} a.n {$stand->atas_nama}) dengan bukti transfer tersimpan.");
         });
     }
 }

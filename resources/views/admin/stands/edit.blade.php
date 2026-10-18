@@ -82,7 +82,7 @@
 
             @if($vendorUser)
             <div class="pt-4 border-t border-slate-100">
-                <h3 class="text-xs font-extrabold uppercase tracking-wider text-orange-600 mb-3">2. Akun Login Penjual (Read-only)</h3>
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-orange-600 mb-3">2. Akun Login Penjual</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Email Login Vendor</label>
@@ -100,22 +100,6 @@
             </div>
             @endif
 
-            <!-- Section 3: Informasi Rekening (Dikelola Mandiri oleh Vendor) -->
-            <div class="pt-4 border-t border-slate-100">
-                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">3. Rekening Pencairan QRIS (Dikelola Mandiri oleh Vendor)</h3>
-                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-                    @if($stand->nomor_rekening)
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span class="font-black text-slate-800">{{ $stand->bank_name ?? 'Bank / E-Wallet' }}</span>
-                        <span class="font-mono text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200 font-bold">{{ $stand->nomor_rekening }}</span>
-                        <span class="text-slate-500">a.n {{ $stand->atas_nama ?? $stand->pemilik }}</span>
-                        <span class="text-[10px] text-slate-400 ml-auto italic">Diatur oleh vendor melalui panel vendor</span>
-                    </div>
-                    @else
-                    <span class="text-amber-600 font-medium text-xs">Vendor belum mendaftarkan rekening di panel vendor. Rekening hanya dapat diatur dan diedit oleh vendor.</span>
-                    @endif
-                </div>
-            </div>
 
             <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                 <a href="{{ route('admin.stands.index') }}"
