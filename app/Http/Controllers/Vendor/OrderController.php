@@ -101,11 +101,20 @@ class OrderController extends Controller
         $orders = $query->latest()->paginate(15)->withQueryString();
 
         return view('vendor.dashboard', compact(
-            'stand', 'orders',
-            'pendingOrdersCount', 'siapDiambilOrdersCount',
-            'activeOrdersCount', 'totalOrdersToday', 'completedOrdersCount', 'revenueToday',
-            'cashRevenue', 'cashUnpaid', 'qrisRevenue', 'qrisPendingPayout',
-            'periode', 'periodeLabel',
+            'stand',
+            'orders',
+            'pendingOrdersCount',
+            'siapDiambilOrdersCount',
+            'activeOrdersCount',
+            'totalOrdersToday',
+            'completedOrdersCount',
+            'revenueToday',
+            'cashRevenue',
+            'cashUnpaid',
+            'qrisRevenue',
+            'qrisPendingPayout',
+            'periode',
+            'periodeLabel',
         ) + ['activeStatus' => $request->status ?? 'all']);
     }
 
@@ -185,10 +194,19 @@ class OrderController extends Controller
         $activeOrdersCount = Order::where('stand_id', $standId)->whereIn('status', ['pending', 'diproses', 'siap_diambil'])->count();
 
         return view('vendor.omset', compact(
-            'stand', 'periode', 'periodeLabel',
-            'totalOmset', 'totalOrders', 'selesaiOrders', 'batalOrders',
-            'cashRevenue', 'qrisRevenue', 'qrisPendingPayout',
-            'topMenus', 'orders', 'activeOrdersCount',
+            'stand',
+            'periode',
+            'periodeLabel',
+            'totalOmset',
+            'totalOrders',
+            'selesaiOrders',
+            'batalOrders',
+            'cashRevenue',
+            'qrisRevenue',
+            'qrisPendingPayout',
+            'topMenus',
+            'orders',
+            'activeOrdersCount',
         ));
     }
 

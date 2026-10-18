@@ -10,7 +10,7 @@
 
 <a href="{{ route('vendor.omset') }}" class="sidebar-link {{ request()->routeIs('vendor.omset') ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
-    <span>Laporan Omset</span>
+    <span>Laporan & Omset</span>
 </a>
 
 <a href="{{ route('vendor.rekening.index') }}" class="sidebar-link {{ request()->routeIs('vendor.rekening.*') ? 'active' : '' }}">
@@ -18,22 +18,33 @@
     <span>Rekening Pencairan</span>
 </a>
 
-<a href="{{ route('vendor.dashboard', ['status' => 'all']) }}" class="sidebar-link {{ request()->routeIs('vendor.dashboard') && request()->has('status') ? 'active' : '' }}">
-    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" /></svg>
-    <span>Status Pesanan</span>
-    @if(isset($activeOrdersCount) && $activeOrdersCount > 0)
-    <span class="ml-auto text-[10px] font-black bg-orange-500 text-white px-2 py-0.5 rounded-full">{{ $activeOrdersCount }}</span>
+<div class="pt-3 pb-1 px-2">
+    <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Status Pesanan</span>
+</div>
+
+<a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'pending'])) }}" class="sidebar-link {{ request()->routeIs('vendor.dashboard') && request('status') === 'pending' ? 'active' : '' }}">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+    <span>Perlu Disiapkan</span>
+    @if(isset($pendingOrdersCount) && $pendingOrdersCount > 0)
+    <span class="ml-auto text-[10px] font-black {{ request('status') === 'pending' ? 'bg-white/20 text-white' : 'bg-orange-500 text-white' }} px-2 py-0.5 rounded-full">{{ $pendingOrdersCount }}</span>
     @endif
 </a>
 
-<div class="pt-3 pb-1 px-2">
-    <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Stand</span>
-</div>
-
-@if(isset($stand) && $stand)
-<a href="{{ route('katalog.index', ['stand' => $stand->id]) }}" target="_blank" class="sidebar-link group">
-    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-    <span>Pratinjau Stand</span>
-    <svg class="w-3.5 h-3.5 ml-auto text-slate-500 group-hover:text-orange-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+<a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'siap_diambil'])) }}" class="sidebar-link {{ request()->routeIs('vendor.dashboard') && request('status') === 'siap_diambil' ? 'active' : '' }}">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
+    <span>Siap Diambil</span>
+    @if(isset($siapDiambilOrdersCount) && $siapDiambilOrdersCount > 0)
+    <span class="ml-auto text-[10px] font-black {{ request('status') === 'siap_diambil' ? 'bg-white/20 text-white' : 'bg-blue-500 text-white' }} px-2 py-0.5 rounded-full">{{ $siapDiambilOrdersCount }}</span>
+    @endif
 </a>
-@endif
+
+<a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'menunggu_pembayaran'])) }}" class="sidebar-link {{ request()->routeIs('vendor.dashboard') && request('status') === 'menunggu_pembayaran' ? 'active' : '' }}">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6H2.25m0 0H3m-3 0h3m0 0a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6a2.25 2.25 0 0 1 2.25-2.25Z" /></svg>
+    <span>Belum Bayar</span>
+</a>
+
+<a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'selesai'])) }}" class="sidebar-link {{ request()->routeIs('vendor.dashboard') && request('status') === 'selesai' ? 'active' : '' }}">
+    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+    <span>Selesai</span>
+</a>
+

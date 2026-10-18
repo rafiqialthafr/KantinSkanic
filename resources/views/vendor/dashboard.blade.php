@@ -34,8 +34,8 @@
     </div>
     @endif
 
-    {{-- STATISTIK (HANYA DITAMPILKAN DI TABLET/DESKTOP, DI MOBILE LANGSUNG FOKUS KE PESANAN) --}}
-    <div class="hidden md:block space-y-4">
+    {{-- STATISTIK (MUNCUL DI MOBILE DAN DESKTOP) --}}
+    <div class="space-y-4">
         <div class="flex items-center justify-between gap-2">
             <div>
                 <h2 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Ringkasan Statistik</h2>
