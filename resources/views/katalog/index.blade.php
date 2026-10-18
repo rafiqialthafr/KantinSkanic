@@ -397,11 +397,11 @@
         <!-- Backdrop -->
         <div id="cart-backdrop" onclick="closeCartModal()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity opacity-0"></div>
 
-        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
-            <div id="cart-panel" class="w-screen max-w-md bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10 w-full sm:w-auto">
+            <div id="cart-panel" class="w-full sm:w-[420px] md:w-[448px] max-w-full bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
 
                 <!-- Header Drawer -->
-                <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/90">
+                <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/90">
                     <div class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -413,7 +413,7 @@
                             <p class="text-[11px] text-slate-400">Pemesanan makanan siswa tanpa antre</p>
                         </div>
                     </div>
-                    <button type="button" onclick="closeCartModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition-colors" aria-label="Tutup">
+                    <button type="button" onclick="closeCartModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer" aria-label="Tutup">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
@@ -421,7 +421,7 @@
                 </div>
 
                 <!-- Body: Item List & Checkout Form -->
-                <div class="flex-1 overflow-y-auto p-5 space-y-6">
+                <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 sm:space-y-6">
 
                     <!-- Item List Section -->
                     <div>
@@ -483,26 +483,26 @@
                         <input type="hidden" id="input-nama" value="{{ $pemesanNama }}">
                         <input type="hidden" id="input-kelas" value="{{ $pemesanKelas }}">
 
-                        <div class="rounded-2xl bg-gradient-to-r from-orange-50/80 to-amber-50/50 border border-orange-200/70 p-3.5 flex items-center justify-between gap-3 shadow-2xs">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                        <div class="rounded-2xl bg-gradient-to-r from-orange-50/80 to-amber-50/50 border border-orange-200/70 p-3 sm:p-3.5 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
+                            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
                                     {{ strtoupper(substr($pemesanNama, 0, 1)) }}
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="flex items-center gap-2">
-                                        <h4 class="text-sm font-extrabold text-slate-900 truncate">{{ $pemesanNama }}</h4>
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-orange-100 text-orange-700 shrink-0">
+                                    <div class="flex items-center gap-1.5 sm:gap-2">
+                                        <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">{{ $pemesanNama }}</h4>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black bg-orange-100 text-orange-700 shrink-0">
                                             {{ $pemesanKelas }}
                                         </span>
                                     </div>
-                                    <p class="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate mt-0.5">
                                         {{ auth()->user()->email }}
                                     </p>
                                 </div>
                             </div>
                             <div class="text-right shrink-0">
-                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60">
-                                    <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-emerald-200/60 whitespace-nowrap">
+                                    <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                     </svg>
                                     <span>Akun Terverifikasi</span>

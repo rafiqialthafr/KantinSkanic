@@ -432,13 +432,30 @@ class OrderCheckoutController extends Controller
     public function getRealtimeStatuses(Request $request): JsonResponse
     {
         $orderIds = $request->input('order_ids', []);
-        if (empty($orderIds)) {
+        $orderCodes = $request->input('order_codes', []);
+
+        if (empty($orderIds) && empty($orderCodes)) {
             return response()->json(['success' => true, 'orders' => []]);
         }
 
-        $orders = Order::with('parentOrder')
-            ->whereIn('id', $orderIds)
-            ->get();
+        $query = Order::with(['parentOrder', 'stand']);
+
+        if (! empty($orderIds) && ! empty($orderCodes)) {
+            $query->where(function ($q) use ($orderIds, $orderCodes) {
+                $q->whereIn('id', $orderIds)
+                    ->orWhereIn('kode_tr', $orderCodes)
+                    ->orWhereIn('ticket_code', $orderCodes);
+            });
+        } elseif (! empty($orderIds)) {
+            $query->whereIn('id', $orderIds);
+        } else {
+            $query->where(function ($q) use ($orderCodes) {
+                $q->whereIn('kode_tr', $orderCodes)
+                    ->orWhereIn('ticket_code', $orderCodes);
+            });
+        }
+
+        $orders = $query->get();
 
         foreach ($orders as $order) {
             if ($order->isQris() && ! $order->isLunas() && $order->parentOrder) {
@@ -453,10 +470,14 @@ class OrderCheckoutController extends Controller
         $data = $orders->map(function ($order) {
             return [
                 'id' => $order->id,
+                'kode_tr' => $order->kode_tr,
+                'ticket_code' => $order->ticket_code ?: $order->kode_tr,
                 'status' => $order->status,
                 'status_pembayaran' => $order->status_pembayaran,
                 'is_lunas' => $order->isLunas(),
                 'is_qris' => $order->isQris(),
+                'stand_name' => $order->stand?->nama_stand ?? 'Stand Kantin',
+                'stand_num' => $order->stand?->nomor_stand ?? '-',
                 'batch_kode' => $order->batch_kode ?: ($order->parentOrder?->order_id ?: $order->kode_tr),
             ];
         });

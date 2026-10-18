@@ -125,7 +125,7 @@
                     <span class="inline-flex flex-col items-center relative">
                         <span class="leading-normal flex items-center justify-center gap-1.5">
                             <span>{{ $tab['label'] }}</span>
-                            @if($key !== 'all' && ($tab['count'] ?? 0) > 0)
+                            @if($key !== 'all' && $key !== 'selesai' && ($tab['count'] ?? 0) > 0)
                             <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black leading-none transition-colors
                                   {{ $isActive
                                      ? 'bg-orange-500 text-white shadow-2xs'
@@ -199,8 +199,11 @@
                             <!-- 2. Status Pengerjaan Makanan -->
                             <span id="order-status-badge-{{ $order->id }}">
                             @if($order->status === 'siap_diambil')
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-teal-50 text-teal-700 border border-teal-200">
-                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping"></span>
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
+                                <span class="relative flex h-2 w-2 shrink-0">
+                                    <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
                                 <span>Siap Diambil</span>
                             </span>
                             @elseif($order->status === 'diproses')
@@ -329,6 +332,8 @@
                         <!-- Tombol 'Lihat Struk' -->
                         @php
                             $receiptPayload = [
+                                'id' => $order->id,
+                                'kode_tr' => $order->kode_tr,
                                 'ticket_code' => $ticketCode,
                                 'batch_code' => $batchCode,
                                 'stand_name' => $order->stand->nama_stand ?? 'Stand Kantin',
@@ -597,6 +602,7 @@
     });
 
     let currentModalTicketCode = '';
+    let currentModalReceiptData = null;
 
     function copyModalTicketCode() {
         if (currentModalTicketCode) {
@@ -698,57 +704,88 @@
         return '';
     }
 
+    function updateReceiptModalDynamicContent(data) {
+        if (!data) return;
+
+        // Dynamic Header Banner Gradient based on Status
+        const banner = document.getElementById('receipt-header-banner');
+        if (banner) {
+            banner.className = 'p-6 text-center text-white relative overflow-hidden transition-colors ' + (
+                data.status === 'siap_diambil' ? 'bg-gradient-to-br from-emerald-500 via-teal-600 to-emerald-700' :
+                data.status === 'diproses' ? 'bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600' :
+                data.status === 'selesai' ? 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900' :
+                data.status === 'dibatalkan' ? 'bg-gradient-to-br from-rose-600 via-red-600 to-rose-700' :
+                'bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600'
+            );
+        }
+
+        const ticketElem = document.getElementById('receipt-ticket-code');
+        if (ticketElem && (data.ticket_code || data.kode_tr)) {
+            ticketElem.textContent = '#' + (data.ticket_code || data.kode_tr);
+        }
+
+        // Determine effective display status
+        let effectiveStatus = data.status;
+        if (data.is_qris && !data.is_lunas && data.status !== 'dibatalkan') {
+            effectiveStatus = 'menunggu_pembayaran';
+        } else if (data.status === 'pending' || data.status === 'menunggu') {
+            effectiveStatus = 'pending';
+        }
+
+        const statusBadgeMap = {
+            menunggu_pembayaran: { label: 'Belum Bayar', cls: 'bg-amber-500 border-amber-200', dot: true },
+            pending: { label: 'Menunggu', cls: 'bg-amber-500 border-amber-200', dot: true },
+            diproses: { label: 'Sedang Dimasak', cls: 'bg-orange-500 border-orange-200', dot: true },
+            siap_diambil: { label: 'Siap Diambil', cls: 'bg-emerald-500 border-emerald-200', dot: true },
+            selesai: { label: 'Selesai', cls: 'bg-slate-600 border-slate-400', dot: false },
+            dibatalkan: { label: 'Dibatalkan', cls: 'bg-rose-500 border-rose-200', dot: false }
+        };
+        const statusInfo = statusBadgeMap[effectiveStatus] || { label: effectiveStatus || '-', cls: 'bg-amber-500 border-amber-200', dot: false };
+
+        const payBadge = document.getElementById('receipt-payment-badge');
+        if (payBadge) {
+            payBadge.innerHTML = `
+                <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full ${statusInfo.cls} text-white shadow-md border-2 font-black text-xs sm:text-sm tracking-wide uppercase transition-all duration-300">
+                    ${statusInfo.dot ? '<span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>' : ''}
+                    <span>${statusInfo.label}</span>
+                </div>
+            `;
+        }
+
+        const payDesc = document.getElementById('receipt-payment-method-desc');
+        if (payDesc) {
+            payDesc.innerHTML = `<strong class="font-extrabold text-slate-800 text-sm block">${data.is_qris ? 'QRIS' : 'COD'}</strong>`;
+        }
+
+        // Stepper & Alert
+        const stepperContainer = document.getElementById('receipt-stepper-container');
+        if (stepperContainer) {
+            stepperContainer.innerHTML = renderReceiptStepper(data.status);
+        }
+        const alertContainer = document.getElementById('receipt-alert-container');
+        if (alertContainer) {
+            alertContainer.innerHTML = renderReceiptAlert(data.status, data.stand_name, data.stand_num);
+        }
+    }
+
     // Modal Struk Pengambilan Digital (Floating - Tanpa QRIS/QR Code)
     function openDigitalReceiptModal(data) {
         const modal = document.getElementById('digital-receipt-modal');
         const card = document.getElementById('digital-receipt-card');
         if (!modal || !card) return;
 
+        currentModalReceiptData = { ...data };
         currentModalTicketCode = data.ticket_code || data.kode_tr || '';
 
-        // Dynamic Header Banner Gradient based on Status
-        const banner = document.getElementById('receipt-header-banner');
-        banner.className = 'p-6 text-center text-white relative overflow-hidden transition-colors ' + (
-            data.status === 'siap_diambil' ? 'bg-gradient-to-br from-emerald-500 via-teal-600 to-emerald-700' :
-            data.status === 'diproses' ? 'bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600' :
-            data.status === 'selesai' ? 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900' :
-            data.status === 'dibatalkan' ? 'bg-gradient-to-br from-rose-600 via-red-600 to-rose-700' :
-            'bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600'
-        );
+        // Dynamic Header & Status Badge
+        updateReceiptModalDynamicContent(currentModalReceiptData);
 
-        document.getElementById('receipt-ticket-code').textContent = '#' + currentModalTicketCode;
         document.getElementById('receipt-stand-name').textContent = data.stand_name || 'Stand Kantin';
         document.getElementById('receipt-stand-num').textContent = data.stand_num && data.stand_num !== '-' ? data.stand_num : '';
         document.getElementById('receipt-customer-name').textContent = data.nama_pemesan || 'Siswa';
         document.getElementById('receipt-customer-class').textContent = 'Kelas: ' + (data.kelas || '-');
         document.getElementById('receipt-created-at').textContent = data.created_at || '-';
         document.getElementById('receipt-total').textContent = 'Rp ' + Number(data.total_harga || 0).toLocaleString('id-ID');
-
-        // Badge header = STATUS PESANAN; Metode pembayaran = hanya "COD" atau "QRIS"
-        const statusBadgeMap = {
-            menunggu_pembayaran: { label: 'Belum Bayar', cls: 'bg-amber-500 border-amber-200', dot: true },
-            pending: { label: 'Menunggu Dikonfirmasi', cls: 'bg-amber-500 border-amber-200', dot: true },
-            diproses: { label: 'Sedang Dimasak', cls: 'bg-orange-500 border-orange-200', dot: true },
-            siap_diambil: { label: 'Siap Diambil', cls: 'bg-emerald-500 border-emerald-200', dot: true },
-            selesai: { label: 'Selesai', cls: 'bg-slate-600 border-slate-400', dot: false },
-            dibatalkan: { label: 'Dibatalkan', cls: 'bg-rose-500 border-rose-200', dot: false }
-        };
-        const statusInfo = statusBadgeMap[data.status] || { label: data.status || '-', cls: 'bg-amber-500 border-amber-200', dot: false };
-
-        const payBadge = document.getElementById('receipt-payment-badge');
-        payBadge.innerHTML = `
-            <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full ${statusInfo.cls} text-white shadow-md border-2 font-black text-xs sm:text-sm tracking-wide uppercase">
-                ${statusInfo.dot ? '<span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>' : ''}
-                <span>${statusInfo.label}</span>
-            </div>
-        `;
-
-        const payDesc = document.getElementById('receipt-payment-method-desc');
-        payDesc.innerHTML = `<strong class="font-extrabold text-slate-800 text-sm block">${data.is_qris ? 'QRIS' : 'COD'}</strong>`;
-
-        // Stepper & Alert
-        document.getElementById('receipt-stepper-container').innerHTML = renderReceiptStepper(data.status);
-        document.getElementById('receipt-alert-container').innerHTML = renderReceiptAlert(data.status, data.stand_name, data.stand_num);
 
         // Items list
         const itemsList = document.getElementById('receipt-items-list');
@@ -787,12 +824,18 @@
         modal.classList.remove('opacity-0', 'pointer-events-none');
         card.classList.remove('scale-95');
         card.classList.add('scale-100');
+
+        // Immediate poll check
+        pollActiveOrderStatuses();
     }
 
     function closeDigitalReceiptModal() {
         const modal = document.getElementById('digital-receipt-modal');
         const card = document.getElementById('digital-receipt-card');
         if (!modal || !card) return;
+
+        currentModalReceiptData = null;
+        currentModalTicketCode = '';
 
         card.classList.remove('scale-100');
         card.classList.add('scale-95');
@@ -847,7 +890,26 @@
 
     let isPolling = false;
     async function pollActiveOrderStatuses() {
-        if (activeOrderIds.length === 0 || isPolling) return;
+        if (isPolling) return;
+
+        const idsToPoll = [...activeOrderIds];
+        const codesToPoll = [];
+
+        if (currentModalReceiptData) {
+            const mId = parseInt(currentModalReceiptData.id);
+            if (mId && !idsToPoll.includes(mId)) {
+                idsToPoll.push(mId);
+            }
+            if (currentModalReceiptData.ticket_code && !codesToPoll.includes(currentModalReceiptData.ticket_code)) {
+                codesToPoll.push(currentModalReceiptData.ticket_code);
+            }
+            if (currentModalReceiptData.kode_tr && !codesToPoll.includes(currentModalReceiptData.kode_tr)) {
+                codesToPoll.push(currentModalReceiptData.kode_tr);
+            }
+        }
+
+        if (idsToPoll.length === 0 && codesToPoll.length === 0) return;
+
         isPolling = true;
         try {
             const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -858,23 +920,56 @@
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrf || ''
                 },
-                body: JSON.stringify({ order_ids: activeOrderIds })
+                body: JSON.stringify({ 
+                    order_ids: idsToPoll,
+                    order_codes: codesToPoll 
+                })
             });
 
             if (res.ok) {
                 const data = await res.json();
                 if (data.success && Array.isArray(data.orders)) {
                     data.orders.forEach(ord => {
+                        // 1. Update Card in DOM if on page
                         const card = document.getElementById(`order-card-${ord.id}`);
-                        if (!card) return;
+                        if (card) {
+                            const prevStatus = card.getAttribute('data-status');
+                            const prevLunas = card.getAttribute('data-is-lunas') === '1';
 
-                        const prevStatus = card.getAttribute('data-status');
-                        const prevLunas = card.getAttribute('data-is-lunas') === '1';
+                            if (prevStatus !== ord.status || prevLunas !== ord.is_lunas) {
+                                card.setAttribute('data-status', ord.status);
+                                card.setAttribute('data-is-lunas', ord.is_lunas ? '1' : '0');
+                                updateOrderBadgesDOM(ord);
 
-                        if (prevStatus !== ord.status || prevLunas !== ord.is_lunas) {
-                            card.setAttribute('data-status', ord.status);
-                            card.setAttribute('data-is-lunas', ord.is_lunas ? '1' : '0');
-                            updateOrderBadgesDOM(ord);
+                                const receiptBtn = card.querySelector('button[data-receipt]');
+                                if (receiptBtn) {
+                                    try {
+                                        const rData = JSON.parse(receiptBtn.getAttribute('data-receipt'));
+                                        rData.status = ord.status;
+                                        rData.is_lunas = ord.is_lunas;
+                                        rData.is_qris = ord.is_qris;
+                                        receiptBtn.setAttribute('data-receipt', JSON.stringify(rData));
+                                    } catch(e) {}
+                                }
+                            }
+                        }
+
+                        // 2. Real-time update open receipt modal
+                        if (currentModalReceiptData) {
+                            const isMatch = (currentModalReceiptData.id && parseInt(currentModalReceiptData.id) === parseInt(ord.id)) ||
+                                (currentModalReceiptData.ticket_code && (currentModalReceiptData.ticket_code === ord.ticket_code || currentModalReceiptData.ticket_code === ord.kode_tr)) ||
+                                (currentModalReceiptData.kode_tr && (currentModalReceiptData.kode_tr === ord.kode_tr || currentModalReceiptData.kode_tr === ord.ticket_code));
+
+                            if (isMatch) {
+                                if (currentModalReceiptData.status !== ord.status || currentModalReceiptData.is_lunas !== ord.is_lunas) {
+                                    currentModalReceiptData.status = ord.status;
+                                    currentModalReceiptData.is_lunas = ord.is_lunas;
+                                    currentModalReceiptData.is_qris = ord.is_qris;
+                                    if (ord.stand_name) currentModalReceiptData.stand_name = ord.stand_name;
+                                    if (ord.stand_num) currentModalReceiptData.stand_num = ord.stand_num;
+                                    updateReceiptModalDynamicContent(currentModalReceiptData);
+                                }
+                            }
                         }
                     });
                 }
@@ -916,8 +1011,11 @@
         let statusBadgeHtml = '';
         if (ord.status === 'siap_diambil') {
             statusBadgeHtml = `
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black bg-teal-50 text-teal-700 border border-teal-200">
-                    <span class="w-2 h-2 rounded-full bg-teal-500 animate-ping"></span>
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
+                    <span class="relative flex h-2 w-2 shrink-0">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
                     <span>Siap Diambil</span>
                 </span>
             `;
@@ -955,9 +1053,8 @@
         badgesContainer.innerHTML = paymentBadgeHtml + `<span id="order-status-badge-${ord.id}">${statusBadgeHtml}</span>`;
     }
 
-    if (activeOrderIds.length > 0) {
-        setInterval(pollActiveOrderStatuses, 3000);
-    }
+    // Auto polling interval (every 2.5s)
+    setInterval(pollActiveOrderStatuses, 2500);
 
     // Snap Payment Handler for "Bayar Ulang via QRIS"
     async function payWithSnap(orderId, btnElement) {

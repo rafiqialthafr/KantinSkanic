@@ -356,11 +356,11 @@
         }
     } catch (e) {}
 
-    // Auto refresh status every 8 seconds if order is active
-    @if(in_array($order->status, ['pending', 'diproses', 'siap_diambil']))
+    // Auto refresh status every 5 seconds if order is active
+    @if(in_array($order->status, ['pending', 'diproses', 'siap_diambil', 'menunggu_pembayaran']) || (!$order->isLunas() && $order->isQris()))
     setInterval(() => {
         window.location.reload();
-    }, 8000);
+    }, 5000);
     @endif
 </script>
 @endpush

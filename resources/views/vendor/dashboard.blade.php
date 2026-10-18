@@ -162,9 +162,12 @@
                             Perlu Disiapkan
                         </span>
                     @elseif($order->status === 'siap_diambil')
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200/80">
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                            Siap Diambil
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200">
+                            <span class="relative flex h-2 w-2 shrink-0">
+                                <span class="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                            </span>
+                            <span>Siap Diambil</span>
                         </span>
                     @elseif($order->status === 'selesai')
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200/80">

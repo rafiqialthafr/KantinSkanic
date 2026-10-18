@@ -50,12 +50,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/orders/{orderId}/sync-status', [OrderCheckoutController::class, 'syncStatus'])->name('api.orders.sync-status');
     Route::get('/api/orders/{orderId}/status', [OrderCheckoutController::class, 'getStatus'])->name('api.orders.status');
     Route::post('/api/orders/{orderId}/cancel-checkout', [OrderCheckoutController::class, 'cancelCheckout'])->name('api.orders.cancel-checkout');
-    Route::post('/api/orders/realtime-statuses', [OrderCheckoutController::class, 'getRealtimeStatuses'])->name('api.orders.realtime-statuses');
 });
 
 // Public status sync endpoint (accessible if user has ticket/order ID)
 Route::post('/api/orders/{orderId}/sync-public', [OrderCheckoutController::class, 'syncStatus'])->name('api.orders.sync-public');
 Route::post('/api/orders/{orderId}/cancel-checkout-public', [OrderCheckoutController::class, 'cancelCheckout'])->name('api.orders.cancel-checkout-public');
+Route::post('/api/orders/realtime-statuses', [OrderCheckoutController::class, 'getRealtimeStatuses'])->name('api.orders.realtime-statuses');
 Route::post('/api/orders/realtime-statuses-public', [OrderCheckoutController::class, 'getRealtimeStatuses'])->name('api.orders.realtime-statuses-public');
 
 // ==========================================================

@@ -244,4 +244,72 @@ class RiwayatPesananTest extends TestCase
         $responseBelumBayar->assertDontSee('SKNC-STD1-2222');
         $responseBelumBayar->assertDontSee('SKNC-STD1-3333');
     }
+
+    public function test_realtime_statuses_endpoint_returns_order_status_by_id_and_code(): void
+    {
+        $stand = Stand::first();
+        $order = Order::create([
+            'kode_tr' => 'SKNC-RT-1234',
+            'ticket_code' => 'SKNC-RT-1234',
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Realtime Test',
+            'kelas' => 'XII RPL',
+            'total_harga' => 10000,
+            'metode_pembayaran' => 'tunai',
+            'status' => 'pending',
+            'status_pembayaran' => 'belum_lunas',
+        ]);
+
+        $response = $this->postJson(route('api.orders.realtime-statuses'), [
+            'order_ids' => [$order->id],
+            'order_codes' => ['SKNC-RT-1234'],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+        $response->assertJsonFragment([
+            'id' => $order->id,
+            'kode_tr' => 'SKNC-RT-1234',
+            'status' => 'pending',
+            'is_lunas' => false,
+            'stand_name' => $stand->nama_stand,
+        ]);
+    }
+
+    public function test_selesai_tab_does_not_display_numeric_indicator_badge(): void
+    {
+        $stand = Stand::first();
+        $student = User::create([
+            'name' => 'Selesai Test User',
+            'email' => 'selesai@user.com',
+            'password' => bcrypt('password123'),
+            'role' => 'siswa',
+        ]);
+
+        Order::create([
+            'kode_tr' => 'SKNC-DONE-999',
+            'user_id' => $student->id,
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Selesai Test User',
+            'kelas' => 'XII RPL',
+            'total_harga' => 10000,
+            'status' => 'selesai',
+            'status_pembayaran' => 'lunas',
+        ]);
+
+        $this->actingAs($student);
+        $response = $this->get('/riwayat-pesanan');
+        $response->assertStatus(200);
+
+        // Confirm Selesai tab exists but does NOT have badge counter
+        $response->assertSee('data-tab-key="selesai"', false);
+        // The tab contains 'Selesai' label, but shouldn't contain a counter badge for selesai
+        $content = $response->getContent();
+        preg_match('/data-tab-key="selesai"[^>]*>(.*?)<\/a>/s', $content, $matches);
+        $this->assertNotEmpty($matches);
+        $selesaiTabHtml = $matches[1];
+        $this->assertStringNotContainsString('rounded-full text-[10px]', $selesaiTabHtml);
+    }
 }
