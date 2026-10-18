@@ -148,7 +148,7 @@
                             @elseif(Auth::user()->isPenjual())
                                 Vendor Stand
                             @else
-                                Siswa
+                                {{ Auth::user()->kelas ?? 'Siswa' }}
                             @endif
                         </span>
                     </div>

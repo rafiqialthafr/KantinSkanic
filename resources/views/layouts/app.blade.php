@@ -245,17 +245,36 @@
                     </button>
 
                     @auth
-                    <!-- Authenticated User Menu: Avatar Only with Dropdown (Hidden di mobile, hanya di desktop) -->
-                    <div class="relative shrink-0 hidden md:flex items-center" id="user-profile-menu-container">
-                        <!-- Avatar Button (Bulat dengan outline hitam) -->
+                    <!-- Authenticated User Menu: Like Admin Profile (Nama & Kelas + Avatar Circle) with Dropdown -->
+                    <div class="relative shrink-0 flex items-center" id="user-profile-menu-container">
+                        <!-- Profile Trigger Button -->
                         <button type="button"
                             id="user-profile-btn"
                             onclick="toggleUserProfileDropdown(event)"
-                            class="shrink-0 aspect-square w-9 h-9 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-black text-xs sm:text-sm flex items-center justify-center p-0 leading-none border-2 active:scale-95 transition-all cursor-pointer focus:outline-hidden"
+                            class="flex items-center gap-2 sm:gap-3 p-1 rounded-2xl hover:bg-slate-100/70 active:scale-98 transition-all cursor-pointer focus:outline-hidden group text-left"
                             aria-expanded="false"
                             aria-haspopup="true"
                             title="{{ Auth::user()->name }}">
-                            <span class="leading-none select-none">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                            <div class="hidden sm:flex flex-col text-right">
+                                <span class="text-xs sm:text-sm font-extrabold text-slate-800 leading-tight group-hover:text-orange-600 transition-colors max-w-[140px] sm:max-w-[180px] truncate">
+                                    {{ Auth::user()->name }}
+                                </span>
+                                <span class="text-[10px] sm:text-xs font-semibold text-slate-400 leading-tight mt-0.5 truncate">
+                                    @if(Auth::user()->isSiswa())
+                                        {{ Auth::user()->kelas ?? 'Siswa' }}
+                                    @elseif(Auth::user()->isAdmin())
+                                        Super Admin
+                                    @elseif(Auth::user()->isPenjual())
+                                        Vendor Stand
+                                    @else
+                                        {{ Auth::user()->kelas ?? 'Siswa' }}
+                                    @endif
+                                </span>
+                            </div>
+                            <!-- Profile Avatar -->
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white font-black text-xs sm:text-sm shrink-0 shadow-sm border-2 border-white ring-2 ring-orange-500/20 group-hover:ring-orange-500/40 transition-all">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
                         </button>
 
                         <!-- Dropdown Popup Card (Kembali ke layout lengkap: Nama, Kelas, Email, Logout — tanpa menu Riwayat) -->
