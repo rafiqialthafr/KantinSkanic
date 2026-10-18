@@ -251,7 +251,7 @@
                                 <svg class="w-3.5 h-3.5 text-orange-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                 </svg>
-                                <span>Lihat Bukti Foto</span>
+                                <span>Lihat</span>
                             </button>
                             @else
                             <span class="text-slate-400 text-[10px] italic">Tidak ada foto</span>
@@ -295,7 +295,7 @@
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="min-w-0 pr-3">
                     <h3 class="text-sm sm:text-base font-black text-slate-900 truncate" id="lightbox-title">Bukti Transfer</h3>
-                    <p class="text-[11px] text-slate-400">Tangkapan layar bukti transfer pencairan saldo QRIS dari Admin</p>
+                    <p class="text-[11px] text-slate-400">Bukti transfer pencairan saldo QRIS dari Admin</p>
                 </div>
                 <button type="button" onclick="closeImagePreview()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center font-bold text-lg cursor-pointer shrink-0">&times;</button>
             </div>

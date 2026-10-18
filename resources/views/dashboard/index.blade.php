@@ -145,10 +145,16 @@
                                 @else bg-rose-100 text-rose-700 @endif">
                                 {{ str_replace('_', ' ', $order->status) }}
                             </span>
-                            @if($order->status_pembayaran === 'lunas')
-                            <span class="px-2.5 py-0.5 text-[10px] font-black rounded-full bg-emerald-500 text-white shadow-2xs">
-                                ✓ QRIS
-                            </span>
+                            @if($order->isLunas())
+                                @if($order->isQris())
+                                <span class="px-2.5 py-0.5 text-[10px] font-black rounded-full bg-emerald-500 text-white shadow-2xs">
+                                    ✓ QRIS LUNAS
+                                </span>
+                                @else
+                                <span class="px-2.5 py-0.5 text-[10px] font-black rounded-full bg-emerald-500 text-white shadow-2xs">
+                                    ✓ TUNAI LUNAS
+                                </span>
+                                @endif
                             @elseif($order->metode_pembayaran === 'tunai' || $order->metode_pembayaran === 'cod')
                             <span class="px-2.5 py-0.5 text-[10px] font-black rounded-full bg-amber-500 text-white shadow-2xs">
                                 💵 BAYAR DI TEMPAT (COD)

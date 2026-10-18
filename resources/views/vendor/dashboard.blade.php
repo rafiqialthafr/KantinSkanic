@@ -275,7 +275,7 @@
 
                 <!-- Sequential Status Progression & Actions -->
                 <div class="flex items-center gap-2 flex-wrap">
-                    @if($order->isTunai() && $order->isBelumLunas() && $order->status !== 'dibatalkan')
+                    @if($order->isTunai() && $order->isBelumLunas() && !in_array($order->status, ['selesai', 'dibatalkan']))
                     <form action="{{ route('vendor.orders.markPaid', $order) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1">

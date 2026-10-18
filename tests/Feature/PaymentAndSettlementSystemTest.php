@@ -160,6 +160,25 @@ class PaymentAndSettlementSystemTest extends TestCase
 
         $order->refresh();
         $this->assertEquals('lunas', $order->status_pembayaran);
+
+        // Verify that completing a COD order automatically sets status_pembayaran to lunas
+        $order2 = Order::create([
+            'kode_tr' => 'COD-AUTO-1',
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Budi Siswa',
+            'kelas' => 'XII RPL 1',
+            'total_harga' => 15000,
+            'metode_pembayaran' => 'tunai',
+            'status_pembayaran' => 'belum_lunas',
+            'status' => 'siap_diambil',
+        ]);
+
+        $this->post(route('vendor.orders.updateStatus', $order2), ['status' => 'selesai']);
+        $order2->refresh();
+        $this->assertEquals('selesai', $order2->status);
+        $this->assertEquals('lunas', $order2->status_pembayaran);
+        $this->assertTrue($order2->isLunas());
+        $this->assertFalse($order2->isBelumLunas());
     }
 
     public function test_super_admin_can_view_settlements_and_process_payout(): void

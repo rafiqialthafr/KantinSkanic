@@ -137,9 +137,12 @@ class DashboardController extends Controller
             }
         }
 
-        $order->update([
-            'status' => $newStatus,
-        ]);
+        $updateData = ['status' => $newStatus];
+        if ($newStatus === 'selesai' && $order->isTunai()) {
+            $updateData['status_pembayaran'] = 'lunas';
+        }
+
+        $order->update($updateData);
 
         $statusLabels = [
             'pending' => 'Menunggu Konfirmasi',

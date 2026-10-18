@@ -51,6 +51,16 @@ class Order extends Model
         return $this->status;
     }
 
+    protected static function booted(): void
+    {
+        static::saving(function (Order $order) {
+            // Jika pesanan COD / Tunai sudah selesai, otomatis berstatus lunas
+            if ($order->status === 'selesai' && $order->isTunai()) {
+                $order->status_pembayaran = 'lunas';
+            }
+        });
+    }
+
     public function isQris(): bool
     {
         return $this->metode_pembayaran === 'qris';
@@ -63,12 +73,12 @@ class Order extends Model
 
     public function isLunas(): bool
     {
-        return $this->status_pembayaran === 'lunas';
+        return $this->status_pembayaran === 'lunas' || ($this->isTunai() && $this->status === 'selesai');
     }
 
     public function isBelumLunas(): bool
     {
-        return $this->status_pembayaran === 'belum_lunas';
+        return $this->status_pembayaran === 'belum_lunas' && ! ($this->isTunai() && $this->status === 'selesai');
     }
 
     public function parentOrder(): BelongsTo

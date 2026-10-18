@@ -237,7 +237,12 @@ class OrderController extends Controller
             }
         }
 
-        $order->update(['status' => $newStatus]);
+        $updateData = ['status' => $newStatus];
+        if ($newStatus === 'selesai' && $order->isTunai()) {
+            $updateData['status_pembayaran'] = 'lunas';
+        }
+
+        $order->update($updateData);
 
         $labels = [
             'pending' => 'Menunggu Konfirmasi',
@@ -290,7 +295,11 @@ class OrderController extends Controller
 
         // Mark as selesai upon pickup verification and increment total_sold
         if ($order->status !== 'selesai') {
-            $order->update(['status' => 'selesai']);
+            $updateData = ['status' => 'selesai'];
+            if ($order->isTunai()) {
+                $updateData['status_pembayaran'] = 'lunas';
+            }
+            $order->update($updateData);
             foreach ($order->items as $item) {
                 if ($item->menu_id) {
                     Menu::where('id', $item->menu_id)->increment('total_sold', $item->jumlah);
