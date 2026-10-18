@@ -8,6 +8,7 @@ use App\Models\Stand;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
 
 class KantinOrderTest extends TestCase
@@ -403,5 +404,69 @@ class KantinOrderTest extends TestCase
         $res2->assertStatus(200);
         $menuItem2 = $res2->viewData('menus')->firstWhere('id', $menu->id);
         $this->assertEquals(2, (int) ($menuItem2->total_terjual ?? 0));
+    }
+
+    public function test_vendor_dashboard_orders_are_paginated_to_15_per_page(): void
+    {
+        $vendorUser = User::where('role', 'penjual')->first();
+        $this->assertNotNull($vendorUser);
+        $stand = $vendorUser->stand;
+        $this->assertNotNull($stand);
+
+        // Create 20 pending orders
+        for ($i = 1; $i <= 20; $i++) {
+            $stand->orders()->create([
+                'kode_tr' => 'PAGINATE-'.$i,
+                'nama_pemesan' => 'Pemesan '.$i,
+                'kelas' => 'X RPL 1',
+                'total_harga' => 10000,
+                'status' => 'pending',
+                'metode_pembayaran' => 'tunai',
+                'status_pembayaran' => 'belum_dibayar',
+            ]);
+        }
+
+        $response = $this->actingAs($vendorUser)->get(route('vendor.dashboard'));
+        $response->assertStatus(200);
+
+        $orders = $response->viewData('orders');
+        $this->assertInstanceOf(LengthAwarePaginator::class, $orders);
+        $this->assertEquals(15, $orders->perPage());
+        $this->assertTrue($orders->hasPages());
+        $this->assertCount(15, $orders->items());
+
+        // Check page 2
+        $responsePage2 = $this->actingAs($vendorUser)->get(route('vendor.dashboard', ['page' => 2]));
+        $responsePage2->assertStatus(200);
+        $ordersPage2 = $responsePage2->viewData('orders');
+        $this->assertEquals(2, $ordersPage2->currentPage());
+    }
+
+    public function test_admin_orders_are_paginated_to_15_per_page_with_query_string(): void
+    {
+        $adminUser = User::where('role', 'admin')->first();
+        $this->assertNotNull($adminUser);
+        $stand = Stand::first();
+
+        // Create 18 orders
+        for ($i = 1; $i <= 18; $i++) {
+            $stand->orders()->create([
+                'kode_tr' => 'ADM-PAGINATE-'.$i,
+                'nama_pemesan' => 'Siswa Admin '.$i,
+                'kelas' => 'XII RPL 2',
+                'total_harga' => 12000,
+                'status' => 'pending',
+                'metode_pembayaran' => 'tunai',
+                'status_pembayaran' => 'belum_dibayar',
+            ]);
+        }
+
+        $response = $this->actingAs($adminUser)->get(route('admin.orders.index', ['status' => 'pending', 'periode' => 'semua']));
+        $response->assertStatus(200);
+
+        $orders = $response->viewData('orders');
+        $this->assertInstanceOf(LengthAwarePaginator::class, $orders);
+        $this->assertEquals(15, $orders->perPage());
+        $this->assertTrue($orders->hasPages());
     }
 }

@@ -98,7 +98,7 @@ class OrderController extends Controller
             $query->where('status', $request->status);
         }
 
-        $orders = $query->latest()->get();
+        $orders = $query->latest()->paginate(15)->withQueryString();
 
         return view('vendor.dashboard', compact(
             'stand', 'orders',

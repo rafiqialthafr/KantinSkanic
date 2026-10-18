@@ -21,7 +21,7 @@
     <span class="text-[10px] uppercase tracking-widest font-bold text-slate-600">Status Pesanan</span>
 </div>
 
-<a href="{{ route('dashboard', ['status' => 'pending']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'pending' ? 'active' : '' }}">
+<a href="{{ route('dashboard', array_merge(request()->except('page'), ['status' => 'pending'])) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'pending' ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
     Menunggu
     @if(($pendingOrdersCount ?? 0) > 0)
@@ -29,7 +29,7 @@
     @endif
 </a>
 
-<a href="{{ route('dashboard', ['status' => 'siap_diambil']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'siap_diambil' ? 'active' : '' }}">
+<a href="{{ route('dashboard', array_merge(request()->except('page'), ['status' => 'siap_diambil'])) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'siap_diambil' ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
     Siap Diambil
     @if(($siapDiambilOrdersCount ?? 0) > 0)
@@ -37,7 +37,7 @@
     @endif
 </a>
 
-<a href="{{ route('dashboard', ['status' => 'selesai']) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'selesai' ? 'active' : '' }}">
+<a href="{{ route('dashboard', array_merge(request()->except('page'), ['status' => 'selesai'])) }}" class="sidebar-link {{ ($activeStatus ?? '') === 'selesai' ? 'active' : '' }}">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
     Selesai
 </a>
@@ -106,7 +106,7 @@
             {{-- Filter Tabs --}}
             <div class="flex items-center gap-1.5 flex-wrap">
                 @foreach(['all' => 'Semua', 'pending' => 'Menunggu', 'siap_diambil' => 'Siap Ambil', 'selesai' => 'Selesai'] as $val => $label)
-                <a href="{{ route('dashboard', ['status' => $val]) }}"
+                <a href="{{ route('dashboard', array_merge(request()->except('page'), ['status' => $val])) }}"
                     class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors whitespace-nowrap
                     {{ ($activeStatus ?? 'all') === $val
                         ? 'bg-orange-500 text-white shadow-xs shadow-orange-300'
@@ -217,6 +217,12 @@
                 </div>
             </div>
             @endforeach
+        </div>
+        @endif
+
+        @if($orders->hasPages())
+        <div class="px-5 py-4 border-t border-slate-100 bg-slate-50/50">
+            {{ $orders->links() }}
         </div>
         @endif
     </div>

@@ -76,7 +76,7 @@ class DashboardController extends Controller
             $ordersQuery->where('status', $request->status);
         }
 
-        $orders = $ordersQuery->latest()->get();
+        $orders = $ordersQuery->latest()->paginate(15)->withQueryString();
 
         return view('dashboard.index', [
             'stand' => $stand,

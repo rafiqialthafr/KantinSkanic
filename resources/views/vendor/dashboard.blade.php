@@ -106,23 +106,23 @@
         <!-- Status Filter Tabs -->
         <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 hidden sm:inline">Status:</span>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'all'])) }}"
+            <a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'all'])) }}"
                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 min-h-[38px] flex items-center {{ ($activeStatus ?? 'all') === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                 Semua Status
             </a>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'pending'])) }}"
+            <a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'pending'])) }}"
                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 min-h-[38px] flex items-center {{ ($activeStatus ?? '') === 'pending' ? 'bg-orange-500 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                 Perlu Disiapkan
             </a>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'siap_diambil'])) }}"
+            <a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'siap_diambil'])) }}"
                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 min-h-[38px] flex items-center {{ ($activeStatus ?? '') === 'siap_diambil' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                 Siap Diambil
             </a>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'menunggu_pembayaran'])) }}"
+            <a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'menunggu_pembayaran'])) }}"
                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 min-h-[38px] flex items-center {{ ($activeStatus ?? '') === 'menunggu_pembayaran' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                 Belum Bayar
             </a>
-            <a href="{{ route('vendor.dashboard', array_merge(request()->query(), ['status' => 'selesai'])) }}"
+            <a href="{{ route('vendor.dashboard', array_merge(request()->except('page'), ['status' => 'selesai'])) }}"
                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 min-h-[38px] flex items-center {{ ($activeStatus ?? '') === 'selesai' ? 'bg-slate-600 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                 Selesai
             </a>
@@ -311,6 +311,13 @@
         </div>
         @endforelse
     </div>
+
+    {{-- Pagination Controls --}}
+    @if($orders->hasPages())
+    <div class="pt-2">
+        {{ $orders->links() }}
+    </div>
+    @endif
 
 </div>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Order;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -22,12 +23,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useTailwind();
+
         View::composer(['vendor.*', 'dashboard.*'], function ($view) {
             if (Auth::check() && Auth::user()->stand) {
                 $standId = Auth::user()->stand->id;
+                $pending = Order::where('stand_id', $standId)->where('status', 'pending')->count();
+                $siap = Order::where('stand_id', $standId)->where('status', 'siap_diambil')->count();
                 $view->with([
-                    'pendingOrdersCount' => Order::where('stand_id', $standId)->where('status', 'pending')->count(),
-                    'siapDiambilOrdersCount' => Order::where('stand_id', $standId)->where('status', 'siap_diambil')->count(),
+                    'pendingOrdersCount' => $pending,
+                    'siapDiambilOrdersCount' => $siap,
+                    'activeOrdersCount' => $pending + $siap,
                 ]);
             }
         });
