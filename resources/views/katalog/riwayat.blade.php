@@ -825,6 +825,114 @@
     </div>
 </div>
 
+<!-- Modal Validasi Pembayaran QRIS Sukses (Tampilan Persis Seperti di Sidebar Keranjang) -->
+<div id="riwayat-qris-success-modal" class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 bg-slate-900/75 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none flex items-center justify-center">
+    <div id="riwayat-qris-success-card" class="bg-slate-50/70 rounded-[2rem] max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform scale-95 transition-all duration-200 max-h-[90vh] flex flex-col relative my-auto">
+
+        <!-- Header: Clean, Minimal, Cohesive with KantinSkanic -->
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 border border-orange-100 flex items-center justify-center font-bold">
+                    <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-base font-extrabold text-slate-800">Status Pembayaran</h2>
+                    <p class="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        QRIS Terverifikasi Lunas
+                    </p>
+                </div>
+            </div>
+            <button type="button" onclick="closeRiwayatQrisSuccessModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer" aria-label="Tutup">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body Content: Clean Modern E-Receipt & Stand Ticket -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 pb-6" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+
+            <!-- Hero: Refined Minimal Success Checkmark -->
+            <div class="text-center pt-1 pb-1">
+                <div class="relative w-16 h-16 mx-auto flex items-center justify-center mb-2.5">
+                    <div class="absolute inset-0 rounded-full opacity-25" style="background-color: #10b981;"></div>
+                    <div class="relative w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="stroke: #ffffff;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-xl font-black text-slate-900 tracking-tight">Pembayaran Sukses!</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Pesanan otomatis diteruskan ke penjual stand</p>
+            </div>
+
+            <!-- Modern E-Receipt Card: Soft Warm KantinSkanic Aesthetic (Clean & Light) -->
+            <div class="bg-white rounded-3xl border border-orange-200/80 p-4 sm:p-5 shadow-xs relative overflow-hidden">
+                <!-- Subtle Orange Gradient Accent Line -->
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500"></div>
+
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black tracking-wider text-slate-400 uppercase">Total Pembayaran</span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        LUNAS
+                    </span>
+                </div>
+
+                <!-- Total Amount -->
+                <div class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1" id="riwayat-qris-success-amount">
+                    Rp 0
+                </div>
+
+                <!-- Receipt Metadata (Clean Details Grid) -->
+                <div class="mt-3.5 pt-3 border-t border-dashed border-slate-200 space-y-2 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400 font-medium text-[11px]">Nama Pemesan</span>
+                        <span class="font-bold text-slate-800 text-[11px] truncate max-w-[200px]" id="riwayat-qris-success-buyer">-</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400 font-medium text-[11px]">Metode Pembayaran</span>
+                        <span class="font-bold text-slate-700 text-[11px] flex items-center gap-1.5">
+                            QRIS
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-400 font-medium text-[11px]">Waktu Transaksi</span>
+                        <span class="text-slate-500 font-medium text-[11px]" id="riwayat-qris-success-time">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stand Tickets Section -->
+            <div id="riwayat-qris-success-tickets-container" class="space-y-2.5">
+                <!-- Injected dynamically by JS -->
+            </div>
+
+        </div>
+
+        <!-- Sticky Bottom CTA -->
+        <div class="p-4 border-t border-slate-100 bg-white space-y-2 shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+            <a id="btn-riwayat-qris-success-history" href="{{ route('order.history', ['status' => 'pending']) }}"
+               onclick="try { sessionStorage.removeItem('riwayat_qris_success_payload'); } catch(e){}"
+               class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-[0.99] text-white font-extrabold text-sm shadow-md shadow-orange-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer text-center">
+                <span>Lihat Status Pesanan</span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+            </a>
+            <button type="button" onclick="closeRiwayatQrisSuccessModal()"
+                    class="w-full py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-[0.99] text-slate-600 font-bold text-xs transition-colors cursor-pointer text-center">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Auto-scroll tab container agar tab aktif (misal yang paling pojok) otomatis bergeser ke tengah
     function autoScrollActiveTab(smooth = false) {
@@ -844,10 +952,22 @@
         document.addEventListener('DOMContentLoaded', () => {
             autoScrollActiveTab(false);
             setTimeout(() => autoScrollActiveTab(true), 80);
+            try {
+                const savedRiwayatSuccess = sessionStorage.getItem('riwayat_qris_success_payload');
+                if (savedRiwayatSuccess) {
+                    showRiwayatQrisSuccessModal(JSON.parse(savedRiwayatSuccess));
+                }
+            } catch (e) {}
         });
     } else {
         autoScrollActiveTab(false);
         setTimeout(() => autoScrollActiveTab(true), 80);
+        try {
+            const savedRiwayatSuccess = sessionStorage.getItem('riwayat_qris_success_payload');
+            if (savedRiwayatSuccess) {
+                showRiwayatQrisSuccessModal(JSON.parse(savedRiwayatSuccess));
+            }
+        } catch (e) {}
     }
 
     // Saat tab diklik, kontainer langsung bergeser ke tengah tab tersebut
@@ -868,6 +988,7 @@
 
     let currentModalTicketCode = '';
     let currentModalReceiptData = null;
+    let isShowingSuccessModal = false;
 
     function copyModalTicketCode() {
         if (currentModalTicketCode) {
@@ -1233,11 +1354,6 @@
                                 const bIds = batchCard.getAttribute('data-order-ids').split(',').map(s => parseInt(s.trim())).filter(Boolean);
                                 if (bIds.includes(parseInt(ord.id))) {
                                     batchCard.setAttribute('data-is-lunas', '1');
-                                    if (window.location.search.includes('status=belum_bayar')) {
-                                        setTimeout(() => {
-                                            window.location.href = "{{ route('order.history', ['status' => 'pending']) }}";
-                                        }, 800);
-                                    }
                                 }
                             });
                         }
@@ -1433,27 +1549,28 @@
                 return;
             }
 
+            const orderPayload = {
+                orderId: data.order_id,
+                grossAmount: data.gross_amount,
+                nama: data.nama_pemesan,
+                kelas: data.kelas,
+                tickets: data.tickets || []
+            };
+
             // Jika token mock / sandbox demo keys
             if (data.snap_token.startsWith('SNAP-MOCK-')) {
-                openSimulatedQrisModal(orderId, data.gross_amount);
+                openSimulatedQrisModal(orderId, data.gross_amount, orderPayload);
                 return;
             }
 
             const launchSnap = () => {
                 window.snap.pay(data.snap_token, {
                     onSuccess: async function(result) {
+                        isShowingSuccessModal = true;
+                        showRiwayatQrisSuccessModal(orderPayload);
                         await syncOrderStatus(orderId, result, true);
                         pollActiveOrderStatuses();
                         showToast('✓ Pembayaran QRIS berhasil!');
-                        if (window.location.search.includes('status=belum_bayar')) {
-                            setTimeout(() => {
-                                window.location.href = "{{ route('order.history', ['status' => 'pending']) }}";
-                            }, 1000);
-                        } else {
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
-                        }
                     },
                     onPending: async function(result) {
                         await syncOrderStatus(orderId, result, false);
@@ -1463,7 +1580,26 @@
                         showToast('Pembayaran gagal atau dibatalkan.');
                     },
                     onClose: function() {
-                        pollActiveOrderStatuses();
+                        fetch(`/api/orders/${orderId}/sync-status`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            },
+                            body: JSON.stringify({})
+                        }).then(res => res.json()).then(syncData => {
+                            if (syncData && syncData.is_paid) {
+                                isShowingSuccessModal = true;
+                                showRiwayatQrisSuccessModal(orderPayload);
+                                pollActiveOrderStatuses();
+                                showToast('✓ Pembayaran QRIS berhasil!');
+                            } else {
+                                pollActiveOrderStatuses();
+                            }
+                        }).catch(() => {
+                            pollActiveOrderStatuses();
+                        });
                     }
                 });
             };
@@ -1479,7 +1615,7 @@
                         launchSnap();
                     } else if (attempts >= 10) {
                         clearInterval(checkSnapInterval);
-                        openSimulatedQrisModal(orderId, data.gross_amount);
+                        openSimulatedQrisModal(orderId, data.gross_amount, orderPayload);
                     }
                 }, 200);
             }
@@ -1491,7 +1627,7 @@
     }
 
     // Simulasi QRIS jika server key belum diubah dari dummy
-    function openSimulatedQrisModal(orderId, grossAmount) {
+    function openSimulatedQrisModal(orderId, grossAmount, orderPayload) {
         let modal = document.getElementById('qris-simulator-modal');
         if (!modal) {
             modal = document.createElement('div');
@@ -1530,20 +1666,130 @@
         confirmBtn.onclick = async function() {
             confirmBtn.disabled = true;
             confirmBtn.textContent = 'Memverifikasi Pelunasan...';
+            isShowingSuccessModal = true;
+            modal.remove();
+            showRiwayatQrisSuccessModal(orderPayload || {
+                orderId: orderId,
+                grossAmount: grossAmount,
+                nama: '{{ auth()->user()->name ?? "Siswa" }}',
+                kelas: '{{ auth()->user()->kelas ?? "" }}',
+                tickets: []
+            });
             await syncOrderStatus(orderId, {}, true);
             pollActiveOrderStatuses();
             showToast('✓ Pembayaran QRIS berhasil dikonfirmasi LUNAS!');
-            modal.remove();
-            if (window.location.search.includes('status=belum_bayar')) {
-                setTimeout(() => {
-                    window.location.href = "{{ route('order.history', ['status' => 'pending']) }}";
-                }, 1000);
-            } else {
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            }
         };
+    }
+
+    // Modal Validasi Pembayaran QRIS Sukses di Riwayat (Tampilan Identik dengan Sidebar Keranjang)
+    function showRiwayatQrisSuccessModal(payload) {
+        isShowingSuccessModal = true;
+        try {
+            sessionStorage.setItem('riwayat_qris_success_payload', JSON.stringify(payload));
+        } catch (e) {}
+
+        const modal = document.getElementById('riwayat-qris-success-modal');
+        const card = document.getElementById('riwayat-qris-success-card');
+        if (!modal || !card) return;
+
+        const { orderId, grossAmount, tickets, nama, kelas } = payload || {};
+
+        const amountElem = document.getElementById('riwayat-qris-success-amount');
+        if (amountElem) {
+            amountElem.textContent = 'Rp ' + Number(grossAmount || 0).toLocaleString('id-ID');
+        }
+
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) +
+            ', ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+        const timeElem = document.getElementById('riwayat-qris-success-time');
+        if (timeElem) {
+            timeElem.textContent = formattedDate;
+        }
+
+        const buyerElem = document.getElementById('riwayat-qris-success-buyer');
+        if (buyerElem) {
+            const customerName = nama || '{{ auth()->user()->name ?? "Siswa" }}';
+            const customerClass = kelas || '{{ auth()->user()->kelas ?? "" }}';
+            buyerElem.textContent = customerName + (customerClass ? ' (' + customerClass + ')' : '');
+        }
+
+        const historyBtn = document.getElementById('btn-riwayat-qris-success-history');
+        if (historyBtn) {
+            historyBtn.href = "{{ route('order.history', ['status' => 'pending']) }}";
+        }
+
+        // Render tickets persis seperti di sidebar
+        const ticketsContainer = document.getElementById('riwayat-qris-success-tickets-container');
+        if (ticketsContainer) {
+            let html = '';
+            if (tickets && tickets.length > 0) {
+                html = tickets.map(t => `
+                    <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-6 h-6 rounded-lg bg-orange-100/80 text-orange-600 flex items-center justify-center shrink-0">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.614A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.015a2.993 2.993 0 0 0 2.25 1.015c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72L4.318 3.44A1.5 1.5 0 0 1 5.378 3h13.244a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72m-13.5 0a3 3 0 0 0 3.75-.614A2.993 2.993 0 0 0 9.75 9.75" />
+                                    </svg>
+                                </span>
+                                <span class="text-xs font-black text-slate-800 truncate">${t.stand_name || 'Stand Kantin'}</span>
+                            </div>
+                            <span class="font-mono text-xs font-black text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-xl border border-orange-200/80 shrink-0">
+                                #${t.ticket_code}
+                            </span>
+                        </div>
+                        ${t.items && t.items.length > 0 ? `
+                            <div class="mt-2.5 space-y-1.5">
+                                ${t.items.map(it => `
+                                    <div class="flex items-center justify-between text-xs text-slate-600">
+                                        <span class="truncate pr-2">${it.nama_menu || it.name || 'Menu'} <span class="font-bold text-slate-900">x${it.jumlah || it.qty || 1}</span></span>
+                                        <span class="font-bold text-slate-800 shrink-0">Rp ${(it.subtotal || ((it.harga_satuan || it.price || 0) * (it.jumlah || it.qty || 1))).toLocaleString('id-ID')}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            } else {
+                html = `
+                    <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black text-slate-800">Kode Pesanan</span>
+                            <span class="font-mono text-xs font-black text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-xl border border-orange-200/80">
+                                #${orderId}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }
+            ticketsContainer.innerHTML = html;
+        }
+
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100', 'pointer-events-auto');
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRiwayatQrisSuccessModal() {
+        isShowingSuccessModal = false;
+        try {
+            sessionStorage.removeItem('riwayat_qris_success_payload');
+        } catch (e) {}
+
+        const modal = document.getElementById('riwayat-qris-success-modal');
+        const card = document.getElementById('riwayat-qris-success-card');
+        if (!modal || !card) return;
+
+        modal.classList.remove('opacity-100', 'pointer-events-auto');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        card.classList.remove('scale-100');
+        card.classList.add('scale-95');
+        document.body.style.overflow = '';
+
+        window.location.href = "{{ route('order.history', ['status' => 'pending']) }}";
     }
 
     // 24-Hour Countdown Timer for Unpaid QRIS Orders (matches Midtrans 24-hour expiry)
@@ -1637,6 +1883,8 @@
     window.copyModalTicketCode = copyModalTicketCode;
     window.showToast = showToast;
     window.openSimulatedQrisModal = openSimulatedQrisModal;
+    window.showRiwayatQrisSuccessModal = showRiwayatQrisSuccessModal;
+    window.closeRiwayatQrisSuccessModal = closeRiwayatQrisSuccessModal;
     window.syncOrderStatus = syncOrderStatus;
     window.pollActiveOrderStatuses = pollActiveOrderStatuses;
 

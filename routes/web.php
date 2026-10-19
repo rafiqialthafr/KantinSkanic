@@ -46,13 +46,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', [KatalogController::class, 'showCheckout'])->name('checkout.show');
     Route::post('/checkout', [OrderCheckoutController::class, 'checkout'])->name('checkout');
     Route::post('/api/orders/checkout', [OrderCheckoutController::class, 'checkout'])->name('api.orders.checkout');
-    Route::get('/api/orders/{orderId}/snap-token', [OrderCheckoutController::class, 'getSnapToken'])->name('api.orders.snap-token');
     Route::post('/api/orders/{orderId}/sync-status', [OrderCheckoutController::class, 'syncStatus'])->name('api.orders.sync-status');
     Route::get('/api/orders/{orderId}/status', [OrderCheckoutController::class, 'getStatus'])->name('api.orders.status');
     Route::post('/api/orders/{orderId}/cancel-checkout', [OrderCheckoutController::class, 'cancelCheckout'])->name('api.orders.cancel-checkout');
 });
 
-// Public status sync endpoint (accessible if user has ticket/order ID)
+// Public status sync & Snap token endpoint (accessible if user has ticket/order ID)
+Route::get('/api/orders/{orderId}/snap-token', [OrderCheckoutController::class, 'getSnapToken'])->name('api.orders.snap-token');
 Route::post('/api/orders/{orderId}/sync-public', [OrderCheckoutController::class, 'syncStatus'])->name('api.orders.sync-public');
 Route::post('/api/orders/{orderId}/cancel-checkout-public', [OrderCheckoutController::class, 'cancelCheckout'])->name('api.orders.cancel-checkout-public');
 Route::post('/api/orders/realtime-statuses', [OrderCheckoutController::class, 'getRealtimeStatuses'])->name('api.orders.realtime-statuses');

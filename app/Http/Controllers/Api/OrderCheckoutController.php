@@ -288,22 +288,39 @@ class OrderCheckoutController extends Controller
             return response()->json(['success' => false, 'message' => 'Waktu pembayaran QRIS telah kedaluwarsa (24 jam). Silakan buat pesanan baru.'], 400);
         }
 
-        if ($parentOrder->snap_token) {
-            return response()->json([
-                'success' => true,
-                'order_id' => $parentOrder->order_id,
-                'snap_token' => $parentOrder->snap_token,
-                'gross_amount' => $parentOrder->gross_amount,
-            ]);
-        }
+        $parentOrder->loadMissing(['subOrders.stand', 'subOrders.items.menu']);
+        $tickets = $parentOrder->subOrders->map(function ($sub) {
+            return [
+                'ticket_code' => $sub->ticket_code ?: $sub->kode_tr,
+                'stand_name' => $sub->stand?->nama_stand ?? 'Stand Kantin',
+                'total_harga' => $sub->total_harga,
+                'items' => $sub->items->map(function ($it) {
+                    return [
+                        'nama_menu' => $it->menu?->nama_menu ?? 'Menu',
+                        'jumlah' => $it->jumlah,
+                        'harga_satuan' => $it->harga_satuan,
+                        'subtotal' => $it->subtotal,
+                    ];
+                })->values()->all(),
+            ];
+        })->values()->all();
 
-        $snapResult = $this->midtransService->createSnapToken($parentOrder, auth()->user());
+        $token = $parentOrder->snap_token;
+        if (! $token) {
+            $snapResult = $this->midtransService->createSnapToken($parentOrder, auth()->user());
+            $token = $snapResult['snap_token'];
+        }
 
         return response()->json([
             'success' => true,
             'order_id' => $parentOrder->order_id,
-            'snap_token' => $snapResult['snap_token'],
+            'snap_token' => $token,
             'gross_amount' => $parentOrder->gross_amount,
+            'nama_pemesan' => $parentOrder->nama_pemesan,
+            'kelas' => $parentOrder->kelas,
+            'tickets' => $tickets,
+            'all_codes' => $parentOrder->subOrders->pluck('ticket_code')->all(),
+            'redirect_url' => route('order.history'),
         ]);
     }
 
