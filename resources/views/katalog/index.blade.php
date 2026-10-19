@@ -400,6 +400,10 @@
         <div class="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10 w-full sm:w-auto">
             <div id="cart-panel" class="w-full sm:w-[420px] md:w-[448px] max-w-full bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
 
+                <!-- ===================================================
+                     VIEW 1: TAMPILAN KERANJANG NORMAL & CHECKOUT
+                =================================================== -->
+                <div id="cart-drawer-default" class="flex flex-col h-full">
                 <!-- Header Drawer -->
                 <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/90">
                     <div class="flex items-center gap-2.5">
@@ -589,6 +593,118 @@
                         </div>
                     </form>
                     @endguest
+                </div>
+                </div>
+
+                <!-- ===================================================
+                     VIEW 2: TAMPILAN QRIS SUDAH LUNAS (ALA SHOPEE)
+                =================================================== -->
+                <div id="cart-drawer-qris-success" class="hidden flex-col h-full bg-slate-50/60 select-none">
+                    <!-- Header Drawer: Clean, Minimal, Cohesive with KantinSkanic -->
+                    <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 border border-orange-100 flex items-center justify-center font-bold">
+                                <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-extrabold text-slate-800">Status Pembayaran</h2>
+                                <p class="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    QRIS Terverifikasi Lunas
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="closeCartModalAndReset()" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer" aria-label="Tutup">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Body Content: Clean Modern E-Receipt & Stand Ticket -->
+                    <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 pb-8" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+
+                        <!-- Hero: Refined Minimal Success Checkmark -->
+                        <div class="text-center pt-1 pb-1">
+                            <div class="relative w-16 h-16 mx-auto flex items-center justify-center mb-2.5">
+                                <div class="absolute inset-0 rounded-full opacity-25" style="background-color: #10b981;"></div>
+                                <div class="relative w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                                    <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" style="stroke: #ffffff;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-900 tracking-tight">Pembayaran Sukses!</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Pesanan otomatis diteruskan ke penjual stand</p>
+                        </div>
+
+                        <!-- Modern E-Receipt Card: Soft Warm KantinSkanic Aesthetic (Clean & Light) -->
+                        <div class="bg-white rounded-3xl border border-orange-200/80 p-4 sm:p-5 shadow-xs relative overflow-hidden">
+                            <!-- Subtle Orange Gradient Accent Line -->
+                            <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500"></div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-black tracking-wider text-slate-400 uppercase">Total Pembayaran</span>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-black">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    LUNAS
+                                </span>
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1" id="qris-success-amount">
+                                Rp 0
+                            </div>
+
+                            <!-- Receipt Metadata (Clean Details Grid) -->
+                            <div class="mt-3.5 pt-3 border-t border-dashed border-slate-200 space-y-2 text-xs">
+                                
+
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400 font-medium text-[11px]">Nama Pemesan</span>
+                                    <span class="font-bold text-slate-800 text-[11px] truncate max-w-[200px]" id="qris-success-buyer">-</span>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400 font-medium text-[11px]">Metode Pembayaran</span>
+                                    <span class="font-bold text-slate-700 text-[11px] flex items-center gap-1.5">
+                                        QRIS
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400 font-medium text-[11px]">Waktu Transaksi</span>
+                                    <span class="text-slate-500 font-medium text-[11px]" id="qris-success-time">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stand Tickets Section -->
+                        <div id="qris-success-tickets-container" class="space-y-2.5">
+                            <!-- Injected dynamically by JS -->
+                        </div>
+
+                    </div>
+
+                    <!-- Sticky Bottom CTA (Premium, High Conversion, KantinSkanic Style) -->
+                    <div class="p-4 border-t border-slate-100 bg-white space-y-2 shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+                        <a id="btn-qris-success-history" href="{{ route('order.history') }}"
+                           onclick="try { sessionStorage.removeItem('kantin_qris_success_payload'); sessionStorage.removeItem('kantin_cart_drawer_open'); } catch(e){}"
+                           class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-[0.99] text-white font-extrabold text-sm shadow-md shadow-orange-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer text-center">
+                            <span>Lihat Status Pesanan
+                                
+                            </span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                        </a>
+                        <button type="button" onclick="closeCartModalAndReset()"
+                                class="w-full py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-[0.99] text-slate-600 font-bold text-xs transition-colors cursor-pointer text-center">
+                            Pesan Menu Lain / Selesai
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -792,6 +908,10 @@
         const backdrop = document.getElementById('cart-backdrop');
         const panel = document.getElementById('cart-panel');
 
+        try {
+            sessionStorage.setItem('kantin_cart_drawer_open', '1');
+        } catch (e) {}
+
         cartStore.updateUI();
         if (modal) {
             modal.classList.remove('hidden');
@@ -807,11 +927,191 @@
         const backdrop = document.getElementById('cart-backdrop');
         const panel = document.getElementById('cart-panel');
 
+        try {
+            sessionStorage.removeItem('kantin_cart_drawer_open');
+        } catch (e) {}
+
         if (backdrop) backdrop.classList.add('opacity-0');
         if (panel) panel.classList.add('translate-x-full');
         setTimeout(() => {
             if (modal) modal.classList.add('hidden');
+            resetCartDrawerToDefault();
         }, 300);
+    }
+
+    function resetCartDrawerToDefault() {
+        const defaultDrawer = document.getElementById('cart-drawer-default');
+        const successDrawer = document.getElementById('cart-drawer-qris-success');
+        if (successDrawer && !successDrawer.classList.contains('hidden')) {
+            successDrawer.classList.add('hidden');
+            successDrawer.classList.remove('flex');
+            if (defaultDrawer) {
+                defaultDrawer.classList.remove('hidden');
+                defaultDrawer.classList.add('flex');
+            }
+            const submitBtn = document.getElementById('btn-submit-order');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    <span id="btn-submit-text">Bayar Sekarang via QRIS</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    </svg>
+                `;
+            }
+            cartStore.updateUI();
+        }
+    }
+
+    function closeCartModalAndReset() {
+        try {
+            sessionStorage.removeItem('kantin_cart_drawer_open');
+            sessionStorage.removeItem('kantin_qris_success_payload');
+        } catch (e) {}
+        closeCartModal();
+    }
+
+    function copyQrisOrderId() {
+        const orderIdElem = document.getElementById('qris-success-order-id');
+        if (!orderIdElem) return;
+        const text = orderIdElem.innerText.trim();
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = orderIdElem.innerText;
+            orderIdElem.innerText = 'Tersalin!';
+            setTimeout(() => {
+                orderIdElem.innerText = text;
+            }, 1500);
+        }).catch(() => {});
+    }
+
+    function showQrisSuccessInSidebar(payload) {
+        const defaultDrawer = document.getElementById('cart-drawer-default');
+        const successDrawer = document.getElementById('cart-drawer-qris-success');
+        if (!defaultDrawer || !successDrawer) return;
+
+        try {
+            sessionStorage.setItem('kantin_qris_success_payload', JSON.stringify(payload));
+            sessionStorage.setItem('kantin_cart_drawer_open', '1');
+        } catch (e) {}
+
+        const { orderId, grossAmount, allCodes, tickets, redirectUrl, items, nama, kelas } = payload;
+
+        // Clear cart from storage (already checked out and paid)
+        cartStore.clearCart(true);
+
+        // Update amounts and details
+        const amountElem = document.getElementById('qris-success-amount');
+        if (amountElem) {
+            amountElem.textContent = 'Rp ' + Number(grossAmount || 0).toLocaleString('id-ID');
+        }
+
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) +
+            ', ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+        const timeElem = document.getElementById('qris-success-time');
+        if (timeElem) {
+            timeElem.textContent = formattedDate;
+        }
+
+        const orderIdElem = document.getElementById('qris-success-order-id');
+        if (orderIdElem) {
+            orderIdElem.textContent = orderId || '-';
+        }
+
+        const buyerElem = document.getElementById('qris-success-buyer');
+        if (buyerElem) {
+            buyerElem.textContent = (nama || 'Siswa') + (kelas ? ' (' + kelas + ')' : '');
+        }
+
+        const historyBtn = document.getElementById('btn-qris-success-history');
+        if (historyBtn) {
+            historyBtn.href = redirectUrl || '{{ route("order.history") }}';
+        }
+
+        // Render tickets
+        const ticketsContainer = document.getElementById('qris-success-tickets-container');
+        if (ticketsContainer) {
+            let html = '';
+            if (tickets && tickets.length > 0) {
+                html = tickets.map(t => `
+                    <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                        <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-6 h-6 rounded-lg bg-orange-100/80 text-orange-600 flex items-center justify-center shrink-0">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.25A2.25 2.25 0 0 1 0 18.75V10.5M13.5 21h4.5m-4.5 0v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                </span>
+                                <span class="text-xs font-black text-slate-800 truncate">${t.stand_name || 'Stand Kantin'}</span>
+                            </div>
+                            <span class="font-mono text-xs font-black text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-xl border border-orange-200/80 shrink-0">
+                                #${t.ticket_code}
+                            </span>
+                        </div>
+                        ${t.items && t.items.length > 0 ? `
+                            <div class="mt-2.5 space-y-1.5">
+                                ${t.items.map(it => `
+                                    <div class="flex items-center justify-between text-xs text-slate-600">
+                                        <span class="truncate pr-2">${it.nama_menu} <span class="font-bold text-slate-900">x${it.jumlah}</span></span>
+                                        <span class="font-bold text-slate-800 shrink-0">Rp ${(it.subtotal || (it.harga_satuan * it.jumlah)).toLocaleString('id-ID')}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            } else {
+                const standGroups = {};
+                (items || []).forEach(item => {
+                    const sName = item.stand || 'Stand Kantin';
+                    if (!standGroups[sName]) standGroups[sName] = [];
+                    standGroups[sName].push(item);
+                });
+                const standNames = Object.keys(standGroups);
+                html = standNames.map((sName, idx) => {
+                    const code = (allCodes && allCodes[idx]) ? allCodes[idx] : orderId;
+                    return `
+                        <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                            <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-6 h-6 rounded-lg bg-orange-100/80 text-orange-600 flex items-center justify-center shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.25A2.25 2.25 0 0 1 0 18.75V10.5M13.5 21h4.5m-4.5 0v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                    </span>
+                                    <span class="text-xs font-black text-slate-800 truncate">${sName}</span>
+                                </div>
+                                <span class="font-mono text-xs font-black text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-xl border border-orange-200/80 shrink-0">
+                                    #${code}
+                                </span>
+                            </div>
+                            <div class="mt-2.5 space-y-1.5">
+                                ${standGroups[sName].map(it => `
+                                    <div class="flex items-center justify-between text-xs text-slate-600">
+                                        <span class="truncate pr-2">${it.nama} <span class="font-bold text-slate-900">x${it.jumlah}</span></span>
+                                        <span class="font-bold text-slate-800 shrink-0">Rp ${(it.harga * it.jumlah).toLocaleString('id-ID')}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            ticketsContainer.innerHTML = html;
+        }
+
+        // Toggle Views in Cart Panel
+        defaultDrawer.classList.add('hidden');
+        defaultDrawer.classList.remove('flex');
+        successDrawer.classList.remove('hidden');
+        successDrawer.classList.add('flex');
+
+        const scrollable = successDrawer.querySelector('.overflow-y-auto');
+        if (scrollable) {
+            scrollable.scrollTop = 0;
+        }
+
+        openCartModal();
     }
 
     function selectDrawerPaymentMethod(method) {
@@ -884,6 +1184,13 @@
         const kelas = document.getElementById('input-kelas').value.trim();
         const catatan = document.getElementById('input-catatan').value.trim();
         const selectedMethod = document.getElementById('selected-payment-method')?.value || 'qris';
+
+        const orderSnapshot = {
+            items: [...items],
+            nama: nama,
+            kelas: kelas,
+            catatan: catatan
+        };
 
         const submitBtn = document.getElementById('btn-submit-order');
         submitBtn.disabled = true;
@@ -970,23 +1277,41 @@
 
                     // If mock token (demo keys in .env)
                     if (data.snap_token.startsWith('SNAP-MOCK-')) {
-                        openIndexSimulatedQrisModal(data.order_id, data.gross_amount, data.redirect_url);
+                        openIndexSimulatedQrisModal(data.order_id, data.gross_amount, data.redirect_url, orderSnapshot, data.all_codes, data.tickets);
                         return;
                     }
 
                     if (typeof window.snap !== 'undefined' && window.snap.pay) {
+                        let isPaidCompleted = false;
+
+                        const handlePaidSuccess = async (result, forceConfirm = false) => {
+                            if (isPaidCompleted) return;
+                            isPaidCompleted = true;
+
+                            submitBtn.innerHTML = `
+                                <svg class="animate-spin h-4 w-4 text-white inline-block mr-2" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span>Menampilkan Bukti Pembayaran...</span>
+                            `;
+                            await syncOrder(result, forceConfirm);
+                            showQrisSuccessInSidebar({
+                                orderId: data.order_id,
+                                grossAmount: data.gross_amount,
+                                allCodes: data.all_codes || [],
+                                tickets: data.tickets || [],
+                                redirectUrl: data.redirect_url,
+                                items: orderSnapshot.items,
+                                nama: orderSnapshot.nama,
+                                kelas: orderSnapshot.kelas
+                            });
+                        };
+
                         window.snap.pay(data.snap_token, {
                             onSuccess: async function(result) {
-                                submitBtn.innerHTML = `
-                                    <svg class="animate-spin h-4 w-4 text-white inline-block mr-2" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span>Pembayaran Berhasil! Mengalihkan...</span>
-                                `;
-                                await syncOrder(result, true);
-                                cartStore.clearCart(true);
-                                window.location.href = data.redirect_url || '{{ route("order.history") }}';
+                                // Midtrans memunculkan validasi 5 detik bawaannya sampai popup tertutup sendiri
+                                await handlePaidSuccess(result, true);
                             },
                             onPending: async function(result) {
                                 submitBtn.innerHTML = `
@@ -1004,12 +1329,29 @@
                                 handleCancelQrisPayment();
                             },
                             onClose: function() {
-                                handleCancelQrisPayment();
+                                // Periksa apakah sudah lunas saat popup tertutup (baik setelah 5 detik atau user tutup manual)
+                                fetch(`/api/orders/${data.order_id}/sync-status`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({})
+                                }).then(res => res.json()).then(syncData => {
+                                    if (syncData && syncData.is_paid) {
+                                        handlePaidSuccess({}, false);
+                                    } else {
+                                        handleCancelQrisPayment();
+                                    }
+                                }).catch(() => {
+                                    handleCancelQrisPayment();
+                                });
                             }
                         });
                         return;
                     } else {
-                        openIndexSimulatedQrisModal(data.order_id, data.gross_amount, data.redirect_url);
+                        openIndexSimulatedQrisModal(data.order_id, data.gross_amount, data.redirect_url, orderSnapshot, data.all_codes, data.tickets);
                         return;
                     }
                 }
@@ -1320,7 +1662,7 @@
         window.addEventListener('focus', pollRealtimeStocks);
     }
 
-    function openIndexSimulatedQrisModal(orderId, grossAmount, redirectUrl) {
+    function openIndexSimulatedQrisModal(orderId, grossAmount, redirectUrl, orderSnapshot, allCodes, tickets) {
         let modal = document.getElementById('index-qris-simulator-modal');
         if (!modal) {
             modal = document.createElement('div');
@@ -1372,8 +1714,18 @@
                     })
                 });
             } catch (e) {}
-            cartStore.clearCart(true);
-            window.location.href = redirectUrl || '{{ route("order.history") }}';
+
+            modal.remove();
+            showQrisSuccessInSidebar({
+                orderId: orderId,
+                grossAmount: grossAmount,
+                allCodes: allCodes || [],
+                tickets: tickets || [],
+                redirectUrl: redirectUrl,
+                items: orderSnapshot?.items || [],
+                nama: orderSnapshot?.nama || '',
+                kelas: orderSnapshot?.kelas || ''
+            });
         };
     }
 
@@ -1415,8 +1767,27 @@
             filterMenuCardsRealtime(searchInput.value);
         }
 
+        // Restore QRIS success view if page was refreshed while viewing payment proof
+        let savedQrisPayload = null;
+        try {
+            const rawPayload = sessionStorage.getItem('kantin_qris_success_payload');
+            if (rawPayload) {
+                savedQrisPayload = JSON.parse(rawPayload);
+            }
+        } catch (e) {}
+
+        if (savedQrisPayload) {
+            showQrisSuccessInSidebar(savedQrisPayload);
+            return;
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('cart') === 'open' || urlParams.get('open_cart') === '1' || window.location.hash === '#cart') {
+        let wasCartOpen = false;
+        try {
+            wasCartOpen = sessionStorage.getItem('kantin_cart_drawer_open') === '1';
+        } catch (e) {}
+
+        if (urlParams.get('cart') === 'open' || urlParams.get('open_cart') === '1' || window.location.hash === '#cart' || wasCartOpen) {
             openCartModal();
         }
     });

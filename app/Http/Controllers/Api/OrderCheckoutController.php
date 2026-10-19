@@ -215,6 +215,22 @@ class OrderCheckoutController extends Controller
             return redirect()->route('order.status', $allTicketCodes[0] ?? $parentOrder->order_id);
         }
 
+        $tickets = $parentOrder->subOrders()->with(['stand', 'items.menu'])->get()->map(function ($sub) {
+            return [
+                'ticket_code' => $sub->ticket_code,
+                'stand_name' => $sub->stand?->nama_stand ?? 'Stand Kantin',
+                'total_harga' => $sub->total_harga,
+                'items' => $sub->items->map(function ($it) {
+                    return [
+                        'nama_menu' => $it->menu?->nama_menu ?? 'Menu',
+                        'jumlah' => $it->jumlah,
+                        'harga_satuan' => $it->harga_satuan,
+                        'subtotal' => $it->subtotal,
+                    ];
+                })->values()->all(),
+            ];
+        })->values()->all();
+
         return response()->json([
             'success' => true,
             'message' => 'Pesanan berhasil dibuat.',
@@ -223,6 +239,7 @@ class OrderCheckoutController extends Controller
             'snap_token' => $snapToken,
             'gross_amount' => $grossAmount,
             'all_codes' => $allTicketCodes,
+            'tickets' => $tickets,
             'redirect_url' => $redirectUrl,
         ]);
     }
@@ -264,6 +281,11 @@ class OrderCheckoutController extends Controller
 
         if ($parentOrder->isPaid()) {
             return response()->json(['success' => false, 'message' => 'Pesanan sudah lunas.'], 400);
+        }
+
+        $expiryHours = (int) config('midtrans.expiry_hours', 24);
+        if ($parentOrder->created_at && now()->greaterThanOrEqualTo($parentOrder->created_at->copy()->addHours($expiryHours))) {
+            return response()->json(['success' => false, 'message' => 'Waktu pembayaran QRIS telah kedaluwarsa (24 jam). Silakan buat pesanan baru.'], 400);
         }
 
         if ($parentOrder->snap_token) {
@@ -391,9 +413,29 @@ class OrderCheckoutController extends Controller
             ->first();
 
         if (! $parentOrder) {
-            $subOrder = Order::where('ticket_code', $orderId)->orWhere('kode_tr', $orderId)->first();
-            if ($subOrder && $subOrder->parent_order_id) {
-                $parentOrder = ParentOrder::with('subOrders.items.menu')->find($subOrder->parent_order_id);
+            $subOrder = Order::with('items.menu')->where('ticket_code', $orderId)->orWhere('kode_tr', $orderId)->orWhere('id', $orderId)->first();
+            if ($subOrder) {
+                if ($subOrder->parent_order_id) {
+                    $parentOrder = ParentOrder::with('subOrders.items.menu')->find($subOrder->parent_order_id);
+                } else {
+                    if ($subOrder->isLunas()) {
+                        return response()->json(['success' => false, 'message' => 'Pesanan yang sudah lunas tidak dapat dibatalkan.'], 400);
+                    }
+                    DB::transaction(function () use ($subOrder) {
+                        foreach ($subOrder->items as $item) {
+                            if ($item->menu) {
+                                $item->menu->increment('stok', $item->jumlah);
+                            }
+                            $item->delete();
+                        }
+                        $subOrder->delete();
+                    });
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Checkout berhasil dibatalkan dan stok telah dikembalikan.',
+                    ]);
+                }
             }
         }
 
@@ -427,10 +469,72 @@ class OrderCheckoutController extends Controller
     }
 
     /**
+     * Clean up unpaid QRIS orders that have exceeded the 24-hour expiration window.
+     * Restores stock to menus and automatically deletes pending checkout records so they disappear.
+     */
+    public static function cleanupExpiredUnpaidOrders(): int
+    {
+        $expiryHours = (int) config('midtrans.expiry_hours', 24);
+        $cutoffTime = now()->subHours($expiryHours);
+        $cleanedCount = 0;
+
+        // 1. Expired unpaid ParentOrders
+        $expiredParentOrders = ParentOrder::with('subOrders.items.menu')
+            ->where('payment_method', 'qris')
+            ->where('payment_status', '!=', 'settlement')
+            ->where('created_at', '<=', $cutoffTime)
+            ->get();
+
+        foreach ($expiredParentOrders as $parentOrder) {
+            if (! $parentOrder->isPaid()) {
+                DB::transaction(function () use ($parentOrder) {
+                    foreach ($parentOrder->subOrders as $subOrder) {
+                        foreach ($subOrder->items as $item) {
+                            if ($item->menu) {
+                                $item->menu->increment('stok', $item->jumlah);
+                            }
+                            $item->delete();
+                        }
+                        $subOrder->delete();
+                    }
+                    $parentOrder->delete();
+                });
+                $cleanedCount++;
+            }
+        }
+
+        // 2. Expired standalone Orders (qris, not lunas, not dibatalkan, no parent_order_id)
+        $expiredSingleOrders = Order::with('items.menu')
+            ->where('metode_pembayaran', 'qris')
+            ->where('status_pembayaran', '!=', 'lunas')
+            ->where('status', '!=', 'dibatalkan')
+            ->whereNull('parent_order_id')
+            ->where('created_at', '<=', $cutoffTime)
+            ->get();
+
+        foreach ($expiredSingleOrders as $singleOrder) {
+            DB::transaction(function () use ($singleOrder) {
+                foreach ($singleOrder->items as $item) {
+                    if ($item->menu) {
+                        $item->menu->increment('stok', $item->jumlah);
+                    }
+                    $item->delete();
+                }
+                $singleOrder->delete();
+            });
+            $cleanedCount++;
+        }
+
+        return $cleanedCount;
+    }
+
+    /**
      * Get real-time status of multiple orders for history page.
      */
     public function getRealtimeStatuses(Request $request): JsonResponse
     {
+        self::cleanupExpiredUnpaidOrders();
+
         $orderIds = $request->input('order_ids', []);
         $orderCodes = $request->input('order_codes', []);
 

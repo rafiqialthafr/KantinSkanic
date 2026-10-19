@@ -56,7 +56,7 @@ class MidtransService
             ],
             'item_details' => $itemDetails,
             'expiry' => [
-                'start_time' => now('Asia/Jakarta')->format('Y-m-d H:i:s O'),
+                'start_time' => ($parentOrder->created_at ? $parentOrder->created_at->timezone('Asia/Jakarta') : now('Asia/Jakarta'))->format('Y-m-d H:i:s O'),
                 'unit' => 'hour',
                 'duration' => (int) config('midtrans.expiry_hours', 24),
             ],

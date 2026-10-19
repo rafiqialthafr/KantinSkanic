@@ -171,6 +171,9 @@ class KatalogController extends Controller
      */
     public function orderHistory(Request $request)
     {
+        // Otomatis hapus pesanan QRIS yang sudah kedaluwarsa (> 24 jam) dan kembalikan stok menu
+        OrderCheckoutController::cleanupExpiredUnpaidOrders();
+
         $statusFilter = $request->query('status', 'all');
         $searchQuery = trim($request->query('q', ''));
 
@@ -238,18 +241,26 @@ class KatalogController extends Controller
 
         // Calculate counts for each tab
         $countsQuery = clone $query;
-        $allOrdersForCounts = $countsQuery->select('id', 'status', 'metode_pembayaran', 'status_pembayaran')->get();
+        $allOrdersForCounts = $countsQuery->select('id', 'parent_order_id', 'batch_kode', 'status', 'metode_pembayaran', 'status_pembayaran')->get();
 
-        $belumBayarIds = $allOrdersForCounts->filter(function ($o) {
+        $belumBayarBatches = $allOrdersForCounts->filter(function ($o) {
+            return $o->metode_pembayaran === 'qris'
+                && $o->status_pembayaran !== 'lunas'
+                && $o->status !== 'dibatalkan';
+        })->groupBy(function ($o) {
+            return $o->parent_order_id ? ('parent_'.$o->parent_order_id) : ($o->batch_kode ?: ('order_'.$o->id));
+        });
+
+        $belumBayarSuborderIds = $allOrdersForCounts->filter(function ($o) {
             return $o->metode_pembayaran === 'qris'
                 && $o->status_pembayaran !== 'lunas'
                 && $o->status !== 'dibatalkan';
         })->pluck('id')->all();
 
         $statusCounts = [
-            'all' => $allOrdersForCounts->count(),
-            'belum_bayar' => count($belumBayarIds),
-            'pending' => $allOrdersForCounts->whereNotIn('id', $belumBayarIds)->whereIn('status', ['pending', 'menunggu_pembayaran', 'diproses'])->count(),
+            'all' => $allOrdersForCounts->whereNotIn('id', $belumBayarSuborderIds)->count() + $belumBayarBatches->count(),
+            'belum_bayar' => $belumBayarBatches->count(),
+            'pending' => $allOrdersForCounts->whereNotIn('id', $belumBayarSuborderIds)->whereIn('status', ['pending', 'menunggu_pembayaran', 'diproses'])->count(),
             'siap_diambil' => $allOrdersForCounts->where('status', 'siap_diambil')->count(),
             'selesai' => $allOrdersForCounts->where('status', 'selesai')->count(),
         ];
@@ -270,18 +281,74 @@ class KatalogController extends Controller
             $query->where('status', 'selesai');
         }
 
-        $orders = $query->latest()->take(50)->get();
+        $rawOrders = $query->latest()->take(50)->get();
+
+        // Group unpaid QRIS orders belonging to the same checkout batch so user pays once
+        $displayItems = collect();
+        $processedBatchKeys = [];
+
+        foreach ($rawOrders as $order) {
+            $isUnpaidQris = $order->isQris() && ! $order->isLunas() && $order->status !== 'dibatalkan';
+
+            if ($isUnpaidQris) {
+                $batchKey = $order->parent_order_id ? ('parent_'.$order->parent_order_id) : ($order->batch_kode ?: ('order_'.$order->id));
+                if (in_array($batchKey, $processedBatchKeys, true)) {
+                    continue;
+                }
+                $processedBatchKeys[] = $batchKey;
+
+                // Gather all suborders belonging to this batch
+                $batchSuborders = $rawOrders->filter(function ($item) use ($order) {
+                    if ($order->parent_order_id && $item->parent_order_id === $order->parent_order_id) {
+                        return true;
+                    }
+                    if ($order->batch_kode && $item->batch_kode === $order->batch_kode) {
+                        return true;
+                    }
+
+                    return $item->id === $order->id;
+                })->values();
+
+                if ($order->parentOrder && $batchSuborders->count() < $order->parentOrder->subOrders()->count()) {
+                    $order->parentOrder->loadMissing(['subOrders.stand.user', 'subOrders.items.menu']);
+                    $batchSuborders = $order->parentOrder->subOrders;
+                }
+
+                $batchCode = $order->batch_kode ?: ($order->parentOrder?->order_id ?: $order->kode_tr);
+                $grossAmount = $order->parentOrder?->gross_amount ?? $batchSuborders->sum('total_harga');
+
+                $displayItems->push([
+                    'type' => 'batch_unpaid',
+                    'batch_code' => $batchCode,
+                    'parent_order' => $order->parentOrder,
+                    'gross_amount' => $grossAmount,
+                    'created_at' => $order->created_at,
+                    'nama_pemesan' => $order->nama_pemesan,
+                    'kelas' => $order->kelas,
+                    'catatan' => $order->catatan,
+                    'sub_orders' => $batchSuborders,
+                    'order_ids' => $batchSuborders->pluck('id')->all(),
+                    'primary_order' => $order,
+                ]);
+            } else {
+                $displayItems->push([
+                    'type' => 'single_order',
+                    'order' => $order,
+                ]);
+            }
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'count' => $orders->count(),
-                'orders' => $this->formatOrdersForResponse($orders),
+                'count' => $rawOrders->count(),
+                'orders' => $this->formatOrdersForResponse($rawOrders),
             ]);
         }
 
         return view('katalog.riwayat', [
-            'orders' => $orders,
+            'orders' => $rawOrders,
+            'displayItems' => $displayItems,
             'statusFilter' => $statusFilter,
             'searchQuery' => $searchQuery,
             'statusCounts' => $statusCounts,
