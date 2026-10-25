@@ -122,69 +122,6 @@
                 </p>
             </div>
 
-            <!-- Akun Demo Box -->
-            <div class="mt-6">
-                <div class="relative my-4 text-center">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200/80"></div></div>
-                    <div class="relative inline-block bg-white px-3 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                        AKUN DEMO (KLIK UNTUK ISI CEPAT)
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <button type="button" onclick="fillDemo('buagus@kantin.com', 'password')"
-                        class="p-2.5 rounded-2xl border border-slate-200/90 bg-white hover:bg-orange-50/50 hover:border-orange-300 text-left transition-all cursor-pointer flex items-center gap-2.5 group">
-                        <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-orange-100 text-slate-500 group-hover:text-orange-600 flex items-center justify-center shrink-0 transition-colors">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                        </div>
-                        <div class="min-w-0">
-                            <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-orange-700">Kantin Bu Agus</span>
-                            <span class="text-[10px] text-slate-400 block truncate">buagus@kantin.com</span>
-                        </div>
-                    </button>
-
-                    <button type="button" onclick="fillDemo('pakjaka@kantin.com', 'password')"
-                        class="p-2.5 rounded-2xl border border-slate-200/90 bg-white hover:bg-orange-50/50 hover:border-orange-300 text-left transition-all cursor-pointer flex items-center gap-2.5 group">
-                        <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-orange-100 text-slate-500 group-hover:text-orange-600 flex items-center justify-center shrink-0 transition-colors">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                        </div>
-                        <div class="min-w-0">
-                            <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-orange-700">Kantin Pak Jaka</span>
-                            <span class="text-[10px] text-slate-400 block truncate">pakjaka@kantin.com</span>
-                        </div>
-                    </button>
-
-                    <button type="button" onclick="fillDemo('bunda@kantin.com', 'password')"
-                        class="p-2.5 rounded-2xl border border-slate-200/90 bg-white hover:bg-orange-50/50 hover:border-orange-300 text-left transition-all cursor-pointer flex items-center gap-2.5 group">
-                        <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-orange-100 text-slate-500 group-hover:text-orange-600 flex items-center justify-center shrink-0 transition-colors">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                        </div>
-                        <div class="min-w-0">
-                            <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-orange-700">Kantin Bunda</span>
-                            <span class="text-[10px] text-slate-400 block truncate">bunda@kantin.com</span>
-                        </div>
-                    </button>
-
-                    <button type="button" onclick="fillDemo('admin@kantin.com', 'password')"
-                        class="p-2.5 rounded-2xl border border-slate-200/90 bg-white hover:bg-orange-50/50 hover:border-orange-300 text-left transition-all cursor-pointer flex items-center gap-2.5 group">
-                        <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-orange-100 text-slate-500 group-hover:text-orange-600 flex items-center justify-center shrink-0 transition-colors">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg>
-                        </div>
-                        <div class="min-w-0">
-                            <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-orange-700">Super Admin</span>
-                            <span class="text-[10px] text-slate-400 block truncate">admin@kantin.com</span>
-                        </div>
-                    </button>
-                </div>
-            </div>
 
             <!-- Kembali ke Beranda Link -->
             <div class="mt-6 text-center">
@@ -225,11 +162,6 @@
 </div>
 
 <script>
-    function fillDemo(email, pass) {
-        document.getElementById('email').value = email;
-        document.getElementById('password').value = pass;
-    }
-
     function togglePassword(inputId, iconId) {
         const input = document.getElementById(inputId);
         const icon = document.getElementById(iconId);

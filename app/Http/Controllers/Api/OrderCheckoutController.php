@@ -207,8 +207,31 @@ class OrderCheckoutController extends Controller
         $redirectUrl = route('order.history');
 
         if ($paymentMethod === 'qris') {
-            $snapResult = $this->midtransService->createSnapToken($parentOrder, $user, $midtransItemDetails);
-            $snapToken = $snapResult['snap_token'];
+            try {
+                $snapResult = $this->midtransService->createSnapToken($parentOrder, $user, $midtransItemDetails);
+                $snapToken = $snapResult['snap_token'];
+                $redirectUrl = $snapResult['redirect_url'] ?? $redirectUrl;
+            } catch (\Exception $e) {
+                // Rollback pesanan dan kembalikan stok jika gagal request Snap token ke Midtrans
+                DB::transaction(function () use ($parentOrder) {
+                    $parentOrder->loadMissing('subOrders.items.menu');
+                    foreach ($parentOrder->subOrders as $subOrder) {
+                        foreach ($subOrder->items as $item) {
+                            if ($item->menu) {
+                                $item->menu->increment('stok', $item->jumlah);
+                            }
+                            $item->delete();
+                        }
+                        $subOrder->delete();
+                    }
+                    $parentOrder->delete();
+                });
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghubungkan ke gateway pembayaran Midtrans: '.$e->getMessage().'. Silakan coba beberapa saat lagi.',
+                ], 502);
+            }
         }
 
         if (! $request->expectsJson() && ! $request->is('api/*')) {
@@ -307,8 +330,15 @@ class OrderCheckoutController extends Controller
 
         $token = $parentOrder->snap_token;
         if (! $token) {
-            $snapResult = $this->midtransService->createSnapToken($parentOrder, auth()->user());
-            $token = $snapResult['snap_token'];
+            try {
+                $snapResult = $this->midtransService->createSnapToken($parentOrder, auth()->user());
+                $token = $snapResult['snap_token'];
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memuat pembayaran Midtrans: '.$e->getMessage(),
+                ], 502);
+            }
         }
 
         return response()->json([

@@ -62,14 +62,17 @@ class MidtransService
             ],
         ];
 
+        $errorMessage = 'Gagal menghubungi server Midtrans.';
+
         try {
             $response = Http::withBasicAuth($serverKey, '')
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                 ])
-                ->connectTimeout(2)
-                ->timeout(4)
+                ->connectTimeout(10)
+                ->timeout(20)
+                ->retry(2, 300, throw: false)
                 ->post($snapUrl, $payload);
 
             if ($response->successful()) {
@@ -90,22 +93,28 @@ class MidtransService
                 }
             }
 
-            Log::error('Midtrans Snap Error: '.$response->body());
+            $errorMessage = $response->body() ?: 'Respons Midtrans tidak berhasil.';
+            Log::error('Midtrans Snap Error: '.$errorMessage);
         } catch (Exception $e) {
-            Log::error('Midtrans Snap Exception: '.$e->getMessage());
+            $errorMessage = $e->getMessage();
+            Log::error('Midtrans Snap Exception: '.$errorMessage);
         }
 
-        // Sandbox simulated fallback for testing environments if server key is dummy or offline
-        $simulatedToken = 'SNAP-MOCK-'.bin2hex(random_bytes(16));
-        $parentOrder->update([
-            'snap_token' => $simulatedToken,
-            'snap_redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/'.$simulatedToken,
-        ]);
+        // Khusus environment automated testing jika HTTP tidak di-mock
+        if (app()->environment('testing')) {
+            $testToken = 'SNAP-TEST-'.bin2hex(random_bytes(16));
+            $parentOrder->update([
+                'snap_token' => $testToken,
+                'snap_redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/'.$testToken,
+            ]);
 
-        return [
-            'snap_token' => $simulatedToken,
-            'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/'.$simulatedToken,
-        ];
+            return [
+                'snap_token' => $testToken,
+                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/'.$testToken,
+            ];
+        }
+
+        throw new \RuntimeException('Gagal menghubungkan ke payment gateway Midtrans: '.$errorMessage);
     }
 
     /**

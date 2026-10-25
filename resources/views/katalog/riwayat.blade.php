@@ -1557,12 +1557,6 @@
                 tickets: data.tickets || []
             };
 
-            // Jika token mock / sandbox demo keys
-            if (data.snap_token.startsWith('SNAP-MOCK-')) {
-                openSimulatedQrisModal(orderId, data.gross_amount, orderPayload);
-                return;
-            }
-
             const launchSnap = () => {
                 window.snap.pay(data.snap_token, {
                     onSuccess: async function(result) {
@@ -1604,18 +1598,19 @@
                 });
             };
 
-            if (window.snap) {
+            if (typeof window.snap !== 'undefined' && window.snap.pay) {
                 launchSnap();
             } else {
                 let attempts = 0;
                 const checkSnapInterval = setInterval(() => {
                     attempts++;
-                    if (window.snap) {
+                    if (typeof window.snap !== 'undefined' && window.snap.pay) {
                         clearInterval(checkSnapInterval);
                         launchSnap();
-                    } else if (attempts >= 10) {
+                    } else if (attempts >= 20) {
                         clearInterval(checkSnapInterval);
-                        openSimulatedQrisModal(orderId, data.gross_amount, orderPayload);
+                        resetBtn();
+                        alert('Modul pembayaran Midtrans gagal dimuat. Silakan muat ulang halaman.');
                     }
                 }, 200);
             }
@@ -1626,60 +1621,7 @@
         }
     }
 
-    // Simulasi QRIS jika server key belum diubah dari dummy
-    function openSimulatedQrisModal(orderId, grossAmount, orderPayload) {
-        let modal = document.getElementById('qris-simulator-modal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'qris-simulator-modal';
-            modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs';
-            modal.innerHTML = `
-                <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center animate-in fade-in zoom-in-95 duration-200">
-                    <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center mx-auto mb-3 font-black text-xl">
-                        QR
-                    </div>
-                    <h3 class="font-black text-slate-800 text-base">QRIS Kantin Skanic</h3>
-                    <p class="text-xs text-slate-500 mt-1 mb-4">Mode Uji Coba / Sandbox Simulator</p>
-                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 inline-block mb-3">
-                        <img id="sim-qris-img" src="" alt="QRIS" class="w-44 h-44 object-contain mx-auto bg-white rounded-xl">
-                    </div>
-                    <div class="font-mono text-sm font-black text-orange-600 mb-4" id="sim-qris-amount">
-                        Rp 0
-                    </div>
-                    <div class="space-y-2">
-                        <button type="button" id="sim-qris-confirm-btn" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xs shadow-md shadow-emerald-500/25 active:scale-95 transition-all cursor-pointer">
-                            ⚡ Simulasikan Pembayaran Berhasil (Lunas)
-                        </button>
-                        <button type="button" onclick="document.getElementById('qris-simulator-modal').remove()" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer">
-                            Tutup
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
 
-        document.getElementById('sim-qris-img').src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent('KANTINSKANIC-QRIS-' + orderId);
-        document.getElementById('sim-qris-amount').textContent = 'Rp ' + Number(grossAmount || 0).toLocaleString('id-ID');
-
-        const confirmBtn = document.getElementById('sim-qris-confirm-btn');
-        confirmBtn.onclick = async function() {
-            confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Memverifikasi Pelunasan...';
-            isShowingSuccessModal = true;
-            modal.remove();
-            showRiwayatQrisSuccessModal(orderPayload || {
-                orderId: orderId,
-                grossAmount: grossAmount,
-                nama: '{{ auth()->user()->name ?? "Siswa" }}',
-                kelas: '{{ auth()->user()->kelas ?? "" }}',
-                tickets: []
-            });
-            await syncOrderStatus(orderId, {}, true);
-            pollActiveOrderStatuses();
-            showToast('✓ Pembayaran QRIS berhasil dikonfirmasi LUNAS!');
-        };
-    }
 
     // Modal Validasi Pembayaran QRIS Sukses di Riwayat (Tampilan Identik dengan Sidebar Keranjang)
     function showRiwayatQrisSuccessModal(payload) {
@@ -1882,7 +1824,6 @@
     window.copyOrderCode = copyOrderCode;
     window.copyModalTicketCode = copyModalTicketCode;
     window.showToast = showToast;
-    window.openSimulatedQrisModal = openSimulatedQrisModal;
     window.showRiwayatQrisSuccessModal = showRiwayatQrisSuccessModal;
     window.closeRiwayatQrisSuccessModal = closeRiwayatQrisSuccessModal;
     window.syncOrderStatus = syncOrderStatus;

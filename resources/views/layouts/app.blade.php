@@ -15,11 +15,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Midtrans Snap Preconnect & Script -->
-    <link rel="preconnect" href="https://app.sandbox.midtrans.com">
-    <link rel="dns-prefetch" href="https://app.sandbox.midtrans.com">
-    <link rel="preconnect" href="https://api.sandbox.midtrans.com">
-    <link rel="dns-prefetch" href="https://api.sandbox.midtrans.com">
-    <script src="{{ config('midtrans.snap_js_url') }}" data-client-key="{{ config('midtrans.client_key') }}" async></script>
+    @if(config('midtrans.is_production'))
+        <link rel="preconnect" href="https://app.midtrans.com">
+        <link rel="dns-prefetch" href="https://app.midtrans.com">
+    @else
+        <link rel="preconnect" href="https://app.sandbox.midtrans.com">
+        <link rel="dns-prefetch" href="https://app.sandbox.midtrans.com">
+        <link rel="preconnect" href="https://api.sandbox.midtrans.com">
+        <link rel="dns-prefetch" href="https://api.sandbox.midtrans.com">
+    @endif
+    <script src="{{ config('midtrans.snap_js_url') }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
