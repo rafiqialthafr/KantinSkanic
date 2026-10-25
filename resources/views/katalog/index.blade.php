@@ -2,54 +2,76 @@
 
 @section('title', 'Daftar Menu & Pesan Makanan')
 
+@push('head')
+    <!-- Preload Optimized Hero Banner for Instantaneous Load -->
+    <link rel="preload" as="image" href="{{ asset('images/banner.webp') }}" type="image/webp" fetchpriority="high">
+@endpush
+
 @section('content')
 <div class="relative pb-24 w-full overflow-x-hidden">
 
     <!-- ===================================================
-         1. HERO SECTION (Full-Bleed Edge-to-Edge matching reference)
-    
-         -->
-    <section class="hero-fullscreen relative w-full overflow-hidden bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400 text-white flex items-center">
+         1. HERO SECTION (Full-Bleed with banner.webp background)
+    =================================================== -->
+    <section class="hero-fullscreen relative w-full overflow-hidden bg-[#faf6f0] flex items-center pt-20 sm:pt-24 lg:pt-20">
 
-        <!-- Giant Geometric Circles on Right (proportional to reference image) -->
-        <div class="absolute -right-16 sm:-right-8 lg:right-10 top-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[580px] lg:h-[580px] rounded-full bg-white/[0.08] pointer-events-none"></div>
-        <div class="absolute -right-32 sm:-right-24 lg:-right-6 top-1/2 -translate-y-1/2 w-[480px] h-[480px] sm:w-[620px] sm:h-[620px] lg:w-[780px] lg:h-[780px] rounded-full border border-white/[0.08] pointer-events-none"></div>
+        <!-- Full-Bleed Optimized Banner (WebP 55KB for Instant Butter-Smooth Load + Soft Fade-in) -->
+        <picture class="absolute inset-0 w-full h-full pointer-events-none select-none">
+            <source srcset="{{ asset('images/banner.webp') }}" type="image/webp">
+            <img id="hero-banner-image"
+                 src="{{ asset('images/banner.png') }}" 
+                 alt="Banner Kantin Skanic" 
+                 fetchpriority="high"
+                 decoding="async"
+                 loading="eager"
+                 class="w-full h-full object-cover object-[85%_center] sm:object-right lg:object-center opacity-0 transition-opacity duration-300 ease-out"
+                 onload="this.classList.remove('opacity-0')"
+            >
+        </picture>
+        <script>
+            (function() {
+                var heroImg = document.getElementById('hero-banner-image');
+                if (heroImg && heroImg.complete) {
+                    heroImg.classList.remove('opacity-0');
+                }
+            })();
+        </script>
+        <noscript>
+            <style>#hero-banner-image { opacity: 1 !important; }</style>
+        </noscript>
+
+        <!-- Directional Overlay for Crystal Clear Readability (Top-to-Bottom on Mobile, Left-to-Right on Desktop) -->
+        <div class="absolute inset-0 bg-gradient-to-b from-[#faf6f0] via-[#faf6f0]/95 to-[#faf6f0]/75 sm:bg-gradient-to-r sm:from-[#faf6f0] sm:via-[#faf6f0]/95 sm:to-transparent sm:w-[65%] lg:w-[55%] pointer-events-none"></div>
 
         <!-- Content Container -->
-        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-            <div class="max-w-2xl lg:max-w-3xl">
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+            <div class="max-w-sm sm:max-w-md lg:max-w-xl">
 
-                <!-- Parallelogram (Jajar Genjang) Badge: PRE-ORDER KANTIN SKANIC -->
-                <div class="inline-flex items-center px-3.5 py-1 sm:px-4.5 sm:py-1.5 rounded-xs bg-white/15 border border-white/25 text-white text-[11px] sm:text-[13px] font-semibold mb-3 sm:mb-4 backdrop-blur-xs tracking-wider uppercase shadow-2xs -skew-x-12 origin-center" style="transform: skewX(-12deg);">
-                    <span class="skew-x-12 truncate block" style="transform: skewX(12deg);">Pre-Order Kantin Skanic</span>
-                </div>
-
-                <!-- Balanced Large Heading (matching reference image) -->
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-[54px] font-black text-white leading-tight sm:leading-[1.15] tracking-tight break-words">
-                    Pesan Makanan <span class="text-amber-200">Tanpa Antre</span><br>
-                    Kantin Skanic<br>
-                    SMKN 1 Ciomas
+                <!-- High-Impact Modern Display Heading (Satoshi Font, Zero Clipping) -->
+                <h1 class="font-satoshi text-4xl sm:text-5xl lg:text-[56px] xl:text-[62px] font-black tracking-tight leading-[1.05] select-none pt-1">
+                    <span class="block text-slate-900 pt-1 pb-0.5">Pesan Makanan</span>
+                    <span class="inline-block text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-amber-500 to-orange-500 pt-0.5 pb-2.5 sm:pb-3 pr-1">Tanpa Antre</span>
                 </h1>
 
-                <!-- Subtitle paragraph -->
-                <p class="mt-3 sm:mt-4 text-xs sm:text-base lg:text-base xl:text-lg text-white/90 max-w-2xl leading-relaxed font-medium">
-                    Wadah digital resmi untuk memesan seluruh menu makanan dan minuman siswa di Kantin SMK Negeri 1 Ciomas. Pilih menu stand favoritmu dan langsung ambil pesananmu tanpa perlu berdesakan.
+                <!-- Subtitle paragraph: Ringkas, jelas, dan ramah untuk siswa -->
+                <p class="mt-2 sm:mt-2.5 text-sm sm:text-base text-slate-600 max-w-xs sm:max-w-sm lg:max-w-md leading-relaxed font-normal">
+                    Pesan menu kantin favoritmu lebih awal di SMKN 1 Ciomas. Praktis, cepat, dan siap diambil saat istirahat tanpa berdesakan.
                 </p>
 
-                <!-- Dual CTA Buttons (Solid with arrow + Ghost outline) -->
+                <!-- Dual CTA Buttons -->
                 <div class="mt-5 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
                     <!-- CTA 1: Solid button with arrow -->
                     <a href="#katalog-section"
-                        class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl bg-white text-orange-600 hover:bg-orange-50 font-black text-xs sm:text-base shadow-lg hover:shadow-xl active:scale-95 transition-all text-center">
+                        class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs sm:text-base shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 active:scale-95 transition-all text-center">
                         <span>Pesan Sekarang</span>
-                        <svg class="w-4 h-4 text-orange-600 shrink-0 transform group-hover:translate-x-1.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <svg class="w-4 h-4 text-white shrink-0 transform group-hover:translate-x-1.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>
                     </a>
 
-                    <!-- CTA 2: Ghost outline button -->
+                    <!-- CTA 2: Outline button -->
                     <a href="{{ route('order.history') }}"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-white text-white hover:bg-white/15 font-black text-xs sm:text-base backdrop-blur-xs active:scale-95 transition-all text-center">
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-slate-300/90 hover:border-orange-500 bg-white/80 hover:bg-white text-slate-700 hover:text-orange-600 font-black text-xs sm:text-base backdrop-blur-xs shadow-xs active:scale-95 transition-all text-center">
                         <span>Riwayat Pesanan</span>
                     </a>
                 </div>

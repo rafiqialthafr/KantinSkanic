@@ -12,7 +12,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Midtrans Snap Preconnect & Script -->
     @if(config('midtrans.is_production'))
@@ -25,6 +25,7 @@
         <link rel="dns-prefetch" href="https://api.sandbox.midtrans.com">
     @endif
     <script src="{{ config('midtrans.snap_js_url') }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    @stack('head')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -90,14 +91,14 @@
             transform: scaleX(1);
         }
 
-        /* Hero section: fills viewport below navbar with flexible expansion */
+        /* Hero section: fills viewport with flexible expansion */
         .hero-fullscreen {
-            min-height: calc(100vh - 4rem);
+            min-height: 100vh;
         }
 
         @media (min-width: 640px) {
             .hero-fullscreen {
-                min-height: calc(100vh - 5rem);
+                min-height: 100vh;
             }
         }
 
@@ -206,7 +207,7 @@
 
 <body class="flex flex-col min-h-full text-slate-800 bg-slate-50 overflow-x-hidden w-full">
     <!-- Top Navigation Bar -->
-    <header id="main-navbar" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs w-full">
+    <header id="main-navbar" class="{{ request()->routeIs('katalog.index') ? 'fixed top-0 left-0 right-0 z-40 bg-transparent border-b border-transparent shadow-none transition-all duration-300 w-full' : 'sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs w-full' }}">
         <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 sm:h-20 gap-2">
 
@@ -604,6 +605,37 @@
             }
         }
 
+        @if(request()->routeIs('katalog.index'))
+        (function() {
+            const navbar = document.getElementById('main-navbar');
+            if (!navbar) return;
+
+            function handleNavbarScroll() {
+                const mobileMenu = document.getElementById('mobile-nav-menu');
+                const isMobileOpen = mobileMenu && mobileMenu.classList.contains('mobile-nav-open');
+
+                if (window.scrollY > 30 || isMobileOpen) {
+                    navbar.classList.remove('bg-transparent', 'border-transparent', 'shadow-none');
+                    navbar.classList.add('bg-white/95', 'backdrop-blur-md', 'border-slate-200/80', 'shadow-xs');
+                } else {
+                    navbar.classList.remove('bg-white/95', 'backdrop-blur-md', 'border-slate-200/80', 'shadow-xs');
+                    navbar.classList.add('bg-transparent', 'border-transparent', 'shadow-none');
+                }
+            }
+
+            window.addEventListener('scroll', handleNavbarScroll, { passive: true });
+            handleNavbarScroll();
+
+            const originalToggleMobileNav = window.toggleMobileNav;
+            window.toggleMobileNav = function() {
+                if (typeof originalToggleMobileNav === 'function') {
+                    originalToggleMobileNav();
+                }
+                setTimeout(handleNavbarScroll, 50);
+            };
+        })();
+        @endif
+
         function toggleUserProfileDropdown(event) {
             if (event) {
                 event.stopPropagation();
@@ -823,4 +855,5 @@
     @stack('scripts')
 </body>
 
+</html>
 </html>
