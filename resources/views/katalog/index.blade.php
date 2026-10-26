@@ -69,10 +69,10 @@
                         </svg>
                     </a>
 
-                    <!-- CTA 2: Outline button -->
-                    <a href="{{ route('order.history') }}"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-slate-300/90 hover:border-orange-500 bg-white/80 hover:bg-white text-slate-700 hover:text-orange-600 font-black text-xs sm:text-base backdrop-blur-xs shadow-xs active:scale-95 transition-all text-center">
-                        <span>Riwayat Pesanan</span>
+                    <!-- CTA 2: Outline button (Menu Terlaris) -->
+                    <a href="{{ route('katalog.index', ['kategori' => 'terlaris']) }}#katalog-section"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl border-2 border-slate-300/90 hover:border-orange-500 bg-white/80 hover:bg-orange-50/50 text-slate-700 hover:text-orange-600 font-black text-xs sm:text-base backdrop-blur-xs shadow-xs hover:shadow-md hover:shadow-orange-500/15 transition-all duration-200 text-center">
+                        <span>Menu Terlaris</span>
                     </a>
                 </div>
 

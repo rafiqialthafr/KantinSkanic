@@ -207,7 +207,7 @@
 
 <body class="flex flex-col min-h-full text-slate-800 bg-slate-50 overflow-x-hidden w-full">
     <!-- Top Navigation Bar -->
-    <header id="main-navbar" class="{{ request()->routeIs('katalog.index') ? 'fixed top-0 left-0 right-0 z-40 bg-transparent border-b border-transparent shadow-none transition-all duration-300 w-full' : 'sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs w-full' }}">
+    <header id="main-navbar" class="{{ request()->routeIs('katalog.index') ? 'absolute top-0 left-0 right-0 z-40 bg-transparent border-b border-transparent shadow-none w-full' : 'relative z-40 bg-white border-b border-slate-200/80 shadow-xs w-full' }}">
         <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 sm:h-20 gap-2">
 
@@ -227,7 +227,7 @@
 
                     <!-- Desktop Nav Links -->
                     <nav class="hidden md:flex items-center">
-                        <a href="{{ route('katalog.index') }}" class="nav-link">Beranda</a>
+                        <a href="{{ route('katalog.index') }}" class="nav-link {{ request()->routeIs('katalog.index') ? 'active' : '' }}">Beranda</a>
                         <a href="{{ route('katalog.index') }}#katalog-section" class="nav-link">Daftar Menu</a>
                         <a href="{{ route('order.history') }}" class="nav-link {{ request()->routeIs('order.history') ? 'active' : '' }}">Riwayat Pesanan</a>
                     </nav>
@@ -593,48 +593,31 @@
         function toggleMobileNav() {
             const menu = document.getElementById('mobile-nav-menu');
             const btn = document.getElementById('mobile-menu-btn');
+            const navbar = document.getElementById('main-navbar');
             if (!menu) return;
 
             const isOpen = menu.classList.contains('mobile-nav-open');
             if (isOpen) {
                 menu.classList.remove('mobile-nav-open');
                 if (btn) btn.classList.remove('is-open');
+                @if(request()->routeIs('katalog.index'))
+                if (navbar) {
+                    navbar.classList.remove('bg-white', 'shadow-xs', 'border-slate-200/80');
+                    navbar.classList.add('bg-transparent', 'border-transparent');
+                }
+                @endif
             } else {
                 menu.classList.add('mobile-nav-open');
                 if (btn) btn.classList.add('is-open');
+                @if(request()->routeIs('katalog.index'))
+                if (navbar) {
+                    navbar.classList.add('bg-white', 'shadow-xs', 'border-slate-200/80');
+                    navbar.classList.remove('bg-transparent', 'border-transparent');
+                }
+                @endif
             }
         }
 
-        @if(request()->routeIs('katalog.index'))
-        (function() {
-            const navbar = document.getElementById('main-navbar');
-            if (!navbar) return;
-
-            function handleNavbarScroll() {
-                const mobileMenu = document.getElementById('mobile-nav-menu');
-                const isMobileOpen = mobileMenu && mobileMenu.classList.contains('mobile-nav-open');
-
-                if (window.scrollY > 30 || isMobileOpen) {
-                    navbar.classList.remove('bg-transparent', 'border-transparent', 'shadow-none');
-                    navbar.classList.add('bg-white/95', 'backdrop-blur-md', 'border-slate-200/80', 'shadow-xs');
-                } else {
-                    navbar.classList.remove('bg-white/95', 'backdrop-blur-md', 'border-slate-200/80', 'shadow-xs');
-                    navbar.classList.add('bg-transparent', 'border-transparent', 'shadow-none');
-                }
-            }
-
-            window.addEventListener('scroll', handleNavbarScroll, { passive: true });
-            handleNavbarScroll();
-
-            const originalToggleMobileNav = window.toggleMobileNav;
-            window.toggleMobileNav = function() {
-                if (typeof originalToggleMobileNav === 'function') {
-                    originalToggleMobileNav();
-                }
-                setTimeout(handleNavbarScroll, 50);
-            };
-        })();
-        @endif
 
         function toggleUserProfileDropdown(event) {
             if (event) {
@@ -855,5 +838,4 @@
     @stack('scripts')
 </body>
 
-</html>
 </html>
