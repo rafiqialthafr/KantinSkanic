@@ -1047,7 +1047,10 @@
 
         const historyBtn = document.getElementById('btn-qris-success-history');
         if (historyBtn) {
-            historyBtn.href = redirectUrl || '{{ route("order.history") }}';
+            const finalOrderHistoryUrl = '{{ route("order.history") }}' + (orderId ? ('?q=' + encodeURIComponent(orderId)) : '');
+            historyBtn.href = (redirectUrl && !redirectUrl.includes('midtrans.com'))
+                ? redirectUrl
+                : finalOrderHistoryUrl;
         }
 
         // Render tickets
@@ -1317,7 +1320,9 @@
                                 grossAmount: data.gross_amount,
                                 allCodes: data.all_codes || [],
                                 tickets: data.tickets || [],
-                                redirectUrl: data.redirect_url,
+                                redirectUrl: (data.redirect_url && !data.redirect_url.includes('midtrans.com'))
+                                    ? data.redirect_url
+                                    : ('{{ route("order.history") }}' + (data.order_id ? ('?q=' + encodeURIComponent(data.order_id)) : '')),
                                 items: orderSnapshot.items,
                                 nama: orderSnapshot.nama,
                                 kelas: orderSnapshot.kelas
@@ -1338,7 +1343,7 @@
                                 `;
                                 await syncOrder(result, false);
                                 cartStore.clearCart(true);
-                                window.location.href = '{{ route("order.history", ["status" => "belum_bayar"]) }}';
+                                window.location.href = '{{ route("order.history", ["status" => "belum_bayar"]) }}' + (data.order_id ? ('&q=' + encodeURIComponent(data.order_id)) : '');
                             },
                             onError: function(result) {
                                 handleCancelQrisPayment();

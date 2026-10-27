@@ -210,6 +210,9 @@ class KatalogController extends Controller
                         ->orWhere('ticket_code', 'like', "%{$searchQuery}%")
                         ->orWhere('batch_kode', 'like', "%{$searchQuery}%")
                         ->orWhere('kode_tr', $cleanCode)
+                        ->orWhereHas('parentOrder', function ($po) use ($searchQuery) {
+                            $po->where('order_id', 'like', "%{$searchQuery}%");
+                        })
                         ->orWhereHas('stand', function ($st) use ($searchQuery) {
                             $st->where('nama_stand', 'like', "%{$searchQuery}%");
                         })
@@ -227,6 +230,9 @@ class KatalogController extends Controller
                         ->orWhere('ticket_code', 'like', "%{$searchQuery}%")
                         ->orWhere('batch_kode', 'like', "%{$searchQuery}%")
                         ->orWhere('kode_tr', $cleanCode)
+                        ->orWhereHas('parentOrder', function ($po) use ($searchQuery) {
+                            $po->where('order_id', 'like', "%{$searchQuery}%");
+                        })
                         ->orWhereHas('stand', function ($st) use ($searchQuery) {
                             $st->where('nama_stand', 'like', "%{$searchQuery}%");
                         })

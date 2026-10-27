@@ -204,13 +204,14 @@ class OrderCheckoutController extends Controller
 
         // 5. If QRIS: request Snap Token from Midtrans Snap Sandbox outside DB transaction
         $snapToken = null;
-        $redirectUrl = route('order.history');
+        $snapRedirectUrl = null;
+        $redirectUrl = route('order.history', ['q' => $parentOrder->order_id]);
 
         if ($paymentMethod === 'qris') {
             try {
                 $snapResult = $this->midtransService->createSnapToken($parentOrder, $user, $midtransItemDetails);
                 $snapToken = $snapResult['snap_token'];
-                $redirectUrl = $snapResult['redirect_url'] ?? $redirectUrl;
+                $snapRedirectUrl = $snapResult['redirect_url'] ?? null;
             } catch (\Exception $e) {
                 // Rollback pesanan dan kembalikan stok jika gagal request Snap token ke Midtrans
                 DB::transaction(function () use ($parentOrder) {
@@ -260,6 +261,7 @@ class OrderCheckoutController extends Controller
             'payment_method' => $paymentMethod,
             'order_id' => $parentOrder->order_id,
             'snap_token' => $snapToken,
+            'snap_redirect_url' => $snapRedirectUrl,
             'gross_amount' => $grossAmount,
             'all_codes' => $allTicketCodes,
             'tickets' => $tickets,
@@ -350,7 +352,7 @@ class OrderCheckoutController extends Controller
             'kelas' => $parentOrder->kelas,
             'tickets' => $tickets,
             'all_codes' => $parentOrder->subOrders->pluck('ticket_code')->all(),
-            'redirect_url' => route('order.history'),
+            'redirect_url' => route('order.history', ['q' => $parentOrder->order_id]),
         ]);
     }
 

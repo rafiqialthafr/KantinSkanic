@@ -98,6 +98,20 @@
 <div class="bg-[#f5f5f5] min-h-[70vh] py-6 sm:py-8">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
+        @if(!empty($searchQuery))
+        <div class="mb-4 flex items-center justify-between p-3 sm:p-3.5 bg-orange-50 border border-orange-200/80 rounded-2xl text-xs sm:text-sm shadow-2xs">
+            <div class="flex items-center gap-2 text-slate-800 font-bold min-w-0">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span class="truncate">Menampilkan pesanan: <span class="font-mono text-orange-700 bg-white px-2 py-0.5 rounded-lg border border-orange-200 shadow-2xs">#{{ $searchQuery }}</span></span>
+            </div>
+            @auth
+            <a href="{{ route('order.history') }}" class="shrink-0 font-extrabold text-orange-600 hover:text-orange-700 hover:underline text-xs ml-3">
+                Lihat Semua Pesanan &rarr;
+            </a>
+            @endauth
+        </div>
+        @endif
+
         <!-- Shopee Navigation Tabs Bar -->
         <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 mb-5 overflow-hidden">
             <div id="shopee-tabs-container" class="flex items-center overflow-x-auto no-scrollbar scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
@@ -115,7 +129,7 @@
                 @php
                     $isActive = ($statusFilter === $key) || ($key === 'all' && empty($statusFilter));
                 @endphp
-                <a href="{{ route('order.history', ['status' => $key]) }}"
+                <a href="{{ route('order.history', array_filter(['status' => $key, 'q' => request('q')])) }}"
                    data-tab-key="{{ $key }}"
                    data-active="{{ $isActive ? 'true' : 'false' }}"
                    class="tab-item shrink-0 sm:flex-1 px-4 sm:px-5 py-3 sm:py-3.5 text-center text-xs sm:text-sm whitespace-nowrap select-none transition-colors duration-150 flex items-center justify-center relative
