@@ -3,7 +3,7 @@
 @section('title', 'Struk & Status Pesanan #' . $order->kode_tr)
 
 @section('content')
-<div class="max-w-xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16">
+<div class="max-w-xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-24 md:pb-16">
 
     <!-- Top Bar: Back Link & Auto-Update Ping -->
     <div class="mb-5 flex items-center justify-between">
@@ -312,7 +312,7 @@
 @endif
 
 <!-- Toast Copy Notification -->
-<div id="copy-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl shadow-2xl text-xs font-bold transition-all transform translate-y-20 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+<div id="copy-toast" class="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl shadow-2xl text-xs font-bold transition-all transform translate-y-20 opacity-0 pointer-events-none z-[60] flex items-center gap-2">
     <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
     </svg>

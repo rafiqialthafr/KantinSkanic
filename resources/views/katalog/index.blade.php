@@ -11,9 +11,49 @@
 <div class="relative pb-24 w-full overflow-x-hidden">
 
     <!-- ===================================================
-         1. HERO SECTION (Full-Bleed with banner.webp background)
+         1a. HERO SECTION - MOBILE (< md): gambar di atas, teks & CTA di bawah, background polos
     =================================================== -->
-    <section class="hero-fullscreen relative w-full overflow-hidden bg-[#faf6f0] flex items-center pt-20 sm:pt-24 lg:pt-20">
+    <section class="md:hidden w-full bg-[#fcf7ec] flex flex-col items-center text-center px-4 pt-4 pb-8">
+
+        <!-- Gambar mangkuk mi berdiri bebas (tanpa kotak/border/shadow); tepinya memudar halus menyatu dengan background -->
+        <picture class="block w-full">
+            <source srcset="{{ asset('images/banner.webp') }}" type="image/webp">
+            <img src="{{ asset('images/banner.png') }}"
+                 alt="Mie ayam spesial Kantin Skanic"
+                 fetchpriority="high"
+                 decoding="async"
+                 loading="eager"
+                 class="block w-full max-w-[210px] sm:max-w-[240px] aspect-square object-cover object-[89%_center] mx-auto my-2 select-none pointer-events-none [mask-image:radial-gradient(closest-side,#000_80%,transparent_100%)]">
+        </picture>
+
+        <h1 class="text-[32px] min-[25px]:text-4xl sm:text-[42px] font-black text-center tracking-tight leading-[1.12] mt-1 mb-5">
+            <span class="block text-slate-900">Pesan Makanan</span>
+            <span class="block text-orange-500 mt-0.5">Tanpa Antre</span>
+        </h1>
+
+        <p class="w-full max-w-xs mx-auto px-2 text-xs sm:text-sm text-zinc-500 text-center leading-relaxed mt-1.5 mb-5">
+            Pesan menu kantin favoritmu lebih awal di SMKN 1 Ciomas. Praktis, cepat, dan siap diambil saat istirahat tanpa berdesakan.
+        </p>
+
+        <div class="w-full max-w-xs mx-auto flex flex-col gap-2.5 px-2">
+            <a href="#katalog-section"
+                class="w-full inline-flex items-center justify-center gap-2 py-2.5 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold shadow-md shadow-orange-500/20 active:scale-95 transition-all">
+                <span>Pesan Sekarang</span>
+                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+            </a>
+            <a href="{{ route('katalog.index', ['kategori' => 'terlaris']) }}#katalog-section"
+                class="w-full inline-flex items-center justify-center py-2.5 text-sm bg-white border border-zinc-200 text-zinc-700 rounded-xl font-medium active:scale-95 transition-all">
+                <span>Menu Terlaris</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- ===================================================
+         1b. HERO SECTION - DESKTOP (Full-Bleed with banner.webp background)
+    =================================================== -->
+    <section class="hero-fullscreen relative w-full overflow-hidden bg-[#faf6f0] hidden md:flex items-center pt-20 sm:pt-24 lg:pt-20">
 
         <!-- Full-Bleed Optimized Banner (WebP 55KB for Instant Butter-Smooth Load + Soft Fade-in) -->
         <picture class="absolute inset-0 w-full h-full pointer-events-none select-none">
@@ -416,7 +456,7 @@
     <!-- ===================================================
          5. DRAWER / MODAL KERANJANG & CHECKOUT
     =================================================== -->
-    <div id="cart-modal" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="cart-modal" class="fixed inset-0 z-[60] overflow-hidden hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <!-- Backdrop -->
         <div id="cart-backdrop" onclick="closeCartModal()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity opacity-0"></div>
 

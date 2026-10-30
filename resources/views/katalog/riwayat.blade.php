@@ -95,7 +95,7 @@
 <!-- ========================================================
      2. SHOPEE-STYLE PESANAN SAYA CONTENT AREA
 ======================================================== -->
-<div class="bg-[#f5f5f5] min-h-[70vh] py-6 sm:py-8">
+<div class="bg-[#f5f5f5] min-h-[70vh] pt-6 sm:pt-8 pb-24 md:pb-8">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         @if(!empty($searchQuery))
@@ -704,7 +704,7 @@
 </div>
 
 <!-- Toast Notifikasi Salin Kode PO -->
-<div id="copy-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl shadow-2xl text-xs font-bold transition-all transform translate-y-20 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+<div id="copy-toast" class="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl shadow-2xl text-xs font-bold transition-all transform translate-y-20 opacity-0 pointer-events-none z-[60] flex items-center gap-2">
     <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
     </svg>
@@ -712,7 +712,7 @@
 </div>
 
 <!-- Modal Popup Struk Digital Pengambilan Stand (Floating Modal - Tanpa Pindah Halaman & Tanpa QR) -->
-<div id="digital-receipt-modal" class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 bg-slate-900/75 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none flex items-center justify-center">
+<div id="digital-receipt-modal" class="fixed inset-0 z-[60] overflow-y-auto p-3 sm:p-4 bg-slate-900/75 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none flex items-center justify-center">
     <div id="digital-receipt-card" class="bg-white rounded-[2rem] max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform scale-95 transition-all duration-200 max-h-[88vh] sm:max-h-[90vh] flex flex-col relative my-auto">
 
         <!-- Scrollable Receipt Body (Simpel, bersih, persis struk floating kemaren tanpa QR) -->
@@ -840,7 +840,7 @@
 </div>
 
 <!-- Modal Validasi Pembayaran QRIS Sukses (Tampilan Persis Seperti di Sidebar Keranjang) -->
-<div id="riwayat-qris-success-modal" class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 bg-slate-900/75 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none flex items-center justify-center">
+<div id="riwayat-qris-success-modal" class="fixed inset-0 z-[60] overflow-y-auto p-3 sm:p-4 bg-slate-900/75 backdrop-blur-xs transition-opacity duration-200 opacity-0 pointer-events-none flex items-center justify-center">
     <div id="riwayat-qris-success-card" class="bg-slate-50/70 rounded-[2rem] max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform scale-95 transition-all duration-200 max-h-[90vh] flex flex-col relative my-auto">
 
         <!-- Header: Clean, Minimal, Cohesive with KantinSkanic -->

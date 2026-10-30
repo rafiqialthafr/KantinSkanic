@@ -102,52 +102,6 @@
             }
         }
 
-        /* Mobile nav smooth slide animation (Overlay menutupi hero section) */
-        #mobile-nav-menu {
-            overflow: hidden;
-            max-height: 0;
-            opacity: 0;
-            transform: translateY(-8px);
-            pointer-events: none;
-            transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.25s ease,
-                transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #mobile-nav-menu.mobile-nav-open {
-            max-height: calc(100vh - 4.5rem);
-            overflow-y: auto;
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        /* Animated hamburger bars */
-        .hamburger-bar {
-            display: block;
-            width: 18px;
-            height: 2px;
-            border-radius: 9999px;
-            background: currentColor;
-            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.2s ease,
-                width 0.25s ease;
-            transform-origin: center;
-        }
-
-        .hamburger-btn.is-open .bar-top {
-            transform: translateY(6px) rotate(45deg);
-        }
-
-        .hamburger-btn.is-open .bar-mid {
-            opacity: 0;
-            transform: scaleX(0);
-        }
-
-        .hamburger-btn.is-open .bar-bot {
-            transform: translateY(-6px) rotate(-45deg);
-        }
-
         /* Micro-bounce animation for cart button & badges */
         @keyframes cartPopAnim {
             0% {
@@ -201,13 +155,21 @@
                 right: 1.5rem !important;
             }
         }
+
+        /* Mobile: naikkan tombol keranjang melayang agar berada di atas bottom navigation */
+        @media (max-width: 767px) {
+            #floating-cart-wrapper {
+                bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.75rem) !important;
+                right: 1rem !important;
+            }
+        }
     </style>
     @stack('styles')
 </head>
 
 <body class="flex flex-col min-h-full text-slate-800 bg-slate-50 overflow-x-hidden w-full">
     <!-- Top Navigation Bar -->
-    <header id="main-navbar" class="{{ request()->routeIs('katalog.index') ? 'absolute top-0 left-0 right-0 z-40 bg-transparent border-b border-transparent shadow-none w-full' : 'relative z-40 bg-white border-b border-slate-200/80 shadow-xs w-full' }}">
+    <header id="main-navbar" class="{{ request()->routeIs('katalog.index') ? 'relative z-40 bg-white border-b border-slate-200/80 shadow-xs md:absolute md:top-0 md:left-0 md:right-0 md:bg-transparent md:border-transparent md:shadow-none w-full' : 'relative z-40 bg-white border-b border-slate-200/80 shadow-xs w-full' }}">
         <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 sm:h-20 gap-2">
 
@@ -373,139 +335,8 @@
                         <span>Masuk</span>
                     </a>
                     @endauth
-
-                    <!-- Mobile Menu Toggle Button (Animated 3-bar hamburger) -->
-                    <button type="button" id="mobile-menu-btn" onclick="toggleMobileNav()"
-                        class="hamburger-btn md:hidden w-9 h-9 flex flex-col items-center justify-center gap-[5px] text-slate-600 hover:text-orange-600 hover:bg-orange-50/80 active:scale-95 rounded-xl border border-slate-200/90 transition-all shrink-0 cursor-pointer"
-                        aria-label="Buka Menu">
-                        <span class="hamburger-bar bar-top"></span>
-                        <span class="hamburger-bar bar-mid" style="width:12px;"></span>
-                        <span class="hamburger-bar bar-bot"></span>
-                    </button>
                 </div>
 
-            </div>
-        </div>
-
-        <!-- Mobile Navigation Dropdown (Absolute overlay - menutupi hero section tanpa mendorong ke bawah) -->
-        <div id="mobile-nav-menu" class="md:hidden absolute top-full left-0 right-0 w-full bg-white border-b border-slate-200 shadow-2xl z-50">
-            <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-3.5 space-y-1.5">
-                @auth
-                <!-- User Profile Header Card -->
-                <div class="px-3.5 py-3 mb-2.5 rounded-2xl bg-gradient-to-r from-orange-50/80 via-amber-50/40 to-slate-50 border border-orange-200/70 flex items-center justify-between">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white font-black text-xs shadow-xs shrink-0">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                        </div>
-                        <div class="min-w-0">
-                            <span class="text-xs font-black text-slate-900 block truncate leading-tight">{{ Auth::user()->name }}</span>
-                            <span class="text-[10px] font-bold text-orange-600 block mt-0.5 uppercase tracking-wide">
-                                @if(Auth::user()->isAdmin())
-                                Super Administrator
-                                @elseif(Auth::user()->isPenjual())
-                                Stand Penjual
-                                @elseif(Auth::user()->kelas)
-                                Kelas {{ Auth::user()->kelas }}
-                                @else
-                                Siswa
-                                @endif
-                            </span>
-                        </div>
-                    </div>
-
-                    @if(Auth::user()->isPenjual())
-                    <a href="{{ route('vendor.dashboard') }}" class="px-2.5 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-[10px] shadow-xs active:scale-95 transition-all flex items-center gap-1 shrink-0">
-                        <span>Panel</span>
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                        </svg>
-                    </a>
-                    @elseif(Auth::user()->isAdmin())
-                    <a href="{{ route('admin.dashboard') }}" class="px-2.5 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-[10px] shadow-xs active:scale-95 transition-all flex items-center gap-1 shrink-0">
-                        <span>Panel</span>
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                        </svg>
-                    </a>
-                    @endif
-                </div>
-                @endauth
-
-                <!-- Nav Links with Sleek SVG Heroicons (Icon box dipertahankan, panah chevron > dihapus) -->
-                <a href="{{ route('katalog.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-orange-600 hover:bg-orange-50/70 transition-colors group">
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-orange-100 group-hover:text-orange-600 text-slate-500 flex items-center justify-center transition-colors">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                        </svg>
-                    </div>
-                    <span>Beranda</span>
-                </a>
-
-                <a href="{{ route('katalog.index') }}#katalog-section" onclick="toggleMobileNav()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-orange-600 hover:bg-orange-50/70 transition-colors group">
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-orange-100 group-hover:text-orange-600 text-slate-500 flex items-center justify-center transition-colors">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
-                        </svg>
-                    </div>
-                    <span>Daftar Menu</span>
-                </a>
-
-                <a href="{{ route('order.history') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-orange-600 hover:bg-orange-50/70 transition-colors group">
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-orange-100 group-hover:text-orange-600 text-slate-500 flex items-center justify-center transition-colors">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                    </div>
-                    <span>Riwayat Pesanan</span>
-                </a>
-
-                @auth
-                @if(Auth::user()->isAdmin())
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-orange-700 bg-orange-50/80 border border-orange-200/70 hover:bg-orange-100 transition-colors group">
-                    <div class="w-8 h-8 rounded-lg bg-orange-500 text-white flex items-center justify-center shadow-xs">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                        </svg>
-                    </div>
-                    <span>Panel Admin</span>
-                </a>
-                @elseif(Auth::user()->isPenjual())
-                <a href="{{ route('vendor.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-orange-700 bg-orange-50/80 border border-orange-200/70 hover:bg-orange-100 transition-colors group">
-                    <div class="w-8 h-8 rounded-lg bg-orange-500 text-white flex items-center justify-center shadow-xs">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016 2.993 2.993 0 0 0 2.25-1.016 3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
-                        </svg>
-                    </div>
-                    <span>Dashboard Stand</span>
-                </a>
-                @endif
-
-                <div class="pt-2 border-t border-slate-100">
-                    <form action="{{ route('logout') }}" method="POST" onsubmit="clearAuthStorageOnLogout()">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors group cursor-pointer">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 group-hover:bg-rose-100 flex items-center justify-center transition-colors">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                                    </svg>
-                                </div>
-                                <span>Keluar Akun</span>
-                            </div>
-                            <span class="text-[10px] text-rose-400 font-semibold">Logout</span>
-                        </button>
-                    </form>
-                </div>
-                @else
-                <div class="pt-2 border-t border-slate-100">
-                    <a href="{{ route('login') }}" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
-                        </svg>
-                        <span>Masuk ke Akun</span>
-                    </a>
-                </div>
-                @endauth
             </div>
         </div>
     </header>
@@ -564,7 +395,7 @@
 
 
     <!-- Footer -->
-    <footer class="mt-auto border-t border-slate-200 bg-white py-6 sm:py-7 text-xs text-slate-500">
+    <footer class="mt-auto border-t border-slate-200 bg-white pt-6 sm:pt-7 pb-24 md:pb-7 text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
                 <!-- Brand & Logo -->
@@ -588,37 +419,40 @@
         </div>
     </footer>
 
+    <!-- Bottom Navigation (Mobile Only): Beranda, Menu, Riwayat -->
+    <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-zinc-200 py-2 px-6 flex justify-around items-center z-50 shadow-lg print:hidden" aria-label="Navigasi utama">
+        <a href="{{ route('katalog.index') }}"
+           class="flex flex-col items-center justify-center gap-1 py-0.5 px-3 transition-colors active:scale-95 {{ request()->routeIs('katalog.index') ? 'text-orange-600' : 'text-zinc-500 hover:text-orange-600' }}">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            </svg>
+            <span class="text-[11px] font-semibold leading-none">Beranda</span>
+        </a>
+
+        <a href="{{ route('katalog.index') }}#katalog-section"
+           class="flex flex-col items-center justify-center gap-1 py-0.5 px-3 text-zinc-500 hover:text-orange-600 transition-colors active:scale-95">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+                <path d="M7 2v20" />
+                <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+            </svg>
+            <span class="text-[11px] font-semibold leading-none">Menu</span>
+        </a>
+
+        <a href="{{ route('order.history') }}"
+           class="flex flex-col items-center justify-center gap-1 py-0.5 px-3 transition-colors active:scale-95 {{ request()->routeIs('order.history') ? 'text-orange-600' : 'text-zinc-500 hover:text-orange-600' }}">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+                <path d="M12 7v5l4 2" />
+            </svg>
+            <span class="text-[11px] font-semibold leading-none">Riwayat</span>
+        </a>
+    </nav>
+
     <!-- Global Layout Scripts -->
     <script>
-        function toggleMobileNav() {
-            const menu = document.getElementById('mobile-nav-menu');
-            const btn = document.getElementById('mobile-menu-btn');
-            const navbar = document.getElementById('main-navbar');
-            if (!menu) return;
-
-            const isOpen = menu.classList.contains('mobile-nav-open');
-            if (isOpen) {
-                menu.classList.remove('mobile-nav-open');
-                if (btn) btn.classList.remove('is-open');
-                @if(request()->routeIs('katalog.index'))
-                if (navbar) {
-                    navbar.classList.remove('bg-white', 'shadow-xs', 'border-slate-200/80');
-                    navbar.classList.add('bg-transparent', 'border-transparent');
-                }
-                @endif
-            } else {
-                menu.classList.add('mobile-nav-open');
-                if (btn) btn.classList.add('is-open');
-                @if(request()->routeIs('katalog.index'))
-                if (navbar) {
-                    navbar.classList.add('bg-white', 'shadow-xs', 'border-slate-200/80');
-                    navbar.classList.remove('bg-transparent', 'border-transparent');
-                }
-                @endif
-            }
-        }
-
-
         function toggleUserProfileDropdown(event) {
             if (event) {
                 event.stopPropagation();
