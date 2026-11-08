@@ -31,6 +31,10 @@ class AdminPeriodFilterTest extends TestCase
             $response->assertStatus(200);
             $response->assertSee('Selamat Datang!');
             $response->assertSee('Total Stand Kantin');
+            $response->assertSee('Grafik Omset Penjualan');
+            $response->assertSee('Total Omset');
+            $response->assertSee('Puncak Omset');
+            $this->assertArrayHasKey('omsetChartData', $response->original->getData());
         }
     }
 
@@ -139,5 +143,92 @@ class AdminPeriodFilterTest extends TestCase
         // 4. In dashboard recent orders, past order must not appear when filtered to 'hari_ini'
         $recentOrdersToday = $responseDashboardToday->viewData('recentOrders');
         $this->assertCount(0, $recentOrdersToday);
+    }
+
+    public function test_admin_and_vendor_can_filter_by_custom_date_range(): void
+    {
+        $this->actingAs($this->admin);
+
+        $stand = Stand::first();
+
+        // Order 1: 5 days ago
+        $order5DaysAgo = Order::create([
+            'kode_tr' => 'TR-CUSTOM-5D',
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Siswa 5 Hari Lalu',
+            'kelas' => 'X PPLG 1',
+            'total_harga' => 20000,
+            'status' => 'selesai',
+            'metode_pembayaran' => 'tunai',
+            'status_pembayaran' => 'lunas',
+        ]);
+        $order5DaysAgo->created_at = now()->subDays(5);
+        $order5DaysAgo->saveQuietly();
+
+        // Order 2: 10 days ago
+        $order10DaysAgo = Order::create([
+            'kode_tr' => 'TR-CUSTOM-10D',
+            'stand_id' => $stand->id,
+            'nama_pemesan' => 'Siswa 10 Hari Lalu',
+            'kelas' => 'X PPLG 2',
+            'total_harga' => 35000,
+            'status' => 'selesai',
+            'metode_pembayaran' => 'qris',
+            'status_pembayaran' => 'lunas',
+        ]);
+        $order10DaysAgo->created_at = now()->subDays(10);
+        $order10DaysAgo->saveQuietly();
+
+        // Filter range: 6 days ago to 4 days ago (should only capture Order 1)
+        $start = now()->subDays(6)->format('Y-m-d');
+        $end = now()->subDays(4)->format('Y-m-d');
+
+        // 1. Admin Dashboard with custom dates
+        $respDash = $this->get(route('admin.dashboard', [
+            'periode' => 'kustom',
+            'start_date' => $start,
+            'end_date' => $end,
+        ]));
+        $respDash->assertStatus(200);
+        $this->assertEquals(1, $respDash->viewData('totalOrders'));
+        $this->assertEquals(20000, $respDash->viewData('totalRevenue'));
+
+        // 2. Admin Orders with custom dates
+        $respOrders = $this->get(route('admin.orders.index', [
+            'start_date' => $start,
+            'end_date' => $end,
+        ]));
+        $respOrders->assertStatus(200);
+        $this->assertEquals(1, $respOrders->viewData('totalOrdersCount'));
+        $this->assertEquals(20000, $respOrders->viewData('totalRevenue'));
+
+        // 3. Admin Reports with custom dates
+        $respReports = $this->get(route('admin.reports.index', [
+            'start_date' => $start,
+            'end_date' => $end,
+        ]));
+        $respReports->assertStatus(200);
+        $this->assertEquals(20000, $respReports->viewData('overallTotalRevenue'));
+
+        // 4. Vendor dashboard & omset with custom dates
+        $vendorUser = $stand->user;
+        $this->actingAs($vendorUser);
+
+        $respVendorDash = $this->get(route('vendor.dashboard', [
+            'start_date' => $start,
+            'end_date' => $end,
+        ]));
+        $respVendorDash->assertStatus(200);
+        $this->assertEquals(1, $respVendorDash->viewData('totalOrdersToday'));
+        $this->assertEquals(20000, $respVendorDash->viewData('revenueToday'));
+
+        $respVendorOmset = $this->get(route('vendor.omset', [
+            'periode' => 'kustom',
+            'start_date' => $start,
+            'end_date' => $end,
+        ]));
+        $respVendorOmset->assertStatus(200);
+        $this->assertEquals(20000, $respVendorOmset->viewData('totalOmset'));
+        $this->assertEquals(1, $respVendorOmset->viewData('totalOrders'));
     }
 }

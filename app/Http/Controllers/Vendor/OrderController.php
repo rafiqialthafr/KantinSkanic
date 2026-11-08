@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\PeriodFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,28 +31,11 @@ class OrderController extends Controller
         $stand = Auth::user()->stand;
         $standId = $stand->id;
 
-        // ── Periode filter (same logic as admin ReportController) ──
-        $periode = $request->query('periode', 'hari_ini');
-        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
-            $periode = 'hari_ini';
-        }
-
-        $periodeLabel = match ($periode) {
-            'hari_ini' => 'Hari Ini',
-            'minggu_ini' => 'Minggu Ini',
-            'bulan_ini' => 'Bulan Ini',
-            'semua' => 'Keseluruhan',
-        };
-
-        $applyPeriode = function ($q) use ($periode) {
-            match ($periode) {
-                'hari_ini' => $q->whereDate('created_at', today()),
-                'minggu_ini' => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-                'bulan_ini' => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
-                'semua' => null,
-                default => $q->whereDate('created_at', today()),
-            };
-        };
+        // ── Periode filter (unified PeriodFilterService) ──
+        $period = PeriodFilterService::resolve($request);
+        $periode = $period['periode'];
+        $periodeLabel = $period['periodeLabel'];
+        $applyPeriode = $period['filter'];
 
         $today = now()->startOfDay();
 
@@ -126,27 +110,10 @@ class OrderController extends Controller
         $stand = Auth::user()->stand;
         $standId = $stand->id;
 
-        $periode = $request->query('periode', 'hari_ini');
-        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
-            $periode = 'hari_ini';
-        }
-
-        $periodeLabel = match ($periode) {
-            'hari_ini' => 'Hari Ini',
-            'minggu_ini' => 'Minggu Ini',
-            'bulan_ini' => 'Bulan Ini',
-            'semua' => 'Keseluruhan',
-        };
-
-        $applyPeriode = function ($q) use ($periode) {
-            match ($periode) {
-                'hari_ini' => $q->whereDate('created_at', today()),
-                'minggu_ini' => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-                'bulan_ini' => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
-                'semua' => null,
-                default => $q->whereDate('created_at', today()),
-            };
-        };
+        $period = PeriodFilterService::resolve($request);
+        $periode = $period['periode'];
+        $periodeLabel = $period['periodeLabel'];
+        $applyPeriode = $period['filter'];
 
         $baseQuery = Order::where('stand_id', $standId);
         $applyPeriode($baseQuery);

@@ -46,7 +46,7 @@
             <a href="{{ route('katalog.index', ['kategori' => 'terlaris']) }}#katalog-section"
                 class="w-full inline-flex items-center justify-center py-2.5 text-sm bg-white border border-zinc-200 text-zinc-700 rounded-xl font-medium active:scale-95 transition-all">
                 <span>Menu Terlaris</span>
-            </a>
+            </a>    
         </div>
     </section>
 

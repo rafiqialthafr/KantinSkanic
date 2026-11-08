@@ -70,6 +70,12 @@
         <form method="GET" action="{{ route('admin.orders.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {{-- Preserve current period filter --}}
             <input type="hidden" name="periode" value="{{ $periode }}">
+            @if(request()->filled('start_date'))
+                <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+            @endif
+            @if(request()->filled('end_date'))
+                <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+            @endif
 
             <div>
                 <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Cari Kode / Pemesan</label>
@@ -106,7 +112,7 @@
                     Filter
                 </button>
                 @if(request()->anyFilled(['search', 'stand_id', 'status']))
-                <a href="{{ route('admin.orders.index', ['periode' => $periode]) }}" class="min-h-[40px] flex items-center py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors">
+                <a href="{{ route('admin.orders.index', request()->only(['periode', 'start_date', 'end_date'])) }}" class="min-h-[40px] flex items-center py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors">
                     Reset
                 </a>
                 @endif

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Stand;
+use App\Services\PeriodFilterService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,7 +18,7 @@ class ReportController extends Controller
      */
     public function index(Request $request): View
     {
-        $data = $this->getReportData($request->query('periode', 'hari_ini'));
+        $data = $this->getReportData($request);
 
         return view('admin.reports.index', $data);
     }
@@ -27,7 +28,7 @@ class ReportController extends Controller
      */
     public function exportExcel(Request $request): Response
     {
-        $data = $this->getReportData($request->query('periode', 'hari_ini'));
+        $data = $this->getReportData($request);
 
         if ($request->query('format') === 'csv') {
             $filename = 'laporan-omset-kantinskanic-'.$data['periode'].'-'.Carbon::now()->format('Ymd-His').'.csv';
@@ -118,7 +119,7 @@ class ReportController extends Controller
      */
     public function exportPdf(Request $request): View
     {
-        $data = $this->getReportData($request->query('periode', 'hari_ini'));
+        $data = $this->getReportData($request);
 
         return view('admin.reports.pdf', $data);
     }
@@ -128,35 +129,13 @@ class ReportController extends Controller
      *
      * @return array<string, mixed>
      */
-    protected function getReportData(string $periode): array
+    protected function getReportData(Request|array|string $input = 'hari_ini'): array
     {
-        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
-            $periode = 'hari_ini';
-        }
-
-        $periodeLabel = match ($periode) {
-            'hari_ini' => 'Hari Ini',
-            'minggu_ini' => 'Minggu Ini',
-            'bulan_ini' => 'Bulan Ini',
-            'semua' => 'Keseluruhan',
-        };
-
-        $periodeDetail = match ($periode) {
-            'hari_ini' => Carbon::today('Asia/Jakarta')->locale('id')->isoFormat('dddd, D MMMM Y'),
-            'minggu_ini' => Carbon::now('Asia/Jakarta')->startOfWeek()->locale('id')->isoFormat('D MMMM Y').' — '.Carbon::now('Asia/Jakarta')->endOfWeek()->locale('id')->isoFormat('D MMMM Y'),
-            'bulan_ini' => Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('MMMM Y'),
-            'semua' => 'Semua Riwayat s/d '.Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('D MMMM Y'),
-        };
-
-        $periodFilter = function ($q) use ($periode): void {
-            match ($periode) {
-                'hari_ini' => $q->whereDate('created_at', today()),
-                'minggu_ini' => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-                'bulan_ini' => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
-                'semua' => null,
-                default => $q->whereDate('created_at', today()),
-            };
-        };
+        $period = PeriodFilterService::resolve(is_string($input) ? ['periode' => $input] : $input);
+        $periode = $period['periode'];
+        $periodeLabel = $period['periodeLabel'];
+        $periodeDetail = $period['periodeDetail'];
+        $periodFilter = $period['filter'];
 
         $stands = Stand::withCount([
             'menus',

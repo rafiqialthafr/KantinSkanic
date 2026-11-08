@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Stand;
 use App\Models\User;
+use App\Services\PeriodFilterService;
 use Illuminate\Http\Request;
 
 class SystemController extends Controller
@@ -16,17 +17,9 @@ class SystemController extends Controller
      */
     public function index(Request $request)
     {
-        $periode = $request->query('periode', 'hari_ini');
-        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
-            $periode = 'hari_ini';
-        }
-
-        $periodeLabel = match ($periode) {
-            'hari_ini' => 'Hari Ini',
-            'minggu_ini' => 'Minggu Ini',
-            'bulan_ini' => 'Bulan Ini',
-            'semua' => 'Keseluruhan',
-        };
+        $period = PeriodFilterService::resolve($request);
+        $periode = $period['periode'];
+        $periodeLabel = $period['periodeLabel'];
 
         $userCounts = [
             'admin' => User::where('role', 'admin')->count(),

@@ -28,7 +28,7 @@
 
         <div class="grid grid-cols-2 sm:flex sm:items-center gap-2.5 shrink-0">
             {{-- Tombol Ekspor Excel --}}
-            <a href="{{ route('admin.reports.export.excel', ['periode' => $periode]) }}"
+            <a href="{{ route('admin.reports.export.excel', request()->only(['periode', 'start_date', 'end_date'])) }}"
                class="inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-sm shadow-emerald-600/25 transition-all cursor-pointer"
                title="Unduh laporan omset format Excel (.xls)">
                 <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -38,7 +38,7 @@
             </a>
 
             {{-- Tombol Ekspor PDF --}}
-            <a href="{{ route('admin.reports.export.pdf', ['periode' => $periode]) }}"
+            <a href="{{ route('admin.reports.export.pdf', request()->only(['periode', 'start_date', 'end_date'])) }}"
                target="_blank"
                class="inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-sm shadow-rose-600/25 transition-all cursor-pointer"
                title="Buka & cetak laporan omset format PDF">

@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Stand;
 use App\Models\User;
+use App\Services\PeriodFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,43 +19,18 @@ class StandController extends Controller
      */
     public function index(Request $request)
     {
-        $periode = $request->query('periode', 'hari_ini');
+        $period = PeriodFilterService::resolve($request);
+        $periode = $period['periode'];
+        $periodeLabel = $period['periodeLabel'];
+        $periodScope = $period['scope'];
 
         // Base query for time-sensitive order metrics
-        $orderQuery = Order::query();
-
-        match ($periode) {
-            'hari_ini' => $orderQuery->whereDate('created_at', today()),
-            'minggu_ini' => $orderQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-            'bulan_ini' => $orderQuery->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
-            'semua' => null,
-            default => $orderQuery->whereDate('created_at', today()),
-        };
-
-        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
-            $periode = 'hari_ini';
-        }
-
-        $periodeLabel = match ($periode) {
-            'hari_ini' => 'Hari Ini',
-            'minggu_ini' => 'Minggu Ini',
-            'bulan_ini' => 'Bulan Ini',
-            'semua' => 'Keseluruhan',
-        };
+        $orderQuery = Order::query()->tap($periodScope);
 
         // Time-sensitive metrics (updated based on period filter)
         $totalOrders = (clone $orderQuery)->count();
         $totalRevenue = (clone $orderQuery)->where('status', 'selesai')->sum('total_harga');
         $completedOrdersCount = (clone $orderQuery)->where('status', 'selesai')->count();
-
-        // Build a period-scoped date constraint for reuse
-        $periodScope = match ($periode) {
-            'hari_ini' => fn ($q) => $q->whereDate('created_at', today()),
-            'minggu_ini' => fn ($q) => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-            'bulan_ini' => fn ($q) => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
-            'semua' => fn ($q) => $q,
-            default => fn ($q) => $q->whereDate('created_at', today()),
-        };
 
         // Static / Master Data (constant cumulative)
         // orders_count dipersempit ke periode aktif agar badge di tabel stand konsisten
@@ -77,6 +53,9 @@ class StandController extends Controller
             ->take(50)
             ->get();
 
+        // Dataset grafik omset penjualan interaktif sesuai filter periode aktif
+        $omsetChartData = PeriodFilterService::getRevenueChartData($period);
+
         return view('admin.dashboard', compact(
             'stands',
             'totalStands',
@@ -89,7 +68,8 @@ class StandController extends Controller
             'completedOrdersCount',
             'recentOrders',
             'periode',
-            'periodeLabel'
+            'periodeLabel',
+            'omsetChartData'
         ));
     }
 
@@ -98,25 +78,10 @@ class StandController extends Controller
      */
     public function manageIndex(Request $request)
     {
-        $periode = $request->query('periode', 'hari_ini');
-        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
-            $periode = 'hari_ini';
-        }
-
-        $periodeLabel = match ($periode) {
-            'hari_ini' => 'Hari Ini',
-            'minggu_ini' => 'Minggu Ini',
-            'bulan_ini' => 'Bulan Ini',
-            'semua' => 'Keseluruhan',
-        };
-
-        $periodScope = match ($periode) {
-            'hari_ini' => fn ($q) => $q->whereDate('created_at', today()),
-            'minggu_ini' => fn ($q) => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-            'bulan_ini' => fn ($q) => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
-            'semua' => fn ($q) => $q,
-            default => fn ($q) => $q->whereDate('created_at', today()),
-        };
+        $period = PeriodFilterService::resolve($request);
+        $periode = $period['periode'];
+        $periodeLabel = $period['periodeLabel'];
+        $periodScope = $period['scope'];
 
         $totalOrdersInPeriod = Order::query()->tap($periodScope)->count();
 

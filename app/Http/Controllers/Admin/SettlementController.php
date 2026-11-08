@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Settlement;
 use App\Models\Stand;
+use App\Services\PeriodFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,27 +17,10 @@ class SettlementController extends Controller
      */
     public function index(Request $request)
     {
-        $periode = $request->query('periode', 'hari_ini');
-        if (! in_array($periode, ['hari_ini', 'minggu_ini', 'bulan_ini', 'semua'], true)) {
-            $periode = 'hari_ini';
-        }
-
-        $periodeLabel = match ($periode) {
-            'hari_ini' => 'Hari Ini',
-            'minggu_ini' => 'Minggu Ini',
-            'bulan_ini' => 'Bulan Ini',
-            'semua' => 'Keseluruhan',
-        };
-
-        $periodFilter = function ($q) use ($periode) {
-            match ($periode) {
-                'hari_ini' => $q->whereDate('created_at', today()),
-                'minggu_ini' => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-                'bulan_ini' => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
-                'semua' => null,
-                default => $q->whereDate('created_at', today()),
-            };
-        };
+        $period = PeriodFilterService::resolve($request);
+        $periode = $period['periode'];
+        $periodeLabel = $period['periodeLabel'];
+        $periodFilter = $period['filter'];
 
         // 1. Transaction Recap (Khusus QRIS sesuai periode)
         // Total QRIS Masuk: Semua pembayaran QRIS yang sudah lunas dan tidak dibatalkan

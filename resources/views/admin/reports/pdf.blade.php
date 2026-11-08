@@ -335,7 +335,7 @@
             <span style="color: #94a3b8; font-size: 11px;">(Pilih 'Save as PDF' / 'Simpan sebagai PDF' saat jendela cetak terbuka)</span>
         </div>
         <div class="toolbar-actions">
-            <a href="{{ route('admin.reports.index', ['periode' => $periode]) }}" class="btn btn-secondary">
+            <a href="{{ route('admin.reports.index', request()->only(['periode', 'start_date', 'end_date'])) }}" class="btn btn-secondary">
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
                 Kembali ke Panel
             </a>

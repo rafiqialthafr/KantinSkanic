@@ -81,7 +81,12 @@
 
     </div>
 
-    {{-- 2. STANDS MANAGEMENT --}}
+    {{-- 2. GRAFIK OMSET PENJUALAN KANTIN (SaaS Modern Interactive Chart) --}}
+    @if(isset($omsetChartData))
+    <x-omset-chart :chartData="$omsetChartData" :periodeLabel="$periodeLabel" :periode="$periode" />
+    @endif
+
+    {{-- 3. STANDS MANAGEMENT --}}
     <div id="daftar-stand" class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xs overflow-hidden scroll-mt-6">
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
