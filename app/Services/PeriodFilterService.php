@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\Stand;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -200,7 +201,7 @@ class PeriodFilterService
             $query->where('stand_id', $standId);
         }
 
-        $orders = $query->orderBy('created_at')->get(['id', 'total_harga', 'metode_pembayaran', 'created_at']);
+        $orders = $query->orderBy('created_at')->get(['id', 'stand_id', 'total_harga', 'metode_pembayaran', 'created_at']);
 
         $buckets = [];
 
@@ -429,6 +430,7 @@ class PeriodFilterService
 
         // 2. Compute Summary Metrics & Arrays
         $labels = [];
+        $fullLabels = [];
         $revenue = [];
         $qris = [];
         $cash = [];
@@ -443,6 +445,7 @@ class PeriodFilterService
 
         foreach ($buckets as $item) {
             $labels[] = $item['label'];
+            $fullLabels[] = $item['full_label'] ?? $item['label'];
             $revenue[] = $item['revenue'];
             $qris[] = $item['qris'];
             $cash[] = $item['cash'];
@@ -463,12 +466,93 @@ class PeriodFilterService
         $qrisPercentage = $totalRevenue > 0 ? (int) round(($qrisRevenue / $totalRevenue) * 100) : 0;
         $cashPercentage = $totalRevenue > 0 ? (int) round(($cashRevenue / $totalRevenue) * 100) : 0;
 
+        // 3. Stand Comparison Data (Bar Chart)
+        $standQuery = Stand::query();
+        if ($standId !== null) {
+            $standQuery->where('id', $standId);
+        }
+        $allStands = $standQuery->orderBy('nama_stand')->get(['id', 'nama_stand', 'nomor_stand']);
+
+        $standStats = [];
+        foreach ($allStands as $st) {
+            $standStats[$st->id] = [
+                'id' => $st->id,
+                'name' => $st->nama_stand,
+                'nomor' => $st->nomor_stand,
+                'revenue' => 0,
+                'orders_count' => 0,
+                'qris' => 0,
+                'cash' => 0,
+            ];
+        }
+
+        foreach ($orders as $order) {
+            $sId = $order->stand_id;
+            if ($sId && isset($standStats[$sId])) {
+                $standStats[$sId]['revenue'] += (int) $order->total_harga;
+                $standStats[$sId]['orders_count']++;
+                if ($order->metode_pembayaran === 'qris') {
+                    $standStats[$sId]['qris'] += (int) $order->total_harga;
+                } else {
+                    $standStats[$sId]['cash'] += (int) $order->total_harga;
+                }
+            } elseif ($sId) {
+                if (! isset($standStats[$sId])) {
+                    $standStats[$sId] = [
+                        'id' => $sId,
+                        'name' => 'Stand #'.$sId,
+                        'nomor' => '-',
+                        'revenue' => 0,
+                        'orders_count' => 0,
+                        'qris' => 0,
+                        'cash' => 0,
+                    ];
+                }
+                $standStats[$sId]['revenue'] += (int) $order->total_harga;
+                $standStats[$sId]['orders_count']++;
+                if ($order->metode_pembayaran === 'qris') {
+                    $standStats[$sId]['qris'] += (int) $order->total_harga;
+                } else {
+                    $standStats[$sId]['cash'] += (int) $order->total_harga;
+                }
+            }
+        }
+
+        // Sort stands by revenue DESC, then by name
+        usort($standStats, function ($a, $b) {
+            if ($b['revenue'] !== $a['revenue']) {
+                return $b['revenue'] <=> $a['revenue'];
+            }
+
+            return strcmp($a['name'], $b['name']);
+        });
+
+        $standLabels = [];
+        $standRevenues = [];
+        $standOrders = [];
+        $standShares = [];
+
+        foreach ($standStats as $st) {
+            $standLabels[] = $st['name'];
+            $standRevenues[] = $st['revenue'];
+            $standOrders[] = $st['orders_count'];
+            $standShares[] = $totalRevenue > 0 ? (int) round(($st['revenue'] / $totalRevenue) * 100) : 0;
+        }
+
         return [
             'labels' => $labels,
+            'full_labels' => $fullLabels,
             'revenue' => $revenue,
             'qris' => $qris,
             'cash' => $cash,
             'orders_count' => $counts,
+            'stands' => [
+                'labels' => $standLabels,
+                'revenue' => $standRevenues,
+                'orders_count' => $standOrders,
+                'shares' => $standShares,
+                'list' => array_values($standStats),
+            ],
             'summary' => [
                 'total_revenue' => $totalRevenue,
                 'total_orders' => $totalOrders,

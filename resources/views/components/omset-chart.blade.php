@@ -19,10 +19,18 @@
         'peak_amount' => 0,
     ];
     $labels = $chartData['labels'] ?? [];
+    $fullLabels = $chartData['full_labels'] ?? $labels;
     $revenue = $chartData['revenue'] ?? [];
     $qris = $chartData['qris'] ?? [];
     $cash = $chartData['cash'] ?? [];
     $ordersCount = $chartData['orders_count'] ?? [];
+    $standsData = $chartData['stands'] ?? [
+        'labels' => [],
+        'revenue' => [],
+        'orders_count' => [],
+        'shares' => [],
+        'list' => [],
+    ];
 @endphp
 
 <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs overflow-hidden" id="chartCard_{{ $uniqueId }}">
@@ -43,7 +51,7 @@
                         {{ $periodeLabel }}
                     </span>
                 </div>
-                <p class="text-xs text-slate-400 font-medium mt-0.5">
+                <p class="text-xs text-slate-400 font-medium mt-0.5" id="chartDesc_{{ $uniqueId }}">
                     Visualisasi pendapatan omset pesanan selesai kantin
                 </p>
             </div>
@@ -64,10 +72,10 @@
                 QRIS vs Tunai
             </button>
             <button type="button"
-                id="btnModeOrders_{{ $uniqueId }}"
-                onclick="switchOmsetChartMode('{{ $uniqueId }}', 'orders')"
+                id="btnModeStands_{{ $uniqueId }}"
+                onclick="switchOmsetChartMode('{{ $uniqueId }}', 'stands')"
                 class="px-3 py-1.5 rounded-lg font-semibold text-xs text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
-                Volume Pesanan
+                Per Stand
             </button>
         </div>
     </div>
@@ -142,10 +150,16 @@
     if (!canvas) return;
 
     var chartLabels = @json($labels);
+    var fullLabels = @json($fullLabels);
     var revenueData = @json($revenue);
     var qrisData = @json($qris);
     var cashData = @json($cash);
     var ordersCountData = @json($ordersCount);
+
+    var standLabels = @json($standsData['labels'] ?? []);
+    var standRevenueData = @json($standsData['revenue'] ?? []);
+    var standOrdersData = @json($standsData['orders_count'] ?? []);
+    var standSharesData = @json($standsData['shares'] ?? []);
 
     function formatRupiahShort(value) {
         if (value >= 1000000) {
@@ -163,28 +177,28 @@
 
     var ctx = canvas.getContext('2d');
 
-    // Create Silk Warm KantinSkanic Glow Gradients with multi-stop falloff
+    // Create Silk Warm KantinSkanic Glow Gradients with bright, fresh luminosity
     var orangeGradient = ctx.createLinearGradient(0, 0, 0, 320);
-    orangeGradient.addColorStop(0, 'rgba(234, 88, 12, 0.26)');
-    orangeGradient.addColorStop(0.45, 'rgba(249, 115, 22, 0.08)');
-    orangeGradient.addColorStop(1, 'rgba(249, 115, 22, 0.00)');
+    orangeGradient.addColorStop(0, 'rgba(255, 122, 0, 0.35)');
+    orangeGradient.addColorStop(0.5, 'rgba(254, 215, 170, 0.12)');
+    orangeGradient.addColorStop(1, 'rgba(255, 255, 255, 0.00)');
 
     var skyGradient = ctx.createLinearGradient(0, 0, 0, 320);
-    skyGradient.addColorStop(0, 'rgba(2, 132, 199, 0.22)');
-    skyGradient.addColorStop(0.45, 'rgba(2, 132, 199, 0.06)');
-    skyGradient.addColorStop(1, 'rgba(2, 132, 199, 0.00)');
+    skyGradient.addColorStop(0, 'rgba(14, 165, 233, 0.32)');
+    skyGradient.addColorStop(0.5, 'rgba(186, 230, 253, 0.10)');
+    skyGradient.addColorStop(1, 'rgba(255, 255, 255, 0.00)');
 
     var emeraldGradient = ctx.createLinearGradient(0, 0, 0, 320);
-    emeraldGradient.addColorStop(0, 'rgba(16, 185, 129, 0.22)');
-    emeraldGradient.addColorStop(0.45, 'rgba(16, 185, 129, 0.06)');
-    emeraldGradient.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+    emeraldGradient.addColorStop(0, 'rgba(16, 185, 129, 0.32)');
+    emeraldGradient.addColorStop(0.5, 'rgba(167, 243, 208, 0.10)');
+    emeraldGradient.addColorStop(1, 'rgba(255, 255, 255, 0.00)');
 
     // Datasets configuration — Ultra-Smooth Spline Curve with Monotone Interpolation
     var totalDatasets = [
         {
             label: 'Total Omset',
             data: revenueData,
-            borderColor: '#ea580c',
+            borderColor: '#f97316',
             backgroundColor: orangeGradient,
             borderWidth: 3.2,
             fill: true,
@@ -194,7 +208,7 @@
             borderJoinStyle: 'round',
             pointRadius: 0,
             pointHoverRadius: 7,
-            pointHoverBackgroundColor: '#ea580c',
+            pointHoverBackgroundColor: '#f97316',
             pointHoverBorderColor: '#ffffff',
             pointHoverBorderWidth: 3,
             pointHitRadius: 25,
@@ -206,7 +220,7 @@
         {
             label: 'QRIS Online',
             data: qrisData,
-            borderColor: '#0284c7',
+            borderColor: '#0ea5e9',
             backgroundColor: skyGradient,
             borderWidth: 2.8,
             fill: true,
@@ -216,7 +230,7 @@
             borderJoinStyle: 'round',
             pointRadius: 0,
             pointHoverRadius: 6.5,
-            pointHoverBackgroundColor: '#0284c7',
+            pointHoverBackgroundColor: '#0ea5e9',
             pointHoverBorderColor: '#ffffff',
             pointHoverBorderWidth: 2.5,
             pointHitRadius: 25,
@@ -225,7 +239,7 @@
         {
             label: 'Tunai (COD)',
             data: cashData,
-            borderColor: '#059669',
+            borderColor: '#10b981',
             backgroundColor: emeraldGradient,
             borderWidth: 2.8,
             fill: true,
@@ -235,7 +249,7 @@
             borderJoinStyle: 'round',
             pointRadius: 0,
             pointHoverRadius: 6.5,
-            pointHoverBackgroundColor: '#059669',
+            pointHoverBackgroundColor: '#10b981',
             pointHoverBorderColor: '#ffffff',
             pointHoverBorderWidth: 2.5,
             pointHitRadius: 25,
@@ -243,19 +257,37 @@
         }
     ];
 
-    var ordersDatasets = [
+    // Stand Comparison Bar Dataset — Bright radiant warm gradient bars with rounded corners
+    var standDatasets = [
         {
             type: 'bar',
-            label: 'Volume Pesanan Selesai',
-            data: ordersCountData,
-            backgroundColor: 'rgba(249, 115, 22, 0.70)',
-            hoverBackgroundColor: '#ea580c',
-            borderColor: '#ea580c',
-            borderWidth: 0,
-            borderRadius: 12,
+            label: 'Omset Stand',
+            data: standRevenueData,
+            backgroundColor: function(context) {
+                var chart = context.chart;
+                var c = chart.ctx;
+                var area = chart.chartArea;
+                if (!area) {
+                    return '#fb923c';
+                }
+                var grad = c.createLinearGradient(0, area.top, 0, area.bottom);
+                grad.addColorStop(0, '#fb923c');   // bright radiant warm orange-400 at top
+                grad.addColorStop(1, '#f97316');   // vivid warm orange-500 at bottom
+                return grad;
+            },
+            hoverBackgroundColor: '#ff8a3d',
+            borderColor: '#f97316',
+            borderWidth: 1.5,
+            borderRadius: {
+                topLeft: 8,
+                topRight: 8,
+                bottomLeft: 0,
+                bottomRight: 0
+            },
             borderSkipped: false,
-            barPercentage: 0.52,
-            categoryPercentage: 0.72,
+            barPercentage: 0.50,
+            categoryPercentage: 0.65,
+            maxBarThickness: 46,
             yAxisID: 'y'
         }
     ];
@@ -269,6 +301,14 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 14,
+                    right: 18,
+                    bottom: 6,
+                    left: 10
+                }
+            },
             interaction: {
                 intersect: false,
                 mode: 'index'
@@ -286,14 +326,16 @@
                     display: false
                 },
                 tooltip: {
-                    backgroundColor: '#0f172a',
+                    backgroundColor: '#1e293b',
+                    borderColor: '#334155',
+                    borderWidth: 1,
                     titleColor: '#f8fafc',
                     titleFont: {
                         family: "'Plus Jakarta Sans', sans-serif",
                         size: 12,
                         weight: 'bold'
                     },
-                    bodyColor: '#cbd5e1',
+                    bodyColor: '#e2e8f0',
                     bodyFont: {
                         family: "'Plus Jakarta Sans', sans-serif",
                         size: 11
@@ -303,10 +345,25 @@
                     displayColors: true,
                     boxPadding: 4,
                     callbacks: {
+                        title: function(items) {
+                            if (!items || !items.length) return '';
+                            var currentMode = window['omsetChartMode_' + uniqueId] || 'total';
+                            if (currentMode === 'stands') {
+                                return items[0].label;
+                            }
+                            var index = items[0].dataIndex;
+                            return fullLabels[index] || items[0].label;
+                        },
                         label: function(context) {
                             var currentMode = window['omsetChartMode_' + uniqueId] || 'total';
-                            if (currentMode === 'orders') {
-                                return ' ' + context.dataset.label + ': ' + context.parsed.y + ' pesanan';
+                            if (currentMode === 'stands') {
+                                var index = context.dataIndex;
+                                var count = standOrdersData[index] || 0;
+                                var share = standSharesData[index] || 0;
+                                return [
+                                    ' Omset: ' + formatRupiahFull(context.parsed.y) + ' (' + share + '% dari total)',
+                                    ' Volume: ' + count + ' pesanan selesai'
+                                ];
                             }
                             var index = context.dataIndex;
                             var count = ordersCountData[index] || 0;
@@ -317,8 +374,10 @@
             },
             scales: {
                 x: {
+                    offset: false,
                     border: {
-                        display: false
+                        display: true,
+                        color: '#e2e8f0'
                     },
                     grid: {
                         display: false
@@ -330,7 +389,7 @@
                             size: 11,
                             weight: '600'
                         },
-                        padding: 8,
+                        padding: 10,
                         maxRotation: 0,
                         autoSkip: true,
                         maxTicksLimit: 12
@@ -339,24 +398,23 @@
                 y: {
                     beginAtZero: true,
                     border: {
-                        display: false
+                        display: true,
+                        color: '#e2e8f0',
+                        dash: [4, 4]
                     },
                     grid: {
-                        color: '#f1f5f9',
+                        color: '#f8fafc',
                         lineWidth: 1
                     },
                     ticks: {
-                        color: '#94a3b8',
+                        color: '#64748b',
                         font: {
                             family: "'Plus Jakarta Sans', sans-serif",
-                            size: 10.5
+                            size: 10.5,
+                            weight: '600'
                         },
-                        padding: 8,
+                        padding: 14,
                         callback: function(val) {
-                            var currentMode = window['omsetChartMode_' + uniqueId] || 'total';
-                            if (currentMode === 'orders') {
-                                return Number.isInteger(val) ? val + ' pesanan' : '';
-                            }
                             return formatRupiahShort(val);
                         }
                     }
@@ -377,9 +435,10 @@
 
         var btnTotal = document.getElementById('btnModeTotal_' + id);
         var btnSplit = document.getElementById('btnModeSplit_' + id);
-        var btnOrders = document.getElementById('btnModeOrders_' + id);
+        var btnStands = document.getElementById('btnModeStands_' + id);
+        var chartDesc = document.getElementById('chartDesc_' + id);
 
-        [btnTotal, btnSplit, btnOrders].forEach(function(b) {
+        [btnTotal, btnSplit, btnStands].forEach(function(b) {
             if (!b) return;
             b.classList.remove('bg-white', 'text-orange-600', 'shadow-2xs', 'font-bold');
             b.classList.add('text-slate-600', 'hover:text-slate-900', 'font-semibold');
@@ -390,24 +449,46 @@
                 btnTotal.classList.add('bg-white', 'text-orange-600', 'shadow-2xs', 'font-bold');
                 btnTotal.classList.remove('text-slate-600', 'hover:text-slate-900', 'font-semibold');
             }
+            if (chartDesc) {
+                chartDesc.textContent = 'Visualisasi pendapatan omset pesanan selesai kantin';
+            }
             chart.config.type = 'line';
+            chart.data.labels = chartLabels;
             chart.data.datasets = totalDatasets;
+            chart.options.scales.x.offset = false;
+            chart.options.scales.x.ticks.autoSkip = true;
+            chart.options.scales.x.ticks.maxRotation = 0;
         } else if (mode === 'split') {
             if (btnSplit) {
                 btnSplit.classList.add('bg-white', 'text-orange-600', 'shadow-2xs', 'font-bold');
                 btnSplit.classList.remove('text-slate-600', 'hover:text-slate-900', 'font-semibold');
             }
-            chart.config.type = 'line';
-            chart.data.datasets = splitDatasets;
-        } else if (mode === 'orders') {
-            if (btnOrders) {
-                btnOrders.classList.add('bg-white', 'text-orange-600', 'shadow-2xs', 'font-bold');
-                btnOrders.classList.remove('text-slate-600', 'hover:text-slate-900', 'font-semibold');
+            if (chartDesc) {
+                chartDesc.textContent = 'Perbandingan pembayaran non-tunai (QRIS) vs uang tunai (COD)';
             }
-            chart.data.datasets = ordersDatasets;
+            chart.config.type = 'line';
+            chart.data.labels = chartLabels;
+            chart.data.datasets = splitDatasets;
+            chart.options.scales.x.offset = false;
+            chart.options.scales.x.ticks.autoSkip = true;
+            chart.options.scales.x.ticks.maxRotation = 0;
+        } else if (mode === 'stands') {
+            if (btnStands) {
+                btnStands.classList.add('bg-white', 'text-orange-600', 'shadow-2xs', 'font-bold');
+                btnStands.classList.remove('text-slate-600', 'hover:text-slate-900', 'font-semibold');
+            }
+            if (chartDesc) {
+                chartDesc.textContent = 'Perbandingan performa omset masing-masing stand kantin periode ' + @json($periodeLabel);
+            }
+            chart.config.type = 'bar';
+            chart.data.labels = standLabels;
+            chart.data.datasets = standDatasets;
+            chart.options.scales.x.offset = true;
+            chart.options.scales.x.ticks.autoSkip = false;
+            chart.options.scales.x.ticks.maxRotation = window.innerWidth < 640 ? 25 : 0;
         }
 
-        chart.update('active');
+        chart.update();
     };
 })();
 </script>

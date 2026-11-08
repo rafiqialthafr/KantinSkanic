@@ -231,4 +231,41 @@ class AdminPeriodFilterTest extends TestCase
         $this->assertEquals(20000, $respVendorOmset->viewData('totalOmset'));
         $this->assertEquals(1, $respVendorOmset->viewData('totalOrders'));
     }
+
+    public function test_admin_dashboard_chart_includes_stand_comparison_data(): void
+    {
+        $this->actingAs($this->admin);
+
+        $stands = Stand::take(2)->get();
+        $stand1 = $stands[0];
+        $stand2 = $stands[1];
+
+        // Create an order for stand 1 today
+        Order::create([
+            'kode_tr' => 'TR-STAND-COMP-1',
+            'stand_id' => $stand1->id,
+            'nama_pemesan' => 'Siswa Stand 1',
+            'kelas' => 'XII RPL',
+            'total_harga' => 50000,
+            'metode_pembayaran' => 'qris',
+            'status' => 'selesai',
+            'catatan' => null,
+        ]);
+
+        $response = $this->get(route('admin.dashboard', ['periode' => 'hari_ini']));
+        $response->assertStatus(200);
+        $response->assertSee('Per Stand');
+
+        $chartData = $response->viewData('omsetChartData');
+        $this->assertArrayHasKey('stands', $chartData);
+        $this->assertArrayHasKey('labels', $chartData['stands']);
+        $this->assertArrayHasKey('revenue', $chartData['stands']);
+        $this->assertArrayHasKey('orders_count', $chartData['stands']);
+        $this->assertArrayHasKey('shares', $chartData['stands']);
+
+        $stand1Index = array_search($stand1->nama_stand, $chartData['stands']['labels'], true);
+        $this->assertNotFalse($stand1Index);
+        $this->assertEquals(50000, $chartData['stands']['revenue'][$stand1Index]);
+        $this->assertEquals(1, $chartData['stands']['orders_count'][$stand1Index]);
+    }
 }
