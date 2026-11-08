@@ -188,8 +188,8 @@ class PeriodFilterService
     public static function getRevenueChartData(array $periodData, ?int $standId = null): array
     {
         $periode = $periodData['periode'] ?? 'hari_ini';
-        $startDate = $periodData['startDate'] ?? Carbon::today('Asia/Jakarta')->startOfDay();
-        $endDate = $periodData['endDate'] ?? Carbon::today('Asia/Jakarta')->endOfDay();
+        $startDate = $periodData['startDate'] ?? null;
+        $endDate = $periodData['endDate'] ?? null;
         $scope = $periodData['scope'] ?? fn ($q) => $q;
 
         $query = Order::query()
@@ -291,13 +291,15 @@ class PeriodFilterService
                 }
             }
         } elseif ($periode === 'semua') {
-            // Rekap 6 bulan terakhir s/d bulan ini
+            // Rekap 12 bulan (Januari - Desember) tahun berjalan
             $now = Carbon::now('Asia/Jakarta');
-            for ($m = 5; $m >= 0; $m--) {
-                $monthDate = $now->copy()->subMonths($m)->startOfMonth();
+            $currentYear = $now->year;
+
+            for ($m = 1; $m <= 12; $m++) {
+                $monthDate = Carbon::create($currentYear, $m, 1, 0, 0, 0, 'Asia/Jakarta');
                 $monthKey = $monthDate->format('Y-m');
                 $buckets[$monthKey] = [
-                    'label' => $monthDate->locale('id')->isoFormat('MMM Y'),
+                    'label' => $monthDate->locale('id')->isoFormat('MMM'),
                     'full_label' => $monthDate->locale('id')->isoFormat('MMMM Y'),
                     'revenue' => 0,
                     'qris' => 0,
@@ -307,9 +309,10 @@ class PeriodFilterService
             }
 
             foreach ($orders as $order) {
-                $monthKey = $order->created_at->setTimezone('Asia/Jakarta')->format('Y-m');
+                $orderDate = $order->created_at->setTimezone('Asia/Jakarta');
+                $monthKey = $orderDate->format('Y-m');
                 if (! isset($buckets[$monthKey])) {
-                    $orderMonth = $order->created_at->setTimezone('Asia/Jakarta')->startOfMonth();
+                    $orderMonth = $orderDate->copy()->startOfMonth();
                     $buckets[$monthKey] = [
                         'label' => $orderMonth->locale('id')->isoFormat('MMM Y'),
                         'full_label' => $orderMonth->locale('id')->isoFormat('MMMM Y'),
